@@ -72,7 +72,7 @@ beforeAll(async () => {
     grant select on storage.objects to anon,authenticated;
     grant all on storage.buckets,storage.objects to service_role;
   `);
-  for (const file of ["202610120001_initial.sql", "202610120002_storage.sql", "202610120003_hardening.sql"]) {
+  for (const file of ["202610120001_initial.sql", "202610120002_storage.sql", "202610120003_hardening.sql", "202610120004_confirmation_delivery.sql"]) {
     await db.exec(await readFile(new URL(`../supabase/migrations/${file}`, import.meta.url), "utf8"));
   }
   await db.exec(await readFile(new URL("../supabase/seed.sql", import.meta.url), "utf8"));
