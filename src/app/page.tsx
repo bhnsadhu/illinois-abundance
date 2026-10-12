@@ -16,7 +16,6 @@ export default async function Home() {
 
   return <div className={`container ${styles.home}`}>
     <header className={styles.heading}>
-      <p className={styles.introLabel}>Illinois Abundance · A student publication</p>
       <h1>Champaign Urbana.<br/><span>With room for more.</span></h1>
       <p>Student perspectives on housing, transportation,<br className={styles.desktopBreak}/> and the decisions that shape the place we call home.</p>
       <div className={styles.introActions}><Link className="button" href="/latest">Explore the writing</Link><Link className="text-link" href="/about">Meet Illinois Abundance <ArrowRight size={17}/></Link></div>
