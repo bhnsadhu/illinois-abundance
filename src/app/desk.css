@@ -1,4 +1,6 @@
 /* Review and administration share the same task-focused workspace. */
+.desk-layout h1 { font-family: var(--body); }
+
 .desk-layout {
   padding-block: 24px 64px;
 }
@@ -22,7 +24,7 @@
 .desk-nav > div:first-child {
   padding: 4px;
   border-radius: 999px;
-  background: #e9e9ed;
+  background: var(--soft-cream);
 }
 
 .desk-nav a {
@@ -161,7 +163,7 @@
 
 .status-new { background: var(--orange); }
 .status-published { background: var(--deep-teal); }
-.status-declined, .status-unpublished { background: #8a8a91; }
+.status-declined, .status-unpublished { background: #818879; }
 
 .queue-meta {
   display: flex;
@@ -218,7 +220,7 @@
   margin: 0 0 28px;
   padding: 20px 24px;
   border-radius: 20px;
-  background: #e9e9ed;
+  background: var(--soft-cream);
 }
 
 .original-submission summary {
@@ -292,7 +294,7 @@
   margin-top: 32px;
   padding: 16px;
   border-radius: 24px;
-  background: #ffffffed;
+  background: #fffef8ed;
   box-shadow: 0 4px 32px #1d1d1f16;
 }
 
@@ -312,7 +314,7 @@
   max-height: 240px;
   object-fit: contain;
   border-radius: 20px;
-  background: #e9e9ed;
+  background: var(--soft-cream);
 }
 
 .admin-nav {
@@ -450,7 +452,7 @@
   margin-top: 10px;
   padding: 3px 10px;
   border-radius: 999px;
-  background: #eef3f1;
+  background: var(--soft-teal);
   color: var(--deep-teal);
   font-size: 11px;
   font-weight: 550;
@@ -492,7 +494,7 @@
   margin-top: 40px;
   padding: 28px;
   border-radius: 24px;
-  background: #e9e9ed;
+  background: var(--soft-cream);
 }
 
 .admin-sample-panel h2 { margin-bottom: 10px; }
@@ -583,11 +585,11 @@
 .digest-send-panel > .field-hint { margin-top: 20px; font-size: 12px; }
 
 @supports ((backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px))) {
-  .editor-actions { background: #ffffffbd; backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); }
+  .editor-actions { background: #fffef8e6; backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); }
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .desk-nav a:hover, .admin-nav a:hover { color: var(--ink); background: #fff9; }
+  .desk-nav a:hover, .admin-nav a:hover { color: var(--ink); background: #fffef8cc; }
   .desk-nav a[aria-current]:hover, .admin-nav a[aria-current=page]:hover { background: var(--paper); }
   .admin-record:has(a):hover { background: var(--cream); }
   .admin-next > a:hover, .queue-story:hover h2 { color: var(--deep-teal); }
