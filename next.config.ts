@@ -1,6 +1,11 @@
 import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  outputFileTracingIncludes: {
+    '/post/*/opengraph-image': ['./public/fonts/*.ttf','./public/fonts/*-metrics.json','./public/brand/logo-wordmark-horizontal.png','./public/illustrations/*.svg'],
+    '/post/*/share.png': ['./public/fonts/*.ttf','./public/fonts/*-metrics.json','./public/brand/logo-wordmark-horizontal.png','./public/illustrations/*.svg'],
+    '/opengraph-image': ['./public/fonts/*.ttf','./public/fonts/*-metrics.json','./public/brand/logo-wordmark-horizontal.png','./public/illustrations/*.svg'],
+  },
   async headers() {
     return [{ source: '/:path*', headers: [
       { key: 'X-Content-Type-Options', value: 'nosniff' },
