@@ -6,4 +6,4 @@ export function initials(name: string) { return name.trim().split(/\s+/).slice(0
 export function slugify(value: string) { return value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 90).replace(/-$/, '') || 'a-new-idea'; }
 export function safeUrl(value: string) { try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) ? url.toString() : null; } catch { return null; } }
 export function escapeHtml(value: string) { return value.replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]!)); }
-export function csvCell(value: unknown) { let text = value == null ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value); if (/^[=+@\-\t\r]/.test(text)) text = `'${text}`; return `"${text.replace(/"/g, '""')}"`; }
+export function csvCell(value: unknown) { let text = value == null ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value); if (/^[\s\uFEFF]*[=+@-]|^[\t\r\n]/.test(text)) text = `'${text}`; return `"${text.replace(/"/g, '""')}"`; }
