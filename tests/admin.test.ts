@@ -34,7 +34,7 @@ const admin = { id: adminId, name: 'Site admin', email: adminEmail, isAdmin: tru
 const missingId = '70000000-0000-4000-8000-000000000099';
 const topicId = '10000000-0000-4000-8000-000000000001';
 const fixtures = {
-  reviewers: { email: 'new-reviewer@illinois.edu', name: 'New Reviewer', is_active: true },
+  reviewers: { email: 'new-reviewer@illinois.edu', name: 'New Reviewer', is_active: true, password: 'Reviewer password 2026' },
   topics: { slug: 'better-places', name: 'Better places', description: '', sort_order: 0, is_active: true },
   events: { slug: 'housing-teach-in', title: 'Housing teach in', description: '', starts_at: '2026-11-01T18:00:00-06:00', ends_at: null, location: 'Campus library', rsvp_url: null, recap_post_id: null, is_published: true },
   writers: { slug: 'new-writer', name: 'New Writer', bio: '' },

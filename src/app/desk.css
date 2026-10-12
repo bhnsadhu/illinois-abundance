@@ -643,3 +643,5 @@
   .editor-actions { background: var(--paper); backdrop-filter: none; -webkit-backdrop-filter: none; outline: 1px solid currentColor; }
   .desk-nav a[aria-current], .admin-nav a[aria-current=page], .admin-record-state { outline: 1px solid currentColor; }
 }
+
+.password-form { max-width: 560px; }

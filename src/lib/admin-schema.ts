@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { emailSchema } from './validation';
+import { passwordSchema } from './password-schema';
 
 const slug = z.string().trim().min(1).max(160).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Use lowercase words separated by hyphens for the link.');
 const dateTime = z.iso.datetime({ offset: true });
@@ -14,7 +15,8 @@ export const adminMutationSchema = z.object({
 export const subscriberRemovalSchema = z.object({ email: emailSchema }).strict();
 
 const schemas = {
-  reviewers: z.object({ email: emailSchema, name: z.string().trim().min(1).max(160), is_active: z.boolean() }).strict(),
+  reviewers: z.object({ email: emailSchema, name: z.string().trim().min(1).max(160), is_active: z.boolean(),
+    password: z.union([passwordSchema, z.literal('')]).optional() }).strict(),
   topics: z.object({ slug, name: z.string().trim().min(1).max(80), description: z.string().trim().max(600), sort_order: z.number().int().min(-10000).max(10000), is_active: z.boolean() }).strict(),
   events: z.object({
     slug, title: z.string().trim().min(1).max(200), description: z.string().trim().max(10000), starts_at: dateTime,
@@ -40,5 +42,7 @@ const createDefaults: Record<EditableAdminResource, Record<string, unknown>> = {
 
 /** Defaults apply only to new records; edits must send the full editable form. */
 export function parseAdminValues(resource: EditableAdminResource, values: Record<string, unknown>, updating: boolean): Record<string, unknown> {
-  return schemas[resource].parse(updating ? values : { ...createDefaults[resource], ...values });
+  const parsed = schemas[resource].parse(updating ? values : { ...createDefaults[resource], ...values });
+  if (resource === 'reviewers' && !updating) passwordSchema.parse((parsed as {password?: string}).password ?? '');
+  return parsed;
 }

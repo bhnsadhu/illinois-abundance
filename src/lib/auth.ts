@@ -15,7 +15,6 @@ export const reviewerCookieOptions = () => ({
   secure: process.env.NODE_ENV === 'production' || site.url.startsWith('https://'),
   maxAge: REVIEWER_SESSION_SECONDS,
 });
-export const hashLoginToken = (token: string) => privateHash(`reviewer-login:${token}`);
 export const hashSessionToken = (token: string) => privateHash(`reviewer-session:${token}`);
 
 export async function getReviewer(): Promise<Reviewer | null> {
@@ -31,18 +30,9 @@ export async function getReviewer(): Promise<Reviewer | null> {
     // current membership list, not cached claims, grants editorial permissions.
     const email = String(session.email).trim().toLowerCase();
     const isAdmin = Boolean(process.env.ADMIN_EMAIL?.trim()) && email === process.env.ADMIN_EMAIL?.trim().toLowerCase();
-    if (isAdmin) {
-      const existing = await db.from<ReviewerRow>('reviewers').select('id,name,email,is_active').eq('email', email).maybeSingle();
-      if (existing.error) return null;
-      if (existing.data?.is_active) return { id: existing.data.id, name: existing.data.name, email, isAdmin: true };
-      const { data, error: createError } = await db.from<ReviewerRow>('reviewers')
-        .upsert({ email, name: existing.data?.name || 'Site admin', is_active: true }, { onConflict: 'email' })
-        .select('id,name,email,is_active').single();
-      return !createError && data ? { id: data.id, name: data.name, email, isAdmin: true } : null;
-    }
     const { data, error: lookupError } = await db.from<ReviewerRow>('reviewers').select('id,name,email,is_active')
       .eq('email', email).eq('is_active', true).maybeSingle();
-    return !lookupError && data ? { id: data.id, name: data.name, email, isAdmin: false } : null;
+    return !lookupError && data ? { id: data.id, name: data.name, email, isAdmin } : null;
   } catch { return null; }
 }
 
@@ -52,7 +42,8 @@ export async function requireReviewer(): Promise<Reviewer> {
   return reviewer;
 }
 export async function requireAdmin(): Promise<Reviewer> {
-  const reviewer = await requireReviewer();
+  const reviewer = await getReviewer();
+  if (!reviewer) redirect('/login/admin');
   if (!reviewer.isAdmin) redirect('/review');
   return reviewer;
 }

@@ -1,4 +1,32 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
-import {ArrowRight,Mail} from './icons';
-export function LoginForm(){const [busy,setBusy]=useState(false);const [sent,setSent]=useState(false);const [error,setError]=useState('');const heading=useRef<HTMLHeadingElement>(null);useEffect(()=>{if(sent)heading.current?.focus();},[sent]);async function submit(event:React.FormEvent<HTMLFormElement>){event.preventDefault();setBusy(true);setError('');const data=new FormData(event.currentTarget);try{const response=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:data.get('email'),website:data.get('website')})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Please try again in a moment.');setSent(true);}catch(error){setError(error instanceof Error?error.message:'Please try again.');}finally{setBusy(false);}}return sent?<div className="form-card" role="status"><Mail size={30}/><h2 ref={heading} tabIndex={-1} className="login-sent-title">Check your inbox.</h2><p>If you’re on the review team, a sign in link is on its way. Open it to get back to the desk.</p><p className="muted">Check your spam folder if it hasn’t arrived.</p><button className="text-button" onClick={()=>setSent(false)}>Try another email</button></div>:<form className="form-card" onSubmit={submit}><label>Email address<input name="email" type="email" autoComplete="email" autoCapitalize="none" placeholder="Your reviewer email" required/></label><div className="honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off"/></label></div>{error&&<p className="alert alert-error" role="alert">{error}</p>}<button className="button full-width" disabled={busy}>{busy?'Sending your link…':'Send a sign in link'}<ArrowRight size={17}/></button><p className="consent-copy login-note">For the review team. Just a link in your inbox.</p></form>;}
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { ArrowRight } from './icons';
+
+export function LoginForm({ role = 'reviewer' }: { role?: 'admin' | 'reviewer' }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setBusy(true); setError('');
+    const data = new FormData(event.currentTarget);
+    try {
+      const response = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.get('email'), password: data.get('password'), role, website: data.get('website') }) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Please try again in a moment.');
+      router.replace(result.redirect === '/admin' ? '/admin' : '/review');
+      router.refresh();
+    } catch (error) { setError(error instanceof Error ? error.message : 'Please try again.'); setBusy(false); }
+  }
+  return <form className="form-card" onSubmit={submit}>
+    <label>Email address<input name="email" type="email" autoComplete="username" autoCapitalize="none" maxLength={254} placeholder={role === 'admin' ? 'Your admin email' : 'Your reviewer email'} required/></label>
+    <label>Password<input name="password" type="password" autoComplete="current-password" maxLength={128} required/></label>
+    <div className="honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off"/></label></div>
+    {error && <p className="alert alert-error" role="alert">{error}</p>}
+    <button className="button full-width" disabled={busy}>{busy ? 'Signing in…' : role === 'admin' ? 'Sign in as admin' : 'Sign in as reviewer'}<ArrowRight size={17}/></button>
+    <p className="consent-copy login-note">{role === 'reviewer' ? 'Use the email and password your admin gave you. Ask your admin if you need a password reset.' : 'Use your admin email and password.'}</p>
+    <p className="login-note"><Link className="text-link" href={role === 'admin' ? '/login' : '/login/admin'}>{role === 'admin' ? 'Reviewer sign in' : 'Admin sign in'}</Link></p>
+  </form>;
+}

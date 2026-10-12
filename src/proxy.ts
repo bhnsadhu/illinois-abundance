@@ -19,5 +19,5 @@ export function proxy(request: NextRequest) {
   return response;
 }
 export const config = {
-  matcher: ['/review/:path*', '/admin/:path*', '/auth/callback', '/api/review/:path*', '/api/admin/:path*', '/api/covers', '/api/logout', '/subscribe/confirm', '/unsubscribe'],
+  matcher: ['/account/:path*', '/api/account/:path*', '/login/:path*', '/api/login', '/review/:path*', '/admin/:path*', '/auth/callback', '/api/review/:path*', '/api/admin/:path*', '/api/covers', '/api/logout', '/subscribe/confirm', '/unsubscribe'],
 };

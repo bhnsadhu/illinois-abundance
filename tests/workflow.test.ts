@@ -7,7 +7,7 @@ import Home from '@/app/page';
 import { POST as submit } from '@/app/api/submissions/route';
 import { POST as verify } from '@/app/api/submissions/verify/route';
 import { POST as login } from '@/app/api/login/route';
-import { GET as callback } from '@/app/auth/callback/route';
+import { hashPassword } from '@/lib/passwords';
 import { POST as review } from '@/app/api/review/[id]/route';
 import { REVIEWER_COOKIE } from '@/lib/auth';
 import { SUBMISSION_COOKIE } from '@/lib/submissions';
@@ -79,7 +79,7 @@ beforeAll(async () => {
   const directory = new URL('../db/migrations/', import.meta.url);
   for (const file of (await readdir(directory)).filter(file => file.endsWith('.sql')).sort()) await db.exec(await readFile(new URL(file, directory), 'utf8'));
   await db.exec(await readFile(new URL('../db/seed.sql', import.meta.url), 'utf8'));
-  await db.query('insert into reviewers(id,email,name) values($1,$2,$3)', ['70000000-0000-4000-8000-000000000019', 'editor@illinois.edu', 'Workflow Editor']);
+  await db.query('insert into reviewers(id,email,name,password_hash) values($1,$2,$3,$4)', ['70000000-0000-4000-8000-000000000019', 'editor@illinois.edu', 'Workflow Editor', await hashPassword('Workflow password 2026')]);
 }, 30000);
 afterAll(async () => { await queue; await db.close(); vi.unstubAllEnvs(); });
 
@@ -108,12 +108,11 @@ it('takes a real submission through verification and review into public Home HTM
   expect(renderToStaticMarkup(await Home())).not.toContain('PRIVATE ORIGINAL');
   expect((await publicDatabase()!.from('public_posts').select('*')).data).toEqual([]);
 
-  // Enter through the real passwordless login and session lookup, too.
-  expect((await login(request('/api/login', { email: 'editor@illinois.edu' }))).status).toBe(200);
-  const loginEmail = mocks.sendEmail.mock.calls[2][0] as { text: string };
-  const url = loginEmail.text.match(/https?:\/\/\S+\/auth\/callback\?token=[a-f0-9]+/)![0];
-  const signedIn = await callback(new NextRequest(url));
-  expect(new URL(signedIn.headers.get('location')!).pathname).toBe('/review');
+  // Enter through real password verification and session lookup, too.
+  const signedIn = await login(request('/api/login', { email: 'editor@illinois.edu', password: 'Workflow password 2026', role: 'reviewer' }));
+  expect(signedIn.status).toBe(200);
+  expect(await signedIn.json()).toEqual({ ok: true, redirect: '/review' });
+  expect(mocks.sendEmail).toHaveBeenCalledTimes(2);
   const session = signedIn.cookies.get(REVIEWER_COOKIE)!;
   mocks.cookieGet.mockImplementation((name: string) => name === REVIEWER_COOKIE ? session : undefined);
 

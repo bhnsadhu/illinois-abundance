@@ -12,7 +12,8 @@
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "migrate": "node --env-file=.env.local --import tsx scripts/migrate.ts",
     "seed": "node --env-file=.env.local --import tsx scripts/seed.ts",
-    "test:db": "vitest run tests/database.test.ts"
+    "test:db": "vitest run tests/database.test.ts",
+    "setup:admin": "node --env-file=.env.local --import tsx scripts/setup-admin.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

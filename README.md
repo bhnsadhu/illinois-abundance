@@ -2,9 +2,9 @@
 
 Student writing on local policy in Champaign Urbana. Readers need no account. Students verify an Illinois email before submitting; reviewers edit and publish; one configured admin manages the site and sends the optional digest.
 
-Live site: **https://abundance.bhanusadhu.com**. The initial deployment includes clearly labeled sample content. The configured admin signs in at `/login` with `bhnsadhu@gmail.com`.
+Live site: **https://abundance.bhanusadhu.com**. The initial deployment includes clearly labeled sample content. The configured admin signs in at `/login/admin` with `bhnsadhu@gmail.com`.
 
-Built with Next.js 16, React 19, TypeScript, Neon Postgres, private Vercel Blob storage, and Resend. Passwordless reviewer authentication is implemented by the app using database-backed, single-use links and sessions.
+Built with Next.js 16, React 19, TypeScript, Neon Postgres, private Vercel Blob storage, and Resend. Admin and reviewer authentication uses salted scrypt password hashes and database-backed sessions.
 
 ## Run locally
 
@@ -75,7 +75,13 @@ Cover uploads accept still JPG, PNG, WebP, or AVIF images up to **4 MB**, requir
 
 ## Review and administration
 
-Open `/login` and request a link for `ADMIN_EMAIL`. Links expire after 15 minutes and work once; sessions last seven days. Current roster membership is checked on every private request. Use `/admin/reviewers` to add or deactivate reviewers, who then sign in through the same page. There are no reader accounts or passwords.
+The footer has separate **Admin sign in** (`/login/admin`) and **Reviewer sign in** (`/login`) links. The configured `ADMIN_EMAIL` is the only admin. Use `/admin/reviewers` to create a reviewer with a name, email, and initial password; share those credentials directly. There is no public signup or login email. Existing reviewers need an admin-assigned password before they can use password sign-in.
+
+Passwords must be 12–128 characters and are stored only as salted scrypt hashes. When editing a reviewer, leave Password blank to keep it or enter a new one to reset it. Admins change their own password through **Change password** (`/account`), as can reviewers. This requires the current password and confirmation of the new one. Changing your password signs out other sessions; an admin reset, email change, deactivation, or deletion revokes all affected sessions. Sessions expire after seven days and current roster membership is checked on every private request.
+
+To initialize the admin after applying migrations, supply `ADMIN_INITIAL_PASSWORD` only to the `npm run setup:admin` process through your local secret manager or a hidden shell prompt. The script preserves an existing password. For a forgotten admin password, run `npm run setup:admin -- --reset` with a newly supplied password. Neither the plaintext nor hash is logged; never commit an initial password. There is no automatic fallback to a default password after a user changes theirs.
+
+The password migration retires existing email login links. Roll it out together with this application version and initialize the admin before opening sign-in to users. Test migrations on an isolated database branch first. Readers continue without accounts.
 
 In `/review`, claim a submission, email the author from your own inbox, and paste the agreed final version. Publishing requires a headline, short version, body, byline, and active topic. Revision checks prevent a second reviewer from silently overwriting a concurrent edit. Editing the published version leaves the original unchanged. To honor a removal request, **unpublish** it and confirm the public link is no longer available.
 
@@ -91,13 +97,13 @@ The preview is signed and expires after 30 minutes. Each send saves a content sn
 
 On a mail outage, use **Retry remaining deliveries**. Do not delete delivery logs or create another campaign merely to bypass a failed send. Stable provider keys protect retries after an interrupted response. Resend retains those keys for [24 hours](https://resend.com/changelog/idempotency-keys), so an unresolved attempt older than 23 hours is held as **uncertain**. A maintainer must compare the private delivery log with Resend's records before resolving that state; blindly resetting it can send duplicates. A busy batch lease clears after two minutes if its request dies.
 
-Application emails are submission codes, submission receipts, reviewer login links, subscription confirmation, and manually requested digests. Author/reviewer editorial correspondence happens outside the app. Finishing or pausing outstanding digest jobs before changing the sending identity or domain keeps retry payloads consistent.
+Application emails are submission codes, submission receipts, subscription confirmation, and manually requested digests. Author/reviewer editorial correspondence happens outside the app. Finishing or pausing outstanding digest jobs before changing the sending identity or domain keeps retry payloads consistent.
 
 ## Privacy and recovery
 
 Public database reads use explicit views inside a transaction that assumes the `anon` role. Row-level security restricts published rows. Author email, original body, claim information, internal notes, subscribers, and delivery logs are excluded from public responses, feeds, search, and generated share images. Server mutations use the owner connection after authorization, validation, origin checks, and distributed rate limits. That owner credential is powerful and must remain private.
 
-The private original-submission table has update, deletion, and truncation guards. Published text remains editable, and sample cleanup can remove only marked samples. Database ownership can alter these protections, so preserving the archive also requires access control and backups. Raw verification codes and reviewer login/session tokens are not stored; subscribers retain their email, confirmation time, and opaque unsubscribe token. Private delivery logs track digest progress.
+The private original-submission table has update, deletion, and truncation guards. Published text remains editable, and sample cleanup can remove only marked samples. Database ownership can alter these protections, so preserving the archive also requires access control and backups. Raw verification codes, passwords, and reviewer session tokens are not stored; subscribers retain their email, confirmation time, and opaque unsubscribe token. Private delivery logs track digest progress.
 
 Views are **estimates**, deduplicated per article and UTC day using a salted hash of the trusted platform IP and user-agent string. Raw values are not stored. Shared networks and identical browsers can undercount; changed networks or clients can overcount. There is no third-party analytics script or cross-day reader profile. Local development shares one rate-limit IP bucket.
 

@@ -2,245 +2,231 @@ import { readFile, readdir } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
 import { NextRequest } from 'next/server';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getReviewer, hashLoginToken, hashSessionToken, requireAdmin, requireReviewer, REVIEWER_COOKIE } from '@/lib/auth';
+import { getReviewer, hashSessionToken, requireAdmin, requireReviewer, REVIEWER_COOKIE } from '@/lib/auth';
+import { hashPassword, verifyPassword } from '@/lib/passwords';
 import { POST as login } from '@/app/api/login/route';
+import { POST as changePassword } from '@/app/api/account/password/route';
+import { POST as adminMutation } from '@/app/api/admin/[resource]/route';
 import { GET as callback } from '@/app/auth/callback/route';
 import { POST as logout } from '@/app/api/logout/route';
 import { proxy } from '@/proxy';
 import { site } from '@/lib/config';
 
-const mocks = vi.hoisted(() => ({ sendEmail: vi.fn(), cookieGet: vi.fn(), cookieSet: vi.fn() }));
-vi.mock('resend', () => ({ Resend: class { emails = { send: mocks.sendEmail }; } }));
+const mocks = vi.hoisted(() => ({ cookieGet: vi.fn(), cookieSet: vi.fn() }));
 vi.mock('next/headers', () => ({ cookies: async () => ({ get: mocks.cookieGet, set: mocks.cookieSet }) }));
-vi.mock('@/lib/database/service', () => ({ serviceDatabase: () => databaseAdapter() }));
-
+vi.mock('next/cache', () => ({ revalidateTag: vi.fn(), revalidatePath: vi.fn() }));
 let db: PGlite;
-let databaseCalls = 0;
 let unavailable = false;
+let databaseCalls = 0;
+// Use the real SQL adapter against an isolated Postgres engine.
+vi.mock('@neondatabase/serverless', () => ({ neon: () => ({
+  async query(text: string, values: unknown[] = []) {
+    databaseCalls++;
+    if (unavailable) throw new Error('Private connection details');
+    await db.exec('savepoint http_query');
+    try {
+      const result = await db.query(text, values);
+      await db.exec('release savepoint http_query');
+      return { rows: result.rows, rowCount: result.affectedRows ?? result.rows.length };
+    } catch (error) {
+      await db.exec('rollback to savepoint http_query; release savepoint http_query');
+      throw error;
+    }
+  },
+}) }));
 const reviewerEmail = 'reviewer@illinois.edu';
 const adminEmail = 'owner@example.test';
 const reviewerId = '70000000-0000-4000-8000-000000000001';
+const adminId = '70000000-0000-4000-8000-000000000002';
+const password = 'Initial password 2026';
+const replacement = 'My new password 2026';
 const sessionToken = 'a'.repeat(64);
-
-type Result = { data: unknown; error: { code: string } | null };
-function databaseAdapter() {
-  return {
-    async rpc(name: string, args: Record<string, unknown>): Promise<Result> {
-      databaseCalls++;
-      if (unavailable) return { data: null, error: { code: 'UNAVAILABLE' } };
-      const pairs = Object.entries(args);
-      const result = await db.query<{ result: unknown }>(`select public.${name}(${pairs.map(([key], index) => `${key} => $${index + 1}`).join(',')}) as result`, pairs.map(([, value]) => value));
-      return { data: result.rows[0].result, error: null };
-    },
-    from(table: string) {
-      if (!['reviewers', 'login_tokens', 'reviewer_sessions'].includes(table)) throw new Error('Unexpected auth table');
-      let operation = 'select';
-      let values: Record<string, unknown> = {};
-      let columns = '*';
-      const filters: { name: string; operator: string; value: unknown }[] = [];
-      const execute = async (single = false): Promise<Result> => {
-        databaseCalls++;
-        if (unavailable) return { data: null, error: { code: 'UNAVAILABLE' } };
-        const params: unknown[] = [];
-        const where = filters.length ? ` where ${filters.map(filter => { params.push(filter.value); return `${filter.name} ${filter.operator} $${params.length}`; }).join(' and ')}` : '';
-        let sql: string;
-        if (operation === 'select') sql = `select ${columns} from public.${table}${where}`;
-        else if (operation === 'delete') sql = `delete from public.${table}${where} returning *`;
-        else {
-          const keys = Object.keys(values);
-          params.push(...Object.values(values));
-          sql = `insert into public.${table}(${keys.join(',')}) values(${params.map((_, i) => `$${i + 1}`).join(',')})`;
-          if (operation === 'upsert') sql += ' on conflict(email) do update set name=excluded.name,is_active=excluded.is_active';
-          sql += ` returning ${columns}`;
-        }
-        const result = await db.query(sql, params);
-        return { data: single ? result.rows[0] ?? null : result.rows, error: null };
-      };
-      const query = {
-        select: (selected: string) => { columns = selected; return query; },
-        eq: (name: string, value: unknown) => { filters.push({ name, operator: '=', value }); return query; },
-        gt: (name: string, value: unknown) => { filters.push({ name, operator: '>', value }); return query; },
-        insert: (input: Record<string, unknown>) => { operation = 'insert'; values = input; return query; },
-        upsert: (input: Record<string, unknown>) => { operation = 'upsert'; values = input; return query; },
-        delete: () => { operation = 'delete'; return query; },
-        maybeSingle: () => execute(true), single: () => execute(true),
-        then: (resolve: (result: Result) => unknown, reject?: (error: unknown) => unknown) => execute().then(resolve, reject),
-      };
-      return query;
-    },
-  };
-}
-
+let initialHash: string;
 function post(path: string, input: unknown = {}, headers: Record<string, string> = {}) {
   return new NextRequest(new URL(path, site.url), { method: 'POST', headers: { origin: new URL(site.url).origin, 'content-type': 'application/json', ...headers }, body: JSON.stringify(input) });
+}
+function signIn(email = reviewerEmail, secret = password, role = 'reviewer') {
+  return login(post('/api/login', { email, password: secret, role }));
 }
 async function createSession(email = reviewerEmail, expires = new Date(Date.now() + 3600000).toISOString()) {
   await db.query('insert into reviewer_sessions(token_hash,email,expires_at) values($1,$2,$3)', [hashSessionToken(sessionToken), email, expires]);
   mocks.cookieGet.mockReturnValue({ name: REVIEWER_COOKIE, value: sessionToken });
 }
-async function requestLink(email = reviewerEmail) {
-  const response = await login(post('/api/login', { email }));
-  expect(response.status).toBe(200);
-  const message = mocks.sendEmail.mock.calls.at(-1)![0] as { text: string; html: string };
-  const url = message.text.match(/https?:\/\/\S+\/auth\/callback\?token=[a-f0-9]+/)![0];
-  return { response, url, token: new URL(url).searchParams.get('token')! };
+function change(currentPassword = password, newPassword = replacement, confirmPassword = newPassword) {
+  return changePassword(post('/api/account/password', { currentPassword, newPassword, confirmPassword }));
 }
-
+async function resetByAdmin(values: Record<string, unknown>, id?: string) {
+  return adminMutation(post('/api/admin/reviewers', { action: 'save', id, values }), { params: Promise.resolve({ resource: 'reviewers' }) });
+}
 beforeAll(async () => {
+  initialHash = await hashPassword(password);
   db = new PGlite();
   const directory = new URL('../db/migrations/', import.meta.url);
   for (const file of (await readdir(directory)).filter(file => file.endsWith('.sql')).sort()) await db.exec(await readFile(new URL(file, directory), 'utf8'));
 }, 30000);
 beforeEach(async () => {
   await db.exec('begin');
-  await db.query('insert into reviewers(id,email,name) values($1,$2,$3)', [reviewerId, reviewerEmail, 'Approved Reviewer']);
+  await db.query('insert into reviewers(id,email,name,password_hash) values($1,$2,$3,$4),($5,$6,$7,$4)', [reviewerId, reviewerEmail, 'Approved Reviewer', initialHash, adminId, adminEmail, 'Site admin']);
   databaseCalls = 0; unavailable = false;
   vi.stubEnv('DATABASE_URL', 'postgresql://test-only.invalid/never-connect');
-  vi.stubEnv('ADMIN_EMAIL', adminEmail); vi.stubEnv('RESEND_API_KEY', 'test-only-mail-key');
-  vi.stubEnv('MAIL_FROM', 'Illinois Abundance <test@example.test>'); vi.stubEnv('CODE_PEPPER', 'test-pepper-longer-than-thirty-two-characters');
+  vi.stubEnv('ADMIN_EMAIL', adminEmail);
+  vi.stubEnv('RESEND_API_KEY', '');
+  vi.stubEnv('CODE_PEPPER', 'test-pepper-longer-than-thirty-two-characters');
   mocks.cookieGet.mockReset().mockReturnValue(undefined); mocks.cookieSet.mockReset();
-  mocks.sendEmail.mockReset().mockResolvedValue({ data: { id: 'mail-test-id' }, error: null });
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 afterEach(async () => { await db.exec('rollback; reset role'); vi.unstubAllEnvs(); vi.restoreAllMocks(); });
 afterAll(async () => { await db.close(); });
 
-describe('Neon passwordless reviewer authentication', () => {
-  it('gives unknown and revoked addresses generic success without issuing a token or email', async () => {
-    expect(await (await login(post('/api/login', { email: 'unknown@example.test' }))).json()).toEqual({ ok: true });
-    await db.query('update reviewers set is_active=false where id=$1', [reviewerId]);
-    expect(await (await login(post('/api/login', { email: reviewerEmail }))).json()).toEqual({ ok: true });
-    expect((await db.query('select * from login_tokens')).rows).toHaveLength(0);
-    expect(mocks.sendEmail).not.toHaveBeenCalled();
+describe('password authentication and account lifecycle', () => {
+  it('uses unique salted hashes, preserves spaces, and rejects missing or malformed hashes', async () => {
+    const spaced = ` ${password} `;
+    const first = await hashPassword(spaced);
+    const second = await hashPassword(spaced);
+    expect(first).not.toBe(second); expect(first).not.toContain(password);
+    expect(await verifyPassword(spaced, first)).toBe(true);
+    for (const [input, hash] of [[password, first], [spaced, null], [spaced, 'corrupt']]) expect(await verifyPassword(input!, hash)).toBe(false);
   });
-
-  it('stores only a purpose-separated hash, sends a branded fixed callback, and expires links in 15 minutes', async () => {
-    const { response, url, token } = await requestLink();
-    expect(await response.json()).toEqual({ ok: true });
-    expect(token).toMatch(/^[a-f0-9]{64}$/);
-    const record = (await db.query<{ token_hash: string; ttl: number }>('select token_hash,extract(epoch from expires_at-created_at)::integer as ttl from login_tokens')).rows[0];
-    expect(record.token_hash).toBe(hashLoginToken(token)); expect(record.token_hash).not.toBe(token);
-    expect(record.token_hash).not.toBe(hashSessionToken(token)); expect(record.ttl).toBeGreaterThanOrEqual(899); expect(record.ttl).toBeLessThanOrEqual(901);
-    expect(new URL(url).origin).toBe(new URL(site.url).origin);
-    expect(mocks.sendEmail.mock.calls[0][0].html).toContain('/brand/logo-wordmark-horizontal.png');
-  });
-
-  it('consumes a link only once and creates exactly one seven-day session when callbacks overlap', async () => {
+  it('signs in with a normalized email without email delivery and stores only a seven-day session hash', async () => {
     vi.stubEnv('NODE_ENV', 'production');
-    const { url } = await requestLink();
-    const responses = await Promise.all([callback(new NextRequest(url)), callback(new NextRequest(url))]);
-    expect(responses.filter(value => new URL(value.headers.get('location')!).pathname === '/review')).toHaveLength(1);
-    expect(responses.filter(value => value.headers.get('set-cookie'))).toHaveLength(1);
-    const successful = responses.find(value => value.headers.get('set-cookie'))!;
-    expect(successful.headers.get('set-cookie')).toContain('HttpOnly'); expect(successful.headers.get('set-cookie')).toContain('Secure'); expect(successful.headers.get('set-cookie')).toMatch(/SameSite=lax/i);
-    expect(successful.headers.get('set-cookie')).toContain('Max-Age=604800');
-    const rawSession = successful.cookies.get(REVIEWER_COOKIE)!.value;
-    const sessions = (await db.query<{ token_hash: string; ttl: number }>('select token_hash,extract(epoch from expires_at-created_at)::integer as ttl from reviewer_sessions')).rows;
-    expect(sessions).toEqual([{ token_hash: hashSessionToken(rawSession), ttl: 604800 }]);
-    expect(successful.headers.get('referrer-policy')).toBe('no-referrer');
-  });
-
-  it('rejects expired and revoked links and ignores open-redirect parameters', async () => {
-    const first = await requestLink();
-    await db.exec("update login_tokens set expires_at=now()-interval '1 second'");
-    expect((await callback(new NextRequest(first.url))).headers.get('location')).toBe(new URL('/login?error=expired', site.url).href);
-    await db.exec('delete from rate_limits');
-    const second = await requestLink();
-    await db.query('update reviewers set is_active=false where id=$1', [reviewerId]);
-    expect((await callback(new NextRequest(second.url))).headers.get('location')).toBe(new URL('/login?error=expired', site.url).href);
-    expect((await db.query('select * from reviewer_sessions')).rows).toHaveLength(0);
-    await db.query('update reviewers set is_active=true where id=$1', [reviewerId]);
-    await db.exec('delete from rate_limits');
-    const third = await requestLink();
-    expect((await callback(new NextRequest(`${third.url}&next=https://evil.example`))).headers.get('location')).toBe(new URL('/review', site.url).href);
-  });
-
-  it('reads hashed server sessions and current membership, never identity supplied in a cookie', async () => {
-    mocks.cookieGet.mockReturnValue({ name: REVIEWER_COOKIE, value: JSON.stringify({ email: adminEmail }) });
-    expect(await getReviewer()).toBeNull(); expect(databaseCalls).toBe(0);
-    await createSession();
-    expect(await getReviewer()).toEqual({ id: reviewerId, email: reviewerEmail, name: 'Approved Reviewer', isAdmin: false });
-    await db.query('update reviewers set is_active=false where id=$1', [reviewerId]);
-    expect(await getReviewer()).toBeNull();
-  });
-
-  it('rejects expired sessions and database failures', async () => {
-    await createSession(reviewerEmail, new Date(Date.now() - 1000).toISOString());
-    expect(await getReviewer()).toBeNull();
-    await db.exec("update reviewer_sessions set expires_at=now()+interval '1 day'");
-    unavailable = true; expect(await getReviewer()).toBeNull();
-  });
-
-  it('recognizes only the exact environment admin and bootstraps its reviewer row', async () => {
-    const { url } = await requestLink(adminEmail);
-    const response = await callback(new NextRequest(url));
-    expect(new URL(response.headers.get('location')!).pathname).toBe('/review');
+    const response = await signIn('REVIEWER@illinois.edu');
+    expect(await response.json()).toEqual({ ok: true, redirect: '/review' });
+    const cookie = response.headers.get('set-cookie')!;
+    expect(cookie).toContain('HttpOnly'); expect(cookie).toContain('Secure'); expect(cookie).toMatch(/SameSite=lax/i);
+    expect(cookie).toContain('Max-Age=604800');
     const raw = response.cookies.get(REVIEWER_COOKIE)!.value;
-    mocks.cookieGet.mockReturnValue({ name: REVIEWER_COOKIE, value: raw });
-    expect(await getReviewer()).toMatchObject({ email: adminEmail, isAdmin: true });
-    expect((await db.query('select is_active from reviewers where email=$1', [adminEmail])).rows).toEqual([{ is_active: true }]);
+    const sessions = (await db.query('select token_hash,extract(epoch from expires_at-created_at)::integer as ttl from reviewer_sessions')).rows;
+    expect(sessions).toEqual([{ token_hash: hashSessionToken(raw), ttl: 604800 }]);
+    mocks.cookieGet.mockReturnValue({ value: raw });
+    expect(await getReviewer()).toEqual({ id: reviewerId, email: reviewerEmail, name: 'Approved Reviewer', isAdmin: false });
+  });
+  it('gives the same failure for wrong passwords, unknown emails, revoked accounts, and wrong admin role', async () => {
+    const responses = [await signIn(reviewerEmail, 'wrong'), await signIn('unknown@example.test'), await signIn(reviewerEmail, password, 'admin')];
+    await db.query('update reviewers set is_active=false where id=$1', [reviewerId]);
+    responses.push(await signIn());
+    for (const response of responses) {
+      expect(response.status).toBe(401); expect(response.headers.get('set-cookie')).toBeNull();
+      expect(await response.json()).toEqual({ error: 'Email or password is incorrect for this sign in.' });
+    }
+    expect((await db.query('select * from reviewer_sessions')).rows).toHaveLength(0);
+  });
+  it('grants admin permissions only to the exact configured email and redirects each role', async () => {
+    const response = await signIn(adminEmail, password, 'admin');
+    expect(await response.json()).toEqual({ ok: true, redirect: '/admin' });
+    mocks.cookieGet.mockReturnValue({ value: response.cookies.get(REVIEWER_COOKIE)!.value });
     expect(await requireAdmin()).toMatchObject({ isAdmin: true });
     vi.stubEnv('ADMIN_EMAIL', `not-${adminEmail}`);
     expect(await getReviewer()).toMatchObject({ isAdmin: false });
-  });
-
-  it('redirects missing sessions to login and keeps reviewers out of admin pages', async () => {
-    await expect(requireReviewer()).rejects.toThrow('NEXT_REDIRECT');
-    await createSession();
     await expect(requireAdmin()).rejects.toThrow('NEXT_REDIRECT');
+    mocks.cookieGet.mockReturnValue(undefined);
+    await expect(requireReviewer()).rejects.toThrow('NEXT_REDIRECT');
   });
-
-  it('enforces origin, honeypot, body caps, and shared email/IP/cooldown limits before delivery', async () => {
-    expect((await login(post('/api/login', { email: reviewerEmail }, { origin: 'https://evil.example' }))).status).toBe(403);
-    expect((await login(post('/api/login', { email: reviewerEmail, website: 'spam' }))).status).toBe(400);
-    expect((await login(post('/api/login', { email: reviewerEmail, extra: 'x'.repeat(5000) }))).status).toBe(413);
-    expect(databaseCalls).toBe(0);
-    await requestLink();
-    expect((await login(post('/api/login', { email: reviewerEmail }))).status).toBe(429);
-    expect((await db.query('select count(*)::integer as total from rate_limits')).rows[0]).toEqual({ total: 3 });
-    expect(mocks.sendEmail).toHaveBeenCalledTimes(1);
-  });
-
-  it('keeps login/session rows and token-consumption RPC private to the backend', async () => {
-    await requestLink();
-    await createSession();
-    await db.exec('set role anon');
-    for (const sql of ['select * from login_tokens', 'select * from reviewer_sessions', "select consume_login(repeat('a',64),repeat('b',64),null)"]) {
-      await db.exec('savepoint denied'); await expect(db.query(sql)).rejects.toThrow(/permission denied/); await db.exec('rollback to savepoint denied');
+  it('changes either role’s password, rotates the current session, and rejects the old password', async () => {
+    for (const email of [reviewerEmail, adminEmail]) {
+      await db.exec('delete from reviewer_sessions');
+      await createSession(email);
+      const response = await change();
+      expect(await response.json()).toEqual({ ok: true });
+      const raw = response.cookies.get(REVIEWER_COOKIE)!.value;
+      expect(raw).not.toBe(sessionToken);
+      expect((await db.query('select token_hash,email from reviewer_sessions')).rows).toEqual([{ token_hash: hashSessionToken(raw), email }]);
+      expect(await getReviewer()).toBeNull();
+      mocks.cookieGet.mockReturnValue({ value: raw });
+      expect(await getReviewer()).toMatchObject({ email });
+      expect((await signIn(email)).status).toBe(401);
+      expect((await signIn(email, replacement)).status).toBe(200);
     }
   });
-
-  it('deletes the server session on logout and clears the protected cookie', async () => {
+  it('requires a session, current password, matching confirmation, length limits, and same origin for changes', async () => {
+    expect((await change()).status).toBe(401);
+    await createSession();
+    for (const response of [await change('wrong'), await change(password, replacement, 'mismatch'), await change(password, 'short'), await change(password, password)]) expect(response.status).toBe(400);
+    expect((await changePassword(post('/api/account/password', {}, { origin: 'https://evil.example' }))).status).toBe(403);
+    expect((await db.query('select password_hash from reviewers where id=$1', [reviewerId])).rows[0]).toEqual({ password_hash: initialHash });
+    expect((await db.query('select * from reviewer_sessions')).rows).toHaveLength(1);
+  });
+  it('allows only the admin to create reviewer credentials and reset them without exposing the hash', async () => {
+    await createSession();
+    const values = { email: 'new@example.test', name: 'New reviewer', is_active: true, password };
+    expect((await resetByAdmin(values)).status).toBe(403);
+    await db.exec('delete from reviewer_sessions'); await createSession(adminEmail);
+    const response = await resetByAdmin(values);
+    const result = await response.json(); expect(result).toEqual({ ok: true, id: expect.any(String) });
+    expect((await signIn(values.email)).status).toBe(200);
+    const reset = await resetByAdmin({ ...values, password: replacement }, result.id);
+    expect(reset.status).toBe(200);
+    expect((await db.query('select * from reviewer_sessions where email=$1', [values.email])).rows).toHaveLength(0);
+    expect((await signIn(values.email)).status).toBe(401);
+    expect((await signIn(values.email, replacement)).status).toBe(200);
+    expect((await resetByAdmin({ ...values, password: '' }, result.id)).status).toBe(200);
+    expect((await signIn(values.email, replacement)).status).toBe(200);
+    expect((await resetByAdmin({ ...values, email: 'empty@example.test', password: '' })).status).toBe(400);
+    expect((await resetByAdmin({ ...values, email: adminEmail, password: replacement }, reviewerId)).status).toBe(400);
+    expect((await resetByAdmin({ ...values, email: adminEmail, password: replacement }, adminId)).status).toBe(400);
+  });
+  it('invalidates sessions on email changes, disabling, deletion, and password resets, without resurrection', async () => {
+    for (const sql of ["update reviewers set email='renamed@example.test' where id=$1", 'update reviewers set is_active=false where id=$1', 'delete from reviewers where id=$1', 'update reviewers set password_hash=null where id=$1']) {
+      await db.exec('savepoint account_change'); await createSession(); await db.query(sql, [reviewerId]);
+      expect((await db.query('select * from reviewer_sessions')).rows).toHaveLength(0);
+      expect(await getReviewer()).toBeNull();
+      await db.exec('rollback to savepoint account_change');
+    }
+  });
+  it('rechecks the verified hash so stale credentials cannot create sessions or overwrite a reset', async () => {
+    const newHash = await hashPassword(replacement);
+    await db.query('update reviewers set password_hash=$1 where id=$2', [newHash, reviewerId]);
+    const login = await db.query('select create_password_session($1,$2,$3,$4) as result', [reviewerId, reviewerEmail, initialHash, hashSessionToken(sessionToken)]);
+    expect(login.rows[0]).toEqual({ result: { status: 'invalid' } });
+    const change = await db.query('select change_reviewer_password($1,$2,$3,$4,$5) as result', [reviewerId, hashSessionToken(sessionToken), initialHash, initialHash, hashSessionToken(sessionToken)]);
+    expect(change.rows[0]).toEqual({ result: { status: 'invalid' } });
+    expect((await db.query('select * from reviewer_sessions')).rows).toHaveLength(0);
+  });
+  it('keeps password hashes and auth functions private to the backend', async () => {
+    for (const role of ['anon', 'authenticated']) {
+      await db.exec(`set role ${role}`);
+      for (const sql of ['select password_hash from reviewers', 'select * from reviewer_sessions', "select create_password_session(gen_random_uuid(),'email','hash',repeat('b',64))", "select change_reviewer_password(gen_random_uuid(),repeat('a',64),'old','new',repeat('b',64))"]) {
+        await db.exec('savepoint denied'); await expect(db.query(sql)).rejects.toThrow(/permission denied/); await db.exec('rollback to savepoint denied');
+      }
+      await db.exec('reset role');
+    }
+  });
+  it('enforces origin, honeypot, body caps, and shared email/IP limits before expensive password work', async () => {
+    const input = { email: reviewerEmail, password, role: 'reviewer' };
+    expect((await login(post('/api/login', input, { origin: 'https://evil.example' }))).status).toBe(403);
+    expect((await login(post('/api/login', { ...input, website: 'spam' }))).status).toBe(400);
+    expect((await login(post('/api/login', { ...input, extra: 'x'.repeat(5000) }))).status).toBe(413);
+    expect(databaseCalls).toBe(0);
+    await signIn(); await db.exec('update rate_limits set requests=10');
+    expect((await signIn()).status).toBe(429);
+    await db.exec('update rate_limits set requests=60');
+    expect((await signIn('another@example.test')).status).toBe(429);
+  });
+  it('rejects forged and expired sessions and fails closed on database outages', async () => {
+    mocks.cookieGet.mockReturnValue({ value: JSON.stringify({ email: adminEmail }) });
+    expect(await getReviewer()).toBeNull(); expect(databaseCalls).toBe(0);
+    await createSession(reviewerEmail, new Date(Date.now() - 1000).toISOString()); expect(await getReviewer()).toBeNull();
+    unavailable = true; expect(await getReviewer()).toBeNull();
+    const response = await signIn(); expect(response.status).toBe(503);
+    expect(await response.text()).not.toContain('Private connection');
+    expect(JSON.stringify(vi.mocked(console.error).mock.calls)).not.toContain('Private connection');
+    vi.stubEnv('DATABASE_URL', ''); expect((await signIn()).status).toBe(503);
+  });
+  it('retires magic links and never accepts them as password authentication', async () => {
+    expect((await callback()).headers.get('location')).toBe(new URL('/login?error=password', site.url).href);
+    expect((await login(post('/api/login', { email: reviewerEmail }))).status).toBe(400);
+    expect((await db.query("select consume_login(repeat('a',64),repeat('b',64),null) as result")).rows[0]).toEqual({ result: { status: 'invalid' } });
+  });
+  it('deletes the server session on logout and lets a failed invalidation retry', async () => {
     await createSession();
     expect((await logout(post('/api/logout', {}, { origin: 'https://evil.example' }))).status).toBe(403);
-    expect((await db.query('select * from reviewer_sessions')).rows).toHaveLength(1);
-    expect(await (await logout(post('/api/logout'))).json()).toEqual({ ok: true });
+    unavailable = true; expect((await logout(post('/api/logout'))).status).toBe(503);
+    expect(mocks.cookieSet).not.toHaveBeenCalled();
+    unavailable = false; expect((await logout(post('/api/logout'))).status).toBe(200);
     expect((await db.query('select * from reviewer_sessions')).rows).toHaveLength(0);
     expect(mocks.cookieSet).toHaveBeenCalledWith(REVIEWER_COOKIE, '', expect.objectContaining({ httpOnly: true, maxAge: 0 }));
   });
-
-  it('does not return or log private provider details and reports unconfigured login honestly', async () => {
-    mocks.sendEmail.mockResolvedValueOnce({ data: null, error: { message: `Private ${reviewerEmail} token secret` } });
-    const failed = await login(post('/api/login', { email: reviewerEmail }));
-    expect(failed.status).toBe(503); expect(await failed.text()).not.toContain(reviewerEmail);
-    expect(JSON.stringify(vi.mocked(console.error).mock.calls)).not.toContain(reviewerEmail);
-    vi.stubEnv('DATABASE_URL', '');
-    expect((await login(post('/api/login', { email: reviewerEmail }))).status).toBe(503);
-  });
-
-  it('lets a failed logout retry server invalidation before clearing its cookie', async () => {
-    await createSession();
-    unavailable = true;
-    expect((await logout(post('/api/logout'))).status).toBe(503);
-    expect(mocks.cookieSet).not.toHaveBeenCalled();
-    expect((await db.query('select * from reviewer_sessions')).rows).toHaveLength(1);
-    unavailable = false;
-    expect((await logout(post('/api/logout'))).status).toBe(200);
-    expect((await db.query('select * from reviewer_sessions')).rows).toHaveLength(0);
-  });
-
-  it('marks private routes no-store without injecting sessions into public content', () => {
-    const response = proxy(new NextRequest(new URL('/review', site.url)));
+  it('marks private routes no-store', () => {
+    const response = proxy(new NextRequest(new URL('/account', site.url)));
     expect(response.headers.get('cache-control')).toBe('private, no-store'); expect(response.headers.get('pragma')).toBe('no-cache');
     expect(response.headers.get('set-cookie')).toBeNull();
   });

@@ -104,7 +104,7 @@ svg { flex-shrink: 0; }
 .footer-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; padding-block: 24px; }
 .footer-brand { display: flex; align-items: center; width: 190px; min-height: 44px; }
 .footer-brand img { width: 100%; height: auto; }
-.footer-links { display: flex; align-items: center; gap: 24px; font-size: 13px; color: var(--muted); }
+.footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; font-size: 13px; color: var(--muted); }
 .footer-links a { min-height: 44px; display: flex; align-items: center; }
 
 /* Shared forms: consistent labels, clear input boundaries, and immediate feedback. */
