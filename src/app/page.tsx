@@ -6,6 +6,7 @@ import { StoryCard } from '@/components/story-card';
 import { Author } from '@/components/author';
 import { getStories, getTopics, getNextEvent, coverFor, coverAlt } from '@/lib/data';
 import { formatDate } from '@/lib/format';
+import { hiddenFeatures } from '@/hidden/features';
 import styles from './page.module.css';
 
 export const revalidate = 60;
@@ -17,8 +18,8 @@ export default async function Home() {
   return <div className={`container ${styles.home}`}>
     <header className={styles.heading}>
       <h1>Champaign Urbana.<br/><span>With room for more.</span></h1>
-      <p>Student perspectives on housing, transportation,<br className={styles.desktopBreak}/> and the decisions that shape the place we call home.</p>
-      <div className={styles.introActions}><Link className="button" href="/latest">Explore the writing</Link><Link className="text-link" href="/about">Meet Illinois Abundance <ArrowRight size={17}/></Link></div>
+      <p>Student stories about housing, transit, and life here.<br className={styles.desktopBreak}/> Campus events hosted by Illinois Abundance.</p>
+      <div className={styles.introActions}><Link className="button" href="/latest">Read the stories</Link><Link className="text-link" href="/events">Come to a campus event <ArrowRight size={17}/></Link></div>
     </header>
 
     {featured ? <section className={styles.feature} aria-labelledby="featured-title">
@@ -68,7 +69,7 @@ export default async function Home() {
         <Link className="text-link" href="/write">Send us a piece <ArrowRight size={17}/></Link>
       </div>
       <div className={styles.event}>
-        <span className={styles.label}>Next teach in</span>
+        <span className={styles.label}>Next campus event</span>
         <h2>{nextEvent ? nextEvent.title : 'We’re planning the next one.'}</h2>
         {nextEvent ? <>
           <div className={styles.eventDetails}>
@@ -81,9 +82,9 @@ export default async function Home() {
       </div>
     </section>
 
-    <section className={styles.subscribe} id="subscribe" aria-labelledby="subscribe-heading">
+    {!hiddenFeatures.newsletter && <section className={styles.subscribe} id="subscribe" aria-labelledby="subscribe-heading">
       <div><span className={styles.label}>Stay in the loop</span><h2 id="subscribe-heading">Good ideas.<br/>In your inbox.</h2><p>New writing and upcoming teach ins.<br/>Unsubscribe whenever you like.</p></div>
       <SubscriptionForm compact/>
-    </section>
+    </section>}
   </div>;
 }

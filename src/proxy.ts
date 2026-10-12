@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { hiddenDestination } from '@/hidden/features';
 
 export function proxy(request: NextRequest) {
+  const destination = hiddenDestination(request.nextUrl.pathname);
+  if (destination) {
+    const response = request.nextUrl.pathname.startsWith('/api/') || !['GET', 'HEAD'].includes(request.method)
+      ? NextResponse.json({ error: 'Not found.' }, { status: 404 })
+      : NextResponse.redirect(new URL(destination, request.url));
+    response.headers.set('Cache-Control', 'private, no-store');
+    response.headers.set('Referrer-Policy', 'no-referrer');
+    response.headers.set('X-Robots-Tag', 'noindex');
+    return response;
+  }
   if (request.nextUrl.pathname === '/unsubscribe' && request.method === 'POST') {
     const target = request.nextUrl.clone();
     target.pathname = '/api/unsubscribe';
@@ -19,5 +30,5 @@ export function proxy(request: NextRequest) {
   return response;
 }
 export const config = {
-  matcher: ['/account/:path*', '/api/account/:path*', '/login/:path*', '/api/login', '/review/:path*', '/admin/:path*', '/auth/callback', '/api/review/:path*', '/api/admin/:path*', '/api/covers', '/api/logout', '/subscribe/confirm', '/unsubscribe'],
+  matcher: ['/account/:path*', '/api/account/:path*', '/login/:path*', '/api/login', '/review/:path*', '/admin/:path*', '/auth/callback', '/api/review/:path*', '/api/admin/:path*', '/api/covers', '/api/logout', '/learn/:path*', '/show-up/:path*', '/subscribe/:path*', '/api/subscribe/:path*', '/unsubscribe'],
 };

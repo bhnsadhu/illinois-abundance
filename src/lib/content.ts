@@ -2,7 +2,7 @@ export const content = {
   tagline: 'A student view of Champaign Urbana.',
   description: 'Student writing on local policy in Champaign Urbana.',
   footer: 'Student writing on housing, transit, and local policy.',
-  events: { title: 'Events & teach ins', intro: 'Discussions about housing, transportation, and the decisions shaping Champaign Urbana.', next: 'Next event', upcoming: 'Coming up', past: 'Past events', empty: 'No upcoming events.', emptyBody: 'New dates will appear here when they’re confirmed.', sample: 'Sample event. This is an example of what’s to come, not a confirmed gathering.' },
+  events: { title: 'Events on campus.', intro: 'Join Illinois Abundance for campus conversations, teach ins, and gatherings. Find the details and come along.', next: 'Next event', upcoming: 'Coming up', past: 'Past events', empty: 'No upcoming events.', emptyBody: 'New dates will appear here when they’re confirmed.', sample: 'Sample event. This is an example of what’s to come, not a confirmed gathering.' },
   learn: { title: 'Local policy, explained.', intro: 'Short guides to zoning, housing costs, and how local decisions get made.', empty: 'No guides published yet.', emptyBody: 'Check back for introductions to the issues we cover.' },
   search: { title: 'Search the publication.', intro: 'Find writing on housing, transit, energy, and other local issues.', hint: 'Try housing, buses, or clean energy. Use quotation marks to find an exact phrase.', empty: 'No matching stories.', emptyBody: 'Try a shorter phrase or explore one of our topics.' },
   writer: { eyebrow: 'Contributors', empty: 'No published stories yet.', intro: 'Contributions to Illinois Abundance.' },
@@ -10,10 +10,10 @@ export const content = {
     // Public bio: https://www.instagram.com/illinoisabundance/
     tagline: 'Building up our village',
     title: 'About Illinois Abundance.',
-    intro: 'We’re a student group at the University of Illinois Urbana Champaign writing about housing, transportation, and other issues that shape life here.',
+    intro: 'We’re a student group at the University of Illinois Urbana Champaign. We publish stories about the place we share and host events on campus.',
     sections: [
       { title: 'What do we mean by abundance?', body: 'We’re interested in what it takes to build enough homes, provide useful public transportation, and make services easier to reach. That means looking at costs, rules, and the choices local institutions make.' },
-      { title: 'What we do', body: 'This site brings together student writing, short explainers, and information about teach ins and public meetings. We start with questions close to campus: what affects rent, how people get around, and what gets built.' },
+      { title: 'What we do', body: 'We publish student perspectives on housing, transportation, and life around campus. We also host campus events where people can meet, ask questions, and talk through these ideas together.' },
       { title: 'Writing for the site', body: 'You can send us an observation, an argument, or a question you want to investigate. A reviewer will work with you by email before anything is published.' },
     ],
     steps: ['Send us a draft.', 'Work through edits with a student reviewer.', 'Publish under your name.'],

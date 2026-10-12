@@ -99,6 +99,8 @@ describe('public search and complete listings',()=>{
     const map=await sitemap();
     expect(map.filter(entry=>entry.url.includes('/post/'))).toHaveLength(501);
     expect(map.some(entry=>/\/admin|\/review|\/api\//.test(entry.url))).toBe(false);
+    expect(map.some(entry=>/\/learn(?:\/|$)|\/show-up(?:\/|$)|\/subscribe(?:\/|$)/.test(entry.url))).toBe(false);
+    expect(map.some(entry=>entry.url.endsWith('/events'))).toBe(true);
   });
 });
 

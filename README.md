@@ -1,6 +1,8 @@
 # Illinois Abundance
 
-Student writing on local policy in Champaign Urbana. Readers need no account. Students verify an Illinois email before submitting; reviewers edit and publish; one configured admin manages the site and sends the optional digest.
+Student writing on local policy in Champaign Urbana. Readers need no account. Students verify an Illinois email before submitting; reviewers edit and publish; one configured admin manages publishing, reviewer accounts, and campus events.
+
+Current scope: stories and campus events on both the public site and the admin side. Learn, public meetings, newsletter tools, and exports are preserved behind switches in [`src/hidden/features.ts`](src/hidden/features.ts). See [`src/hidden/README.md`](src/hidden/README.md) for the retained code and restoration steps. No stored content or subscriber data is removed.
 
 Live site: **https://abundance.bhanusadhu.com**. The initial deployment includes clearly labeled sample content. The configured admin signs in at `/login/admin` with `bhnsadhu@gmail.com`.
 
@@ -87,7 +89,7 @@ In `/review`, claim a submission, email the author from your own inbox, and past
 
 The admin manages topics, writers, events, explainers, meetings, subscribers, statistics, and CSV exports. The configured admin cannot be removed, disabled, or reassigned through the roster UI. To hand over administration, update `ADMIN_EMAIL` in the deployment and redeploy, verify the new admin can sign in, then deactivate the previous admin's reviewer row if they should no longer review. Changing the environment removes their admin privilege; it does not automatically remove ordinary reviewer membership.
 
-## Subscriptions and the manual digest
+## Subscriptions and the manual digest (currently hidden)
 
 Any email can request a subscription. The address is eligible for digests only after the confirmation link is opened. Requesting again preserves an existing confirmed subscription and its unsubscribe token. Confirmation and digest emails include an unsubscribe link and the one-click email-client headers. `/unsubscribe?token=...` supports human visits and RFC 8058 POST requests without a login.
 

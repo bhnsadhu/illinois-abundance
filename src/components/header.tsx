@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Search, Menu, X } from './icons';
+import { isPathHidden } from '@/hidden/features';
 
-const links = [['Latest', '/latest'], ['Learn', '/learn'], ['Events', '/events'], ['Show up', '/show-up'], ['About', '/about']];
+const links = [['Stories', '/latest'], ['Learn', '/learn'], ['Events', '/events'], ['Show up', '/show-up'], ['About', '/about']].filter(([, href]) => !isPathHidden(href));
 
 export function Header() {
   const [open, setOpen] = useState(false);
