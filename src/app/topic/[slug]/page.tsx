@@ -11,7 +11,8 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const topic = (await getStoryTopics()).find(item => item.slug === slug);
+  const [topics, storyTopics] = await Promise.all([getTopics(), getStoryTopics()]);
+  const topic = [...topics, ...storyTopics].find(item => item.slug === slug);
   return topic ? { title: topic.name, description: topic.description, alternates: { canonical: `/topic/${topic.slug}` } } : { title: 'Topic not found' };
 }
 

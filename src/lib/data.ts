@@ -3,6 +3,7 @@ import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 import { publicDatabase } from './database/public';
 import { samplesEnabled } from './config';
+import { eventEnd } from './syndication';
 import type { Topic, Writer, PublicPost, Story, Event, LearnPage, Meeting } from './types';
 import { sampleTopics, sampleWriters, samplePosts, sampleEvents, sampleLearnPages, sampleMeetings } from './sample-data';
 
@@ -18,12 +19,17 @@ const fields = {
   learn_pages: 'id,slug,title,short_version,body,is_published,is_sample,created_at,updated_at',
   meetings: 'id,body_name,starts_at,location,agenda_url,is_published,is_sample',
 } as const;
+const BATCH_SIZE = 250;
 async function publicRows<T>(table: keyof typeof fields, samples: T[]): Promise<T[]> {
   const db = publicDatabase();
   if (!db) return table === 'topics' || samplesEnabled() ? samples : [];
-  const { data, error } = await db.from(`public_${table}`).select(fields[table] as string);
-  if (error) { console.error(`Public content unavailable: ${table} (${error.code})`); return []; }
-  return data as unknown as T[];
+  const rows: T[] = [];
+  for (let offset = 0; ; offset += BATCH_SIZE) {
+    const { data, error } = await db.from(`public_${table}`).select(fields[table]).order('id').range(offset, offset + BATCH_SIZE - 1);
+    if (error) { console.error(`Public content unavailable: ${table} (${error.code})`); return []; }
+    rows.push(...data as unknown as T[]);
+    if (!data || data.length < BATCH_SIZE) return rows;
+  }
 }
 export const getTopics = publicCache(async () => (await publicRows<Topic>('topics', sampleTopics)).filter(t=>t.is_active).sort((a,b)=>a.sort_order-b.sort_order));
 export const getStoryTopics = publicCache(async ():Promise<Topic[]> => { const db=publicDatabase(); if(!db)return sampleTopics; const {data,error}=await db.from('public_story_topics').select(fields.topics); if(error)return getTopics();return data as Topic[]; });
@@ -32,19 +38,45 @@ async function attachStories(posts: PublicPost[]): Promise<Story[]> {
  const [topics,writers]=await Promise.all([getStoryTopics(),getWriters()]);
  return posts.flatMap(post=>{const topic=topics.find(t=>t.id===post.topic_id);return topic?[{...post,topic,writer:writers.find(w=>w.id===post.writer_id)||null}]:[];});
 }
-export const getStories = publicCache(async (limit:number=100,offset:number=0):Promise<Story[]> => {
- const db=publicDatabase();
- if(!db)return attachStories(samplesEnabled()?[...samplePosts].sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at)).slice(offset,offset+limit):[]);
- const {data,error}=await db.from('public_posts').select(fields.posts).order('published_at',{ascending:false}).order('id',{ascending:false}).range(offset,offset+Math.min(limit,1000)-1);
- if(error)return [];return attachStories(data as PublicPost[]);
+async function storyRows(limit?: number, offset = 0, filter?: { column: 'topic_id' | 'writer_id'; value: string }): Promise<PublicPost[]> {
+  if (!Number.isSafeInteger(offset) || offset < 0 || (limit !== undefined && (!Number.isSafeInteger(limit) || limit < 1))) return [];
+  const db = publicDatabase();
+  if (!db) return samplesEnabled() ? [...samplePosts].filter(post => !filter || post[filter.column] === filter.value).sort((a,b) => Date.parse(b.published_at)-Date.parse(a.published_at) || b.id.localeCompare(a.id)).slice(offset, limit === undefined ? undefined : offset+limit) : [];
+  const rows: PublicPost[] = [];
+  while (limit === undefined || rows.length < limit) {
+    const size = Math.min(BATCH_SIZE, limit === undefined ? BATCH_SIZE : limit-rows.length);
+    let query = db.from('public_posts').select(fields.posts).order('published_at',{ascending:false}).order('id',{ascending:false}).range(offset+rows.length,offset+rows.length+size-1);
+    if (filter) query = query.eq(filter.column, filter.value);
+    const { data, error } = await query;
+    if (error) return [];
+    rows.push(...data as PublicPost[]);
+    if (!data || data.length < size) break;
+  }
+  return rows;
+}
+export const getStories = publicCache(async (limit:number = 100, offset:number = 0):Promise<Story[]> => attachStories(await storyRows(limit, offset)));
+export const getAllStories = publicCache(async ():Promise<Story[]> => attachStories(await storyRows()));
+export const getTopicStories = publicCache(async (topicId: string, limit?: number, offset:number = 0):Promise<Story[]> => attachStories(await storyRows(limit, offset, {column:'topic_id',value:topicId})));
+export const getWriterStories = publicCache(async (writerId: string):Promise<Story[]> => attachStories(await storyRows(undefined, 0, {column:'writer_id',value:writerId})));
+export const getRecapStories = publicCache(async (ids: string[]):Promise<Story[]> => {
+  if (!ids.length) return [];
+  const db = publicDatabase();
+  if (!db) return attachStories(samplesEnabled() ? samplePosts.filter(post => ids.includes(post.id)) : []);
+  const rows: PublicPost[] = [];
+  for (let offset=0; offset<ids.length; offset+=BATCH_SIZE) {
+    const { data,error }=await db.from('public_posts').select(fields.posts).in('id',ids.slice(offset,offset+BATCH_SIZE));
+    if (error) return [];
+    rows.push(...data as PublicPost[]);
+  }
+  return attachStories(rows);
 });
-export const getTopicStories = publicCache(async (topicId:string,limit:number=100,offset:number=0):Promise<Story[]>=>{
- const db=publicDatabase();if(!db)return attachStories(samplesEnabled()?samplePosts.filter(p=>p.topic_id===topicId).sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at)).slice(offset,offset+limit):[]);
- const {data,error}=await db.from('public_posts').select(fields.posts).eq('topic_id',topicId).order('published_at',{ascending:false}).range(offset,offset+Math.min(limit,1000)-1);return error?[]:attachStories(data as PublicPost[]);
-});
-export const getWriterStories = publicCache(async (writerId:string):Promise<Story[]>=>{
- const db=publicDatabase();if(!db)return attachStories(samplesEnabled()?samplePosts.filter(p=>p.writer_id===writerId):[]);
- const {data,error}=await db.from('public_posts').select(fields.posts).eq('writer_id',writerId).order('published_at',{ascending:false}).limit(100);return error?[]:attachStories(data as PublicPost[]);
+export const searchStories = publicCache(async (query: string, limit:number=13, offset:number=0):Promise<Story[]> => {
+  const text=query.trim();
+  if (!text || text.length>200 || !Number.isSafeInteger(offset) || offset<0 || offset>100000) return [];
+  const db=publicDatabase();
+  if (!db) return attachStories(samplesEnabled() ? samplePosts.filter(post=>`${post.headline} ${post.short_version} ${post.final_body}`.toLowerCase().includes(text.toLowerCase())).slice(offset,offset+limit) : []);
+  const { data,error }=await db.rpc<PublicPost[]>('search_public_posts',{p_query:text,p_limit:limit,p_offset:offset});
+  return error ? [] : attachStories(data || []);
 });
 export const getStory = publicCache(async (slug:string):Promise<Story|undefined>=>{
  const db=publicDatabase();if(!db){const post=samplesEnabled()?samplePosts.find(p=>p.slug===slug):undefined;return post?(await attachStories([post]))[0]:undefined;}
@@ -53,6 +85,11 @@ export const getStory = publicCache(async (slug:string):Promise<Story|undefined>
 export const getEvents = publicCache(async () => (await publicRows<Event>('events',sampleEvents)).filter(e=>e.is_published).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)));
 export const getLearnPages = publicCache(async () => (await publicRows<LearnPage>('learn_pages',sampleLearnPages)).filter(p=>p.is_published));
 export const getMeetings = publicCache(async () => (await publicRows<Meeting>('meetings',sampleMeetings)).filter(m=>m.is_published).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)));
+export const getUpcomingMeetings = publicCache(async () => { const now=Date.now(); return (await getMeetings()).filter(meeting=>Date.parse(meeting.starts_at)>=now); });
+export const getEventGroups = publicCache(async () => {
+  const now=Date.now(), events=await getEvents();
+  return {events, upcoming:events.filter(event=>eventEnd(event)>now), past:events.filter(event=>eventEnd(event)<=now).reverse()};
+});
 export function illustrationFor(slug: string) { return `/illustrations/${['housing','infrastructure','energy','healthcare','education','technology'].includes(slug) ? slug : 'housing'}.svg`; }
 export function coverFor(story: Story) { return story.cover_url || illustrationFor(story.topic.slug); }
 export function coverAlt(story: Story) { return story.cover_alt || `Hand drawn illustration about ${story.topic.name.toLowerCase()}`; }

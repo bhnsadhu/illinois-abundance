@@ -281,7 +281,7 @@ export function createDatabase(connectionString: string, mode: 'service' | 'publ
     from<T extends object = Row>(table: string) { return new DatabaseQuery<T>(table, run, anonymous); },
     async rpc<T = unknown>(name: string, args: Row = {}): Promise<DatabaseResult<T>> {
       try {
-        if (anonymous) throw new InvalidQuery('Public database functions are not available.', '42501');
+        if (anonymous && name !== 'search_public_posts') throw new InvalidQuery('This database function is not available publicly.', '42501');
         const functionName = identifier(name);
         if (!object(args)) throw new InvalidQuery('Invalid database function arguments.');
         const values: unknown[] = [];
@@ -290,7 +290,7 @@ export function createDatabase(connectionString: string, mode: 'service' | 'publ
           values.push(parameter(value));
           return `${name} => $${values.length}`;
         });
-        const [result] = await run([{ text: `SELECT "public".${functionName}(${parameters.join(', ')}) AS "result"`, values }], false);
+        const [result] = await run([{ text: `SELECT "public".${functionName}(${parameters.join(', ')}) AS "result"`, values }], anonymous);
         return { data: normalize(result.rows[0]?.result ?? null) as T | null, error: null, count: null };
       } catch (error) { return rejected(error); }
     },
