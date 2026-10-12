@@ -80,11 +80,8 @@
 .story-card h3 {
   max-width: 26ch;
   margin: 0 0 14px;
-  font-family: var(--body);
   font-size: clamp(23px, 2.1vw, 28px);
-  font-weight: 650;
   line-height: 1.16;
-  letter-spacing: -.035em;
   text-wrap: pretty;
 }
 
@@ -229,9 +226,7 @@
 .topic-heading h1 {
   margin-bottom: 22px;
   font-size: clamp(52px, 6.5vw, 88px);
-  font-weight: 400;
   line-height: 1.03;
-  letter-spacing: -.015em;
 }
 
 .topic-heading p {
@@ -282,13 +277,10 @@
 }
 
 .article-heading h1 {
-  font-family: var(--body);
   max-width: 22ch;
   margin-bottom: 28px;
   font-size: clamp(42px, 5.5vw, 76px);
-  font-weight: 600;
   line-height: 1.05;
-  letter-spacing: -.05em;
   text-wrap: pretty;
 }
 
@@ -341,9 +333,7 @@
 .prose h2 {
   margin: 1.8em 0 .6em;
   font-size: 34px;
-  font-weight: 650;
   line-height: 1.16;
-  letter-spacing: -.035em;
   text-wrap: pretty;
 }
 
@@ -361,8 +351,6 @@
 .article-sources h2 {
   margin-bottom: 16px;
   font-size: 24px;
-  font-weight: 650;
-  letter-spacing: -.025em;
 }
 
 .article-sources ul {
@@ -421,8 +409,6 @@
 .writer-box h2 {
   margin-bottom: 12px;
   font-size: 28px;
-  font-weight: 650;
-  letter-spacing: -.035em;
   overflow-wrap: anywhere;
 }
 
@@ -440,8 +426,6 @@
 .article-share h2 {
   margin-bottom: 12px;
   font-size: 30px;
-  font-weight: 650;
-  letter-spacing: -.035em;
 }
 
 .article-share > p {
@@ -492,7 +476,6 @@
 
 .related-stories .section-heading h2 {
   font-size: 40px;
-  letter-spacing: -.045em;
 }
 
 .about-hero {
@@ -506,9 +489,7 @@
 .about-hero h1 {
   margin-bottom: 28px;
   font-size: clamp(48px, 5.3vw, 72px);
-  font-weight: 400;
   line-height: 1.05;
-  letter-spacing: -.015em;
 }
 
 .about-hero .eyebrow {
@@ -564,9 +545,7 @@
   max-width: 18ch;
   margin: 0;
   font-size: 30px;
-  font-weight: 650;
   line-height: 1.16;
-  letter-spacing: -.035em;
 }
 
 .about-section > p {
@@ -590,8 +569,6 @@
   max-width: 12ch;
   margin-bottom: 0;
   font-size: 48px;
-  font-weight: 650;
-  letter-spacing: -.045em;
 }
 
 .about-write ol {
@@ -684,7 +661,7 @@
   .article-back { margin-bottom: 32px; font-size: 12px; }
   .article-kicker { gap: 8px; margin-bottom: 18px; font-size: 12px; }
   .article-kicker .sample-label { margin-left: 0; }
-  .article-heading h1 { margin-bottom: 24px; font-size: clamp(38px, 10vw, 56px); letter-spacing: -.045em; }
+  .article-heading h1 { margin-bottom: 24px; font-size: clamp(38px, 10vw, 56px); }
   .article-deck { margin-bottom: 26px; font-size: 18px; line-height: 1.6; }
   .article-heading .author { gap: 12px; font-size: 12px; }
   .article-cover { height: 300px; margin-bottom: 40px; border-radius: 20px; }

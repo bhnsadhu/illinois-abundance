@@ -49,11 +49,12 @@ img { max-width: 100%; height: auto; display: block; }
 button:disabled { opacity: .55; cursor: wait; }
 ::selection { background: #d1e8e4; color: var(--ink); }
 :focus-visible { outline: 3px solid var(--deep-teal); outline-offset: 5px; border-radius: 5px; }
-h1, h2, h3, h4, p { margin-top: 0; }
-h1, h2, h3, .display { font-family: var(--body); font-weight: 650; text-wrap: balance; overflow-wrap: anywhere; }
-h1 { font-family: var(--hand); font-weight: 400; font-size: clamp(48px, 5.8vw, 76px); line-height: 1.08; letter-spacing: -.015em; margin-bottom: 24px; }
-h2 { font-size: clamp(32px, 3.5vw, 48px); line-height: 1.1; letter-spacing: -.04em; }
-h3 { font-size: 26px; line-height: 1.2; letter-spacing: -.025em; }
+h1, h2, h3, h4, h5, h6, p { margin-top: 0; }
+/* All headings share the handwritten face used by the home hero. */
+h1, h2, h3, h4, h5, h6, .display { font-family: var(--hand); font-weight: 400; font-synthesis: none; letter-spacing: -.01em; text-wrap: balance; overflow-wrap: anywhere; }
+h1 { font-size: clamp(48px, 5.8vw, 76px); line-height: 1.08; margin-bottom: 24px; }
+h2 { font-size: clamp(32px, 3.5vw, 48px); line-height: 1.1; }
+h3 { font-size: 26px; line-height: 1.2; }
 p { margin-bottom: 1.2em; }
 svg { flex-shrink: 0; }
 .container, .nav-wrap { width: min(var(--page-width), calc(100% - 2 * var(--page-gutter))); margin-inline: auto; }
