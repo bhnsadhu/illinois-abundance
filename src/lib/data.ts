@@ -21,14 +21,35 @@ async function publicRows<T>(table: keyof typeof fields, samples: T[]): Promise<
   return data as unknown as T[];
 }
 export const getTopics = cache(async () => (await publicRows<Topic>('topics', sampleTopics)).filter(t=>t.is_active).sort((a,b)=>a.sort_order-b.sort_order));
+export const getStoryTopics = cache(async ():Promise<Topic[]> => { const db=publicDatabase(); if(!db)return sampleTopics; const {data,error}=await db.from('public_story_topics').select(fields.topics); if(error)return getTopics();return data as Topic[]; });
 export const getWriters = cache(async () => publicRows<Writer>('writers', sampleWriters));
-export const getStories = cache(async (): Promise<Story[]> => {
-  const [posts, topics, writers] = await Promise.all([publicRows<PublicPost>('posts', samplePosts), getTopics(), getWriters()]);
-  return posts.flatMap(post => { const topic = topics.find(t=>t.id===post.topic_id); return topic ? [{...post, topic, writer: writers.find(w=>w.id===post.writer_id)||null}] : []; }).sort((a,b)=>new Date(b.published_at).getTime()-new Date(a.published_at).getTime());
+async function attachStories(posts: PublicPost[]): Promise<Story[]> {
+ const [topics,writers]=await Promise.all([getStoryTopics(),getWriters()]);
+ return posts.flatMap(post=>{const topic=topics.find(t=>t.id===post.topic_id);return topic?[{...post,topic,writer:writers.find(w=>w.id===post.writer_id)||null}]:[];});
+}
+export const getStories = cache(async (limit=100,offset=0):Promise<Story[]> => {
+ const db=publicDatabase();
+ if(!db)return attachStories(samplesEnabled()?[...samplePosts].sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at)).slice(offset,offset+limit):[]);
+ const {data,error}=await db.from('public_posts').select(fields.posts).order('published_at',{ascending:false}).order('id',{ascending:false}).range(offset,offset+Math.min(limit,1000)-1);
+ if(error)return [];return attachStories(data as PublicPost[]);
 });
-export const getStory = cache(async (slug: string) => (await getStories()).find(p=>p.slug===slug));
+export const getTopicStories = cache(async (topicId:string,limit=100,offset=0):Promise<Story[]>=>{
+ const db=publicDatabase();if(!db)return attachStories(samplesEnabled()?samplePosts.filter(p=>p.topic_id===topicId).sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at)).slice(offset,offset+limit):[]);
+ const {data,error}=await db.from('public_posts').select(fields.posts).eq('topic_id',topicId).order('published_at',{ascending:false}).range(offset,offset+Math.min(limit,1000)-1);return error?[]:attachStories(data as PublicPost[]);
+});
+export const getWriterStories = cache(async (writerId:string):Promise<Story[]>=>{
+ const db=publicDatabase();if(!db)return attachStories(samplesEnabled()?samplePosts.filter(p=>p.writer_id===writerId):[]);
+ const {data,error}=await db.from('public_posts').select(fields.posts).eq('writer_id',writerId).order('published_at',{ascending:false}).limit(100);return error?[]:attachStories(data as PublicPost[]);
+});
+export const getStory = cache(async (slug:string):Promise<Story|undefined>=>{
+ const db=publicDatabase();if(!db){const post=samplesEnabled()?samplePosts.find(p=>p.slug===slug):undefined;return post?(await attachStories([post]))[0]:undefined;}
+ const {data,error}=await db.from('public_posts').select(fields.posts).eq('slug',slug).maybeSingle();return error||!data?undefined:(await attachStories([data as PublicPost]))[0];
+});
 export const getEvents = cache(async () => (await publicRows<Event>('events',sampleEvents)).filter(e=>e.is_published).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)));
 export const getLearnPages = cache(async () => (await publicRows<LearnPage>('learn_pages',sampleLearnPages)).filter(p=>p.is_published));
 export const getMeetings = cache(async () => (await publicRows<Meeting>('meetings',sampleMeetings)).filter(m=>m.is_published).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)));
-export function coverFor(story: Story) { return story.cover_url || `/illustrations/${story.topic.slug}.svg`; }
+export function illustrationFor(slug: string) { return `/illustrations/${['housing','infrastructure','energy','healthcare','education','technology'].includes(slug) ? slug : 'housing'}.svg`; }
+export function coverFor(story: Story) { return story.cover_url || illustrationFor(story.topic.slug); }
 export function coverAlt(story: Story) { return story.cover_alt || `Hand drawn illustration about ${story.topic.name.toLowerCase()}`; }
+
+export async function getNextEvent() { const now=Date.now(); return (await getEvents()).find(event=>Date.parse(event.starts_at)>now); }

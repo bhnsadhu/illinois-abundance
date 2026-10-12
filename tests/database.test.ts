@@ -72,7 +72,7 @@ beforeAll(async () => {
     grant select on storage.objects to anon,authenticated;
     grant all on storage.buckets,storage.objects to service_role;
   `);
-  for (const file of ["202610120001_initial.sql", "202610120002_storage.sql"]) {
+  for (const file of ["202610120001_initial.sql", "202610120002_storage.sql", "202610120003_hardening.sql"]) {
     await db.exec(await readFile(new URL(`../supabase/migrations/${file}`, import.meta.url), "utf8"));
   }
   await db.exec(await readFile(new URL("../supabase/seed.sql", import.meta.url), "utf8"));
@@ -138,6 +138,23 @@ describe("database privacy and RLS", () => {
     }
   });
 
+  it("retains published articles and their safe topic labels when a topic leaves the directory", async () => {
+    const id = await submission();
+    await rpc("review_post", [id, 1, reviewerId, "publish", publishChanges]);
+    await db.query("update topics set is_active=false where id=$1", [topicId]);
+    await role("anon");
+    expect((await db.query("select id from public_posts where id=$1", [id])).rows).toEqual([{ id }]);
+    expect((await db.query("select id from public_topics where id=$1", [topicId])).rows).toHaveLength(0);
+    expect((await db.query("select id,name,is_active from public_story_topics where id=$1", [topicId])).rows).toEqual([
+      { id: topicId, name: "Housing", is_active: false },
+    ]);
+    await role("service_role");
+    await rpc("review_post", [id, 2, reviewerId, "unpublish", {}]);
+    await role("anon");
+    expect((await db.query("select * from public_story_topics where id=$1", [topicId])).rows).toHaveLength(0);
+    expect((await db.query("select * from topics where id=$1", [topicId])).rows).toHaveLength(0);
+  });
+
   it("protects original text and source identity even from accidental service-role edits and deletes", async () => {
     const id = await submission();
     await denied("update submission_private set original_body='Rewritten' where post_id=$1", [id], /immutable/);
@@ -156,6 +173,16 @@ describe("database privacy and RLS", () => {
     await denied("insert into storage.objects(bucket_id,name) values ('covers','untrusted.png')");
     await role("authenticated", "reviewer@illinois.edu");
     expect((await db.query("select * from storage.objects")).rows).toHaveLength(0);
+  });
+
+  it("blocks accidental truncation of originals through service and privileged SQL", async () => {
+    const id = await submission();
+    await denied("truncate public.submission_private");
+    await denied("truncate public.posts cascade");
+    await role("postgres");
+    await denied("truncate public.submission_private", [], /Truncation is forbidden/);
+    await denied("truncate public.posts cascade", [], /Truncation is forbidden/);
+    expect((await db.query("select post_id from submission_private")).rows).toEqual([{ post_id: id }]);
   });
 });
 
@@ -227,6 +254,12 @@ describe("reviewing and publish permissions", () => {
     expect((await db.query("select status,headline from posts where id=$1", [id])).rows[0]).toEqual({ status: "in_progress", headline: "" });
     await rpc("review_post", [id, 2, otherReviewerId, "claim", {}]);
     expect((await db.query<{ claimed_by: string }>("select claimed_by from submission_private")).rows[0].claimed_by).toBe(otherReviewerId);
+  });
+
+  it("rejects a missing revision instead of bypassing concurrent edit protection", async () => {
+    const id = await submission();
+    expect(await rpc("review_post", [id, null, reviewerId, "publish", publishChanges])).toEqual({ status: "conflict", version: 1 });
+    expect((await db.query("select status,headline,version from posts where id=$1", [id])).rows[0]).toEqual({ status: "new", headline: "", version: 1 });
   });
 
   it("forbids inactive reviewers and requires a complete article and active topic", async () => {
