@@ -6,7 +6,7 @@ import { ImageResponse } from 'next/og';
 import { fitHeadline, type FontMetrics, type ShareContent } from './share-content';
 
 export type ShareFormat = 'opengraph' | 'instagram';
-const colors = { background: '#FFFBE4', ink: '#202722', teal: '#244E49', muted: '#5B635E' };
+const colors = { background: '#FFFDF2', ink: '#202722', teal: '#244E49', muted: '#5B635E' };
 const topics = ['housing', 'infrastructure', 'energy', 'healthcare', 'education', 'technology'];
 const asset = (...path: string[]) => join(process.cwd(), 'public', ...path);
 
