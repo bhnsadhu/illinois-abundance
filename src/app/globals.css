@@ -208,7 +208,7 @@ label:has(input[type=checkbox]) { display: flex; gap: 10px; align-items: center;
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .button:active, .icon-button:active, .nav-write:active, .mobile-nav { transform: none; }
+  .button:active, .icon-button:active, .nav-write:active, .mobile-nav[data-open] { transform: none; }
 }
 @media (prefers-reduced-transparency: reduce) {
   .site-header { background: var(--cream); backdrop-filter: none; -webkit-backdrop-filter: none; }
