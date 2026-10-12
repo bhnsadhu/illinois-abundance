@@ -48,10 +48,10 @@ export default async function PostPage({ params }: Props) {
         {sources.length > 0 && <section className="article-sources" aria-labelledby="sources-heading"><h2 id="sources-heading">Sources</h2><ul>{sources.map((source, i) => <li key={`${source.url}-${i}`}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.label}<ArrowUpRight size={15} aria-label="Opens in a new tab"/></a></li>)}</ul></section>}
         {new Date(story.updated_at).getTime() > new Date(story.published_at).getTime() + 1000 && <p className="article-updated">Updated <time dateTime={story.updated_at}>{formatDate(story.updated_at, { year: 'numeric' })}</time></p>}
         <aside className="writer-box" aria-label="About the writer"><span className="writer-avatar" aria-hidden="true">{initials(author)}</span><div><p className="eyebrow">Written by</p><h2>{story.writer ? <Link href={`/writer/${story.writer.slug}`}>{author}</Link> : author}</h2>{story.writer?.bio && <p>{story.writer.bio}</p>}{story.writer && <Link className="text-link" href={`/writer/${story.writer.slug}`}>More from {story.writer.name.split(' ')[0]} <ArrowRight size={15}/></Link>}</div></aside>
-        <section className="article-share" aria-label="Share this story"><h2>Good ideas travel.</h2><p>Send this one to someone who cares about this place.</p><ShareActions slug={story.slug}/></section>
+        <section className="article-share" aria-label="Share this story"><h2>Share this story</h2><p>Copy the link or download a card for Instagram.</p><ShareActions slug={story.slug}/></section>
         <a className="removal-link" href={`mailto:${site.contact}?subject=${removalSubject}`}>Request removal</a>
       </div>
     </article>
-    {related.length > 0 && <section className="container related-stories" aria-labelledby="related-heading"><div className="section-heading"><h2 id="related-heading">A little more to think about.</h2><Link href="/latest" className="text-link">All stories <ArrowUpRight size={16}/></Link></div><div className="story-grid">{related.map(item => <StoryCard key={item.id} story={item}/>)}</div></section>}
+    {related.length > 0 && <section className="container related-stories" aria-labelledby="related-heading"><div className="section-heading"><h2 id="related-heading">More stories</h2><Link href="/latest" className="text-link">All stories <ArrowUpRight size={16}/></Link></div><div className="story-grid">{related.map(item => <StoryCard key={item.id} story={item}/>)}</div></section>}
   </>;
 }

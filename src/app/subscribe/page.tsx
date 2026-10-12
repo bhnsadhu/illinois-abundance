@@ -1,4 +1,4 @@
 import type {Metadata} from 'next';
 import {SubscriptionForm} from '@/components/subscription-form';
-export const metadata:Metadata={title:'Subscribe',description:'Good ideas and the next teach in, in your inbox.',alternates:{canonical:'/subscribe'}};
-export default function SubscribePage(){return <div className="container verify-page page-section"><span className="eyebrow">A LITTLE MORE IN YOUR INBOX</span><h1>Stay curious.</h1><p className="form-intro">New writing. Local conversations. A reason to show up.</p><SubscriptionForm/></div>;}
+export const metadata:Metadata={title:'Subscribe',description:'Get new articles and upcoming teach ins by email.',alternates:{canonical:'/subscribe'}};
+export default function SubscribePage(){return <div className="container verify-page page-section"><span className="eyebrow">ILLINOIS ABUNDANCE BY EMAIL</span><h1>Subscribe</h1><p className="form-intro">Get new articles and upcoming teach ins by email. Unsubscribe whenever you like.</p><SubscriptionForm/></div>;}
