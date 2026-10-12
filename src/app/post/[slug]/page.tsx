@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { Author } from '@/components/author';
 import { BodyText } from '@/components/body-text';
 import { StoryCard } from '@/components/story-card';
+import { ViewCounter } from '@/components/view-counter';
 import { ShareActions } from '@/components/share-actions';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from '@/components/icons';
 import { coverAlt, coverFor, getStory, getStories } from '@/lib/data';
@@ -32,6 +33,7 @@ export default async function PostPage({ params }: Props) {
   const author = story.byline || story.author_name;
   const removalSubject = encodeURIComponent(`Removal request: ${story.headline}`);
   return <>
+    <ViewCounter postId={story.id}/>
     <article className="editorial-article">
       <header className="article-heading container">
         <Link href="/latest" className="text-link article-back"><ArrowLeft size={15}/> All stories</Link>
