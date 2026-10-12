@@ -1,0 +1,5 @@
+import { z } from 'zod';
+export const emailSchema = z.string().trim().toLowerCase().email().max(254);
+export const submissionSchema = z.object({ name: z.string().trim().min(2,'Tell us your full name.').max(120), email: emailSchema.refine(v=>v.endsWith('@illinois.edu'),'Use your @illinois.edu email.'), body: z.string().trim().min(30,'Give us a little more to read.').max(20000,'Keep your piece under 20,000 characters.'), website: z.string().max(0).optional().default('') });
+export const sourceSchema = z.object({ label: z.string().trim().min(1).max(200), url: z.url().refine(v=>/^https?:\/\//.test(v),'Use an http or https link.') });
+export const postEditSchema = z.object({ headline: z.string().trim().min(1).max(200), short_version: z.string().trim().min(1).max(600), final_body: z.string().trim().min(30).max(30000), topic_id: z.uuid(), byline: z.string().trim().min(1).max(160), writer_id: z.uuid().nullable().optional(), sources: z.array(sourceSchema).max(30).default([]), cover_url: z.string().nullable().optional(), cover_alt: z.string().max(300).nullable().optional() });
