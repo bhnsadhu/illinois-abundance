@@ -7,6 +7,8 @@ export const content = {
   search: { title: 'Search the publication.', intro: 'Find writing on housing, transit, energy, and other local issues.', hint: 'Try housing, buses, or clean energy. Use quotation marks to find an exact phrase.', empty: 'No matching stories.', emptyBody: 'Try a shorter phrase or explore one of our topics.' },
   writer: { eyebrow: 'Contributors', empty: 'No published stories yet.', intro: 'Contributions to Illinois Abundance.' },
   about: {
+    // Public bio: https://www.instagram.com/illinoisabundance/
+    tagline: 'Building up our village',
     title: 'About Illinois Abundance.',
     intro: 'We’re a student group at the University of Illinois Urbana Champaign writing about housing, transportation, and other issues that shape life here.',
     sections: [
