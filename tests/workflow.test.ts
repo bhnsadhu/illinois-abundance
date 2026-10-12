@@ -89,7 +89,8 @@ it('takes a real submission through verification and review into public Home HTM
     body: '  PRIVATE ORIGINAL: my complete unedited thoughts belong in the permanent archive.\nKeep this exact original spacing.  ',
   };
   const emptyHome = renderToStaticMarkup(await Home());
-  expect(emptyHome).toContain('The next good idea could be yours.');
+  expect(emptyHome).toContain('class="empty-state"');
+  expect(emptyHome).not.toContain('id="featured-title"');
 
   const submitted = await submit(request('/api/submissions', form));
   expect(submitted.status).toBe(200);

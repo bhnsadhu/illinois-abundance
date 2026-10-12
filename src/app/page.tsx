@@ -1,20 +1,88 @@
-import { SubscriptionForm } from '@/components/subscription-form';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUpRight, CalendarDays } from '@/components/icons';
+import { ArrowRight } from '@/components/icons';
+import { SubscriptionForm } from '@/components/subscription-form';
 import { StoryCard } from '@/components/story-card';
 import { Author } from '@/components/author';
-import { getStories, getTopics, getNextEvent, coverFor, coverAlt, illustrationFor } from '@/lib/data';
+import { getStories, getTopics, getNextEvent, coverFor, coverAlt } from '@/lib/data';
 import { formatDate } from '@/lib/format';
+import styles from './page.module.css';
+
 export const revalidate = 60;
+
 export default async function Home() {
-  const [stories,topics,nextEvent] = await Promise.all([getStories(4),getTopics(),getNextEvent()]);
-  const featured=stories[0];
-  return <div className="container home"><section className="page-heading"><div className="eyebrow"><span className="status-dot"/>LOCAL IDEAS. BIG POSSIBILITIES.</div><div className="home-heading-row"><div><h1>Latest<span className="orange">.</span></h1><p>Student writing on local policy in Champaign Urbana.</p></div><div className="home-note">A little more<br/><span>possibility.</span><svg width="60" height="32" viewBox="0 0 60 32" fill="none" aria-hidden="true"><path d="M3 5C15 27 36 26 51 13M41 12L54 11L51 25" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div></section>
-  {featured ? <section className={`feature-story topic-${featured.topic.slug}`} aria-labelledby="featured-title"><div className="feature-copy"><div className="feature-kicker"><Link href={`/topic/${featured.topic.slug}`} className="topic-label"><span/>{featured.topic.name}</Link><span className="feature-kind">THE LATEST STORY</span></div><h2 id="featured-title"><Link href={`/post/${featured.slug}`}>{featured.headline}</Link></h2><p>{featured.short_version}</p><Link className="feature-read" href={`/post/${featured.slug}`}>Read the story <span><ArrowUpRight size={20}/></span></Link><Author name={featured.byline} date={featured.published_at} href={featured.writer?`/writer/${featured.writer.slug}`:undefined}/>{featured.is_sample && <span className="sample-caption">Sample story · Preview content</span>}</div><Link href={`/post/${featured.slug}`} className="feature-visual" tabIndex={-1} aria-hidden="true"><Image src={coverFor(featured)} alt={coverAlt(featured)} width={800} height={560} priority unoptimized/><div className="illustration-caption">A better everyday starts here.</div></Link></section> : <section className="empty-state"><h2>The next good idea could be yours.</h2><p>Nothing here yet. Help start the conversation about a better Champaign Urbana.</p><Link className="button" href="/write">Write the first piece <ArrowUpRight size={18}/></Link></section>}
-  {stories.length>1 && <section className="home-section"><div className="section-heading"><h2>More to think about.</h2><Link href="/latest" className="text-link">Explore all stories <ArrowUpRight size={17}/></Link></div><div className="story-grid">{stories.slice(1,4).map(story=><StoryCard key={story.id} story={story}/>)}</div></section>}
-  <section className="home-section topics-section"><div className="section-heading"><div><span className="eyebrow">A FEW THINGS WE CARE ABOUT</span><h2>Small questions. Big ideas.</h2></div></div><div className="topic-grid">{topics.map((topic,i)=><Link key={topic.id} href={`/topic/${topic.slug}`} className={`topic-tile topic-${topic.slug}`}><Image src={illustrationFor(topic.slug)} width={180} height={126} alt="" unoptimized/><div><span className="topic-number">0{i+1}</span><h3>{topic.name}</h3><p>{topic.description}</p></div><ArrowUpRight size={19}/></Link>)}</div></section>
-  <section className="participate-grid"><div className="write-tile"><span className="eyebrow">YOUR PERSPECTIVE BELONGS HERE</span><h2>Got a thought?<br/>Put it into words.</h2><p>You bring the idea. We’ll help you share it.<br/>No policy degree required.</p><Link className="button button-light" href="/write">Write for us <ArrowUpRight size={17}/></Link><svg className="pencil-drawing" viewBox="0 0 120 160" fill="none" aria-hidden="true"><path d="M25 127L42 82L89 19Q96 10 106 19L109 22Q117 28 109 38L62 103Z" fill="#EACA6F" stroke="#121515" strokeWidth="4" strokeLinejoin="round"/><path d="M43 81L63 102M82 29L101 44M51 90L93 35M25 127L44 122L31 110" stroke="#121515" strokeWidth="4" strokeLinecap="round"/><path d="M17 145Q54 132 95 145" stroke="#FFFBE4" strokeWidth="3" strokeLinecap="round"/></svg></div><div className="teach-tile"><div className="eyebrow"><CalendarDays size={15}/>LET’S FIGURE IT OUT TOGETHER</div><h2>{nextEvent?nextEvent.title:'Good conversations. Better possibilities.'}</h2><p>{nextEvent?'Our next teach in. Bring your questions and a friend.':'Come learn with us. Find our next teach in and meet people who care about this place.'}</p>{nextEvent && <div className="next-event-details"><span>{formatDate(nextEvent.starts_at,{month:'long',day:'numeric'})} · {formatDate(nextEvent.starts_at,{month:undefined,day:undefined,hour:'numeric',minute:'2-digit'})}</span><span>{nextEvent.location}</span>{nextEvent.is_sample&&<span className="sample-caption">Sample event · Date for demonstration</span>}</div>}<Link href="/events" className="text-link">See what’s coming up <ArrowUpRight size={17}/></Link></div></section>
-  <section className="subscribe-band" id="subscribe"><div><span className="eyebrow">A LITTLE MORE IN YOUR INBOX</span><h2>Stay curious. Stay in the loop.</h2><p>New stories and upcoming teach ins. An occasional email, always worth opening.</p></div><SubscriptionForm compact/></section>
+  const [stories, topics, nextEvent] = await Promise.all([getStories(4), getTopics(), getNextEvent()]);
+  const featured = stories[0];
+
+  return <div className={`container ${styles.home}`}>
+    <header className={styles.heading}>
+      <h1>Latest</h1>
+      <p>Student writing on local policy<br className={styles.desktopBreak}/> in Champaign Urbana.</p>
+    </header>
+
+    {featured ? <section className={styles.feature} aria-labelledby="featured-title">
+      <div className={styles.featureCopy}>
+        <div className={styles.kicker}>
+          <Link href={`/topic/${featured.topic.slug}`}>{featured.topic.name}</Link>
+          {featured.is_sample && <span>Sample story</span>}
+        </div>
+        <h2 id="featured-title"><Link href={`/post/${featured.slug}`}>{featured.headline}</Link></h2>
+        <p>{featured.short_version}</p>
+        <Author name={featured.byline} date={featured.published_at} href={featured.writer ? `/writer/${featured.writer.slug}` : undefined}/>
+        <Link className={styles.readLink} href={`/post/${featured.slug}`}>Read the story <ArrowRight size={18}/></Link>
+      </div>
+      <Link href={`/post/${featured.slug}`} className={`${styles.featureVisual} topic-color-${featured.topic.slug}`} tabIndex={-1} aria-hidden="true">
+        <Image src={coverFor(featured)} alt={coverAlt(featured)} width={800} height={560} priority unoptimized/>
+      </Link>
+    </section> : <section className="empty-state">
+      <h2>Nothing here yet.</h2>
+      <p>Have something to say about Champaign Urbana? Send us a piece.</p>
+      <Link className="button" href="/write">Write for us <ArrowRight size={18}/></Link>
+    </section>}
+
+    {stories.length > 1 && <section className={styles.recent} aria-labelledby="recent-heading">
+      <div className={styles.sectionHeading}>
+        <h2 id="recent-heading">Recent writing</h2>
+        <Link href="/latest">All stories <ArrowRight size={16}/></Link>
+      </div>
+      <div className="story-grid">{stories.slice(1, 4).map(story => <StoryCard key={story.id} story={story}/>)}</div>
+    </section>}
+
+    <section className={styles.topics} aria-labelledby="topics-heading">
+      <div className={styles.sectionHeading}><h2 id="topics-heading">Topics</h2><p>What we write about</p></div>
+      <div className={styles.topicList}>
+        {topics.map((topic, index) => <Link key={topic.id} href={`/topic/${topic.slug}`} className={styles.topic}>
+          <span className={styles.topicNumber}>{String(index + 1).padStart(2, '0')}</span>
+          <div><h3>{topic.name}</h3><p>{topic.description}</p></div>
+          <ArrowRight size={18}/>
+        </Link>)}
+      </div>
+    </section>
+
+    <section className={styles.participate} aria-label="Get involved">
+      <div className={styles.write}>
+        <span className={styles.label}>Write for us</span>
+        <h2>What would you change<br/> about this place?</h2>
+        <p>Rent, the bus ride to class, a city council decision. If there’s something you want to write about, send it in. A student reviewer will help you edit it.</p>
+        <Link className="text-link" href="/write">Send us a piece <ArrowRight size={17}/></Link>
+      </div>
+      <div className={styles.event}>
+        <span className={styles.label}>Next teach in</span>
+        <h2>{nextEvent ? nextEvent.title : 'We’re planning the next one.'}</h2>
+        {nextEvent ? <>
+          <div className={styles.eventDetails}>
+            <time dateTime={nextEvent.starts_at}>{formatDate(nextEvent.starts_at, { month: 'long', day: 'numeric' })} at {formatDate(nextEvent.starts_at, { month: undefined, day: undefined, hour: 'numeric', minute: '2-digit' })}</time>
+            <span>{nextEvent.location}</span>
+          </div>
+          {nextEvent.is_sample && <p className={styles.sampleNote}>Sample event. Details are for demonstration.</p>}
+        </> : <p>Upcoming dates and locations will be posted here. You don’t need any policy background to come along.</p>}
+        <Link href="/events" className="text-link">View events <ArrowRight size={17}/></Link>
+      </div>
+    </section>
+
+    <section className={styles.subscribe} id="subscribe" aria-labelledby="subscribe-heading">
+      <div><h2 id="subscribe-heading">Get the email</h2><p>New writing and upcoming teach ins.<br/>Unsubscribe whenever you like.</p></div>
+      <SubscriptionForm compact/>
+    </section>
   </div>;
 }
