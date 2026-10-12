@@ -7,3 +7,11 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Commit and push workflow
+
+After every meaningful, verified chunk of work, commit it with a clear message and push it to the current branch's remote. This is the project default; do not wait for a separate reminder or confirmation. Keep commits focused, preserve unrelated work, and never commit credentials or local environment files. If a check or push fails, resolve it when possible and report any remaining blocker.
+
+## Design standard
+
+Use `.agents/skills/apple-design/SKILL.md` for UI work across this project. Build on the existing Illinois Abundance design: preserve its palette, handwritten headings, and layouts unless a redesign is requested. Favor clear hierarchy, immediate feedback, consistent controls, comfortable touch targets, and accessible motion. Make focused improvements when needed; do not restyle working pages solely to resemble Apple's branding.

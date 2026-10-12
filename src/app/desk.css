@@ -596,6 +596,8 @@
   .desk-layout { padding-block: 16px 40px; }
   .desk-nav { gap: 8px; font-size: 12px; }
   .desk-nav > div { gap: 0; }
+  .desk-nav > div:first-child { width: 100%; }
+  .desk-nav > div:first-child a { flex: 1 1 auto; padding-inline: 8px; }
   .desk-nav > div:last-of-type > span { display: none; }
   .desk-nav a { min-height: 44px; padding-inline: 14px; }
   .desk-heading { padding-block: 36px 28px; }

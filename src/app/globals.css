@@ -48,7 +48,7 @@ button, .button { user-select: none; }
 img { max-width: 100%; height: auto; display: block; }
 button:disabled { opacity: .55; cursor: wait; }
 ::selection { background: #d1e8e4; color: var(--ink); }
-:focus-visible { outline: 3px solid var(--deep-teal); outline-offset: 5px; border-radius: 5px; }
+:focus-visible { outline: 3px solid var(--deep-teal); outline-offset: 5px; }
 h1, h2, h3, h4, h5, h6, p { margin-top: 0; }
 /* All headings share the handwritten face used by the home hero. */
 h1, h2, h3, h4, h5, h6, .display { font-family: var(--hand); font-weight: 400; font-synthesis: none; letter-spacing: -.01em; text-wrap: balance; overflow-wrap: anywhere; }
@@ -144,6 +144,7 @@ label:has(input[type=checkbox]) { display: flex; gap: 10px; align-items: center;
 .success-state p { font-size: 17px; }
 .login-sent-title { font-size: 30px; margin: 25px 0 14px; }
 .login-note { margin: 20px 0 0; text-align: center; }
+.login-form { text-align: left; }
 .subscribe-fields label { margin-bottom: 17px; }
 .subscribe-fields > .button { width: 100%; margin-bottom: 15px; }
 .subscribe-success-title { font-size: 30px; margin-bottom: 14px; }

@@ -20,7 +20,7 @@ export function LoginForm({ role = 'reviewer' }: { role?: 'admin' | 'reviewer' }
       router.refresh();
     } catch (error) { setError(error instanceof Error ? error.message : 'Please try again.'); setBusy(false); }
   }
-  return <form className="form-card" onSubmit={submit}>
+  return <form className="form-card login-form" onSubmit={submit}>
     <label>Email address<input name="email" type="email" autoComplete="username" autoCapitalize="none" maxLength={254} placeholder={role === 'admin' ? 'Your admin email' : 'Your reviewer email'} required/></label>
     <label>Password<input name="password" type="password" autoComplete="current-password" maxLength={128} required/></label>
     <div className="honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off"/></label></div>
