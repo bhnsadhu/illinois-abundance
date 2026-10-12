@@ -2,6 +2,8 @@
 
 Student writing on local policy in Champaign Urbana. Readers need no account. Students verify an Illinois email before submitting; reviewers edit and publish; one configured admin manages the site and sends the optional digest.
 
+Live site: **https://abundance.bhanusadhu.com**. The initial deployment includes clearly labeled sample content. The configured admin signs in at `/login` with `bhnsadhu@gmail.com`.
+
 Built with Next.js 16, React 19, TypeScript, Neon Postgres, private Vercel Blob storage, and Resend. Passwordless reviewer authentication is implemented by the app using database-backed, single-use links and sessions.
 
 ## Run locally
@@ -114,7 +116,9 @@ npm run check
 npm run test:db
 ```
 
-The completed Phase 7 baseline passed **155 tests**, lint, typecheck, and production build. Tests include PostgreSQL/RLS behavior using PGlite, HTTP handlers using the production SQL adapter with mocked Neon transport, authentication, submission verification, private covers, admin permissions, digest retries, share images, and a submit → verify → claim → publish → homepage workflow. Mail delivery is mocked. Passing those tests does not verify a real school inbox, DNS, production service quotas, or physical phone behavior; viewport emulation is not a hardware test.
+Final validation passed **155 tests**, lint, typecheck, and production build. Tests include PostgreSQL/RLS behavior using PGlite, HTTP handlers using the production SQL adapter with mocked Neon transport, authentication, submission verification, private covers, admin permissions, digest retries, share images, and a submit → verify → claim → publish → homepage workflow. Mail delivery is mocked. Passing those tests does not verify a real school inbox, DNS, production service quotas, or physical phone behavior; viewport emulation is not a hardware test.
+
+Local production-build Lighthouse performance scores were **100 desktop / 94 mobile** for home and **100 desktop / 91 mobile** for an article. All four runs recorded zero layout shift. These are measured snapshots, not guarantees across devices or network conditions.
 
 Before announcing the site:
 
