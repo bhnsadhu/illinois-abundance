@@ -12,7 +12,7 @@ import { sendMail } from '@/lib/email';
 const mocks = vi.hoisted(() => ({ sendEmail: vi.fn(), generateCode: vi.fn() }));
 vi.mock('resend', () => ({ Resend: class { emails = { send: mocks.sendEmail }; } }));
 vi.mock('@/lib/codes', async (original) => ({ ...await original<typeof import('@/lib/codes')>(), generateCode: mocks.generateCode }));
-vi.mock('@/lib/supabase/service', () => ({ serviceDatabase: () => databaseAdapter() }));
+vi.mock('@/lib/database/service', () => ({ serviceDatabase: () => databaseAdapter() }));
 
 let db: PGlite;
 let databaseCalls = 0;
@@ -22,7 +22,7 @@ const pepper = 'test-pepper-with-at-least-thirty-two-characters';
 const body = '\n  CHAMPAIGN, Ill. We can make room for more neighbors.\n\n## What could change?\nMore homes near campus.\n';
 const form = { name: 'Student Writer', email: 'student@illinois.edu', body, website: '' };
 
-// The production Supabase transport is adapted to real PostgreSQL. No RPC logic
+// The production Neon transport is adapted to real PostgreSQL. No RPC logic
 // is mocked: RLS, attempts, transactions, rate limits, and archives really run.
 function databaseAdapter() {
   return {
@@ -76,26 +76,18 @@ async function beginSubmission() {
 
 beforeAll(async () => {
   db = new PGlite();
-  await db.exec(`
-    create role anon; create role authenticated; create role service_role bypassrls;
-    create schema auth;
-    grant usage on schema auth, public to anon, authenticated, service_role;
-    create function auth.jwt() returns jsonb language sql stable as $$select '{}'::jsonb$$;
-    create function auth.uid() returns uuid language sql stable as $$select null::uuid$$;
-  `);
-  const directory = new URL('../supabase/migrations/', import.meta.url);
+  const directory = new URL('../db/migrations/', import.meta.url);
   for (const file of (await readdir(directory)).filter(file => file.endsWith('.sql')).sort()) {
     await db.exec(await readFile(new URL(file, directory), 'utf8'));
   }
-  await db.exec(await readFile(new URL('../supabase/seed.sql', import.meta.url), 'utf8'));
+  await db.exec(await readFile(new URL('../db/seed.sql', import.meta.url), 'utf8'));
 }, 30000);
 
 beforeEach(async () => {
-  await db.exec('begin; set role service_role');
+  await db.exec('begin');
   databaseCalls = 0;
   delivered = new Map();
-  vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
-  vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-only-service-key');
+  vi.stubEnv('DATABASE_URL', 'postgresql://test:test@localhost/test');
   vi.stubEnv('RESEND_API_KEY', 'test-only-mail-key');
   vi.stubEnv('MAIL_FROM', 'Illinois Abundance <test@example.test>');
   vi.stubEnv('CODE_PEPPER', pepper);

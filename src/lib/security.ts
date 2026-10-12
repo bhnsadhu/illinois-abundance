@@ -1,6 +1,6 @@
 import 'server-only';
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
-import { serviceDatabase } from '@/lib/supabase/service';
+import { serviceDatabase } from '@/lib/database/service';
 import { site } from './config';
 export function secret(name: 'CODE_PEPPER' | 'VIEW_SALT') { const value = process.env[name]; if(!value || value.length < 32) throw new Error('This service is not configured yet. Please try again soon.'); return value; }
 export function privateHash(value: string, salt = secret('CODE_PEPPER')) { return createHmac('sha256',salt).update(value).digest('hex'); }

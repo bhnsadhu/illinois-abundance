@@ -1,5 +1,5 @@
 -- Public reading and private submission records deliberately have separate storage.
--- Apply with Supabase migrations. PostgreSQL 15+ is required for invoker views.
+-- Apply with npm run migrate. PostgreSQL 15+ is required for invoker views.
 create table public.topics (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),

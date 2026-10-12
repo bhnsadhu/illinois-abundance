@@ -7,7 +7,7 @@ import { site } from '@/lib/config';
 import { sendMail } from '@/lib/email';
 import { escapeHtml } from '@/lib/format';
 import { assertOrigin, limitedJson, rateLimit, requestIp, secret } from '@/lib/security';
-import { serviceDatabase } from '@/lib/supabase/service';
+import { serviceDatabase } from '@/lib/database/service';
 import { submissionSchema } from '@/lib/validation';
 
 export const SUBMISSION_COOKIE = 'ia_submission';
@@ -25,7 +25,7 @@ type Challenge = {
 };
 
 function configured() {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  if (!process.env.DATABASE_URL ||
       !process.env.RESEND_API_KEY || !process.env.MAIL_FROM || (process.env.CODE_PEPPER?.length ?? 0) < 32) {
     throw new SubmissionError('Submissions are not connected yet. Please try again soon.', 503);
   }
@@ -163,7 +163,7 @@ export async function verifySubmission(request: NextRequest) {
     configured();
     const id = challengeId(request);
     await limit('submission-verify-ip', requestIp(request), 60, 600);
-    const { data, error } = await serviceDatabase().rpc('verify_submission', {
+    const { data, error } = await serviceDatabase().rpc<{status:string;post_id?:string}>('verify_submission', {
       p_id: id, p_code_hash: hashCode(id, code, secret('CODE_PEPPER')),
     });
     if (error) throw new SubmissionError('We could not check that code. Please try again.', 503);

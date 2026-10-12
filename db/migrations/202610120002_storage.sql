@@ -1,0 +1,4 @@
+-- Covers live in a private Vercel Blob store, provisioned outside PostgreSQL.
+-- The server validates upload type and size. Public delivery checks that a
+-- published article references the cover before serving it through /covers.
+-- This reserved migration intentionally creates no database storage objects.
