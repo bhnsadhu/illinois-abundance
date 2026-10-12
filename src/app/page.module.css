@@ -1,8 +1,8 @@
 .home { padding-bottom: 10px; }
-.heading { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding: 35px 0 27px; border-bottom: 2px solid var(--ink); }
+.heading { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding: 35px 0 27px; }
 .heading h1 { font-size: 64px; line-height: 1; letter-spacing: -.025em; margin: 0; }
 .heading > p { margin: 0; max-width: 38ch; font-size: 14px; line-height: 1.55; color: var(--muted); }
-.feature { display: grid; grid-template-columns: 1fr 1.1fr; gap: 60px; padding: 36px 0 42px; border-bottom: 1px solid var(--line); align-items: center; }
+.feature { display: grid; grid-template-columns: 1fr 1.1fr; gap: 60px; padding: 36px 0 42px; align-items: center; }
 .featureCopy { min-width: 0; }
 .kicker { display: flex; flex-wrap: wrap; align-items: baseline; gap: 18px; margin-bottom: 20px; font-size: 12px; }
 .kicker a { color: var(--deep-teal); font-weight: 650; }
@@ -18,25 +18,24 @@
 .sectionHeading > a { display: inline-flex; align-items: center; min-height: 44px; gap: 12px; font-size: 12px; }
 .sectionHeading > p { font-size: 12px; color: var(--muted); margin: 0; }
 .recent :global(.story-grid) { gap: 27px; }
-.topics { border-top: 2px solid var(--ink); margin-top: 54px; padding-top: 23px; }
+.topics { margin-top: 54px; padding-top: 23px; }
 .topicList { display: grid; grid-template-columns: 1fr 1fr; column-gap: 54px; }
-.topic { display: grid; grid-template-columns: 28px minmax(0, 1fr) 20px; align-items: start; column-gap: 16px; padding: 21px 0; border-top: 1px solid var(--line); }
+.topic { display: grid; grid-template-columns: 28px minmax(0, 1fr) 20px; align-items: start; column-gap: 16px; padding: 21px 0; }
 .topicNumber { font-size: 11px; color: var(--muted); padding-top: 5px; font-variant-numeric: tabular-nums; }
 .topic h3 { font-family: var(--body); font-size: 21px; line-height: 1.3; font-weight: 550; letter-spacing: -.02em; margin: 0 0 7px; }
 .topic p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.55; }
 .topic > svg { margin-top: 5px; }
-.participate { display: grid; grid-template-columns: 1.1fr 1fr; gap: 70px; border-top: 2px solid var(--ink); margin-top: 50px; padding-top: 34px; }
+.participate { display: grid; grid-template-columns: 1.1fr 1fr; gap: 70px; margin-top: 50px; padding-top: 34px; }
 .label { display: block; font-size: 12px; font-weight: 650; margin-bottom: 20px; }
 .write h2 { font-size: 45px; line-height: 1.12; letter-spacing: -.02em; margin-bottom: 18px; }
 .write > p, .event > p { max-width: 48ch; font-size: 14px; line-height: 1.75; color: var(--muted); margin-bottom: 14px; }
-.event { border-left: 1px solid var(--line); padding-left: 40px; }
 .event h2 { font-family: var(--body); font-size: 26px; font-weight: 550; line-height: 1.25; letter-spacing: -.025em; max-width: 24ch; margin-bottom: 20px; }
 .eventDetails { display: grid; gap: 4px; font-size: 13px; }
 .eventDetails time { font-weight: 550; }
 .eventDetails > span { color: var(--muted); }
 .event .sampleNote { font-size: 11px; margin-top: 10px; }
 .event :global(.text-link) { margin-top: 12px; }
-.subscribe { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: center; padding: 30px 0; margin-top: 45px; border-top: 1px solid var(--line); }
+.subscribe { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: center; padding: 30px 0; margin-top: 45px; }
 .subscribe h2 { font-family: var(--body); font-size: 23px; font-weight: 550; letter-spacing: -.02em; margin-bottom: 10px; }
 .subscribe p { color: var(--muted); font-size: 13px; line-height: 1.65; margin-bottom: 0; }
 .subscribe :global(.subscribe-form-compact) { width: 100%; max-width: none; }
@@ -52,7 +51,6 @@
   .featureCopy > p { font-size: 14px; }
   .topicList { column-gap: 30px; }
   .participate, .subscribe { gap: 35px; }
-  .event { padding-left: 30px; }
 }
 @media (max-width: 767px) {
   .heading { align-items: flex-start; flex-direction: column; gap: 14px; padding: 28px 0 23px; }
@@ -74,7 +72,7 @@
   .topic h3 { font-size: 20px; }
   .participate { grid-template-columns: 1fr; gap: 30px; margin-top: 33px; padding-top: 25px; }
   .write h2 { font-size: 39px; }
-  .event { border-left: 0; border-top: 1px solid var(--line); padding: 25px 0 0; }
+  .event { padding: 25px 0 0; }
   .event h2 { font-size: 25px; }
   .subscribe { grid-template-columns: 1fr; gap: 22px; margin-top: 30px; padding: 27px 0 0; }
 }
