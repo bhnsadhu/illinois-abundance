@@ -1,0 +1,6 @@
+import type {Metadata} from 'next';
+import Link from 'next/link';
+import {getSubscriptionResult} from '@/lib/subscriptions';
+export const dynamic='force-dynamic';
+export const metadata:Metadata={title:'Unsubscribe',robots:{index:false,follow:false}};
+export default async function Unsubscribe({searchParams}:{searchParams:Promise<{token?:string}>}){const {token}=await searchParams;const result=await getSubscriptionResult(token,'unsubscribe');return <div className="container verify-page page-section"><span className="eyebrow">YOUR INBOX, YOUR CALL</span><h1>{result==='unsubscribed'?'You’re off the list.':result==='unavailable'?'Let’s try that again.':'This link has finished its job.'}</h1><p className="form-intro">{result==='unsubscribed'?'You won’t receive another digest. The door is always open if you want to come back.':result==='unavailable'?'We couldn’t update your subscription just now. Please try the link again.':'The link is no longer active. You may already have unsubscribed.'}</p>{result==='unavailable'?<form><input type="hidden" name="token" value={token||''}/><button className="button">Try again</button></form>:<Link href="/" className="button button-outline">Back to the ideas</Link>}</div>;}

@@ -1,0 +1,8 @@
+import type {Metadata} from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
+import {getDigestPreview} from '@/lib/digest';
+import {DigestControl} from '@/components/admin/digest-control';
+import {formatDate,safeUrl} from '@/lib/format';
+export const metadata:Metadata={title:'Email digest'};
+export default async function DigestPage(){const preview=await getDigestPreview();return <><div className="desk-heading"><span className="eyebrow">GOOD IDEAS, DELIVERED</span><h1>A little more in their inbox.</h1><p>Preview the past seven days of writing and the next teach in. Send it when it feels ready.</p></div><div className="digest-layout"><section className="digest-preview" aria-label="Digest content preview"><Image src="/brand/logo-wordmark-horizontal.png" alt="Illinois Abundance" width={250} height={24}/><p className="eyebrow">THIS WEEK, RIGHT HERE</p><h2>A little more possibility.</h2>{preview.posts.length?preview.posts.map(post=><article key={post.id}><h3>{post.headline}</h3><p>{post.short_version}</p><Link className="text-link" href={`/post/${post.slug}`}>Read the piece ↗</Link></article>):<p>No new pieces in the past seven days.</p>}{preview.event&&<article className="digest-event"><span className="eyebrow">COME WITH A QUESTION</span><h3>{preview.event.title}</h3><p>{formatDate(preview.event.starts_at,{weekday:'long',hour:'numeric',minute:'2-digit'})} · {preview.event.location}</p><p>{preview.event.description}</p>{safeUrl(preview.event.rsvp_url||'')&&<a className="text-link" href={preview.event.rsvp_url!} target="_blank" rel="noopener noreferrer">RSVP ↗</a>}</article>}<p className="field-hint">Every recipient gets their own one click unsubscribe link.</p></section><DigestControl preview={preview}/></div></>;}
