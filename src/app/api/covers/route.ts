@@ -5,13 +5,14 @@ import { getReviewer } from '@/lib/auth';
 import { put } from '@vercel/blob';
 
 export const runtime = 'nodejs';
-const fileLimit = 5 * 1024 * 1024;
+// Leave room for multipart headers under the hosting request limit.
+const fileLimit = 4 * 1024 * 1024;
 const requestLimit = fileLimit + 32 * 1024;
 
 async function boundedForm(request: Request) {
   const contentType = request.headers.get('content-type') || '';
   if (!contentType.startsWith('multipart/form-data;')) throw new HttpError('Choose an image and add its alt text.');
-  if (Number(request.headers.get('content-length') || 0) > requestLimit) throw new HttpError('Keep your cover image under 5 MB.', 413);
+  if (Number(request.headers.get('content-length') || 0) > requestLimit) throw new HttpError('Keep your cover image under 4 MB.', 413);
   const reader = request.body?.getReader();
   if (!reader) throw new HttpError('Choose an image.');
   const chunks: Uint8Array[] = [];
@@ -20,7 +21,7 @@ async function boundedForm(request: Request) {
     const { value, done } = await reader.read();
     if (done) break;
     bytes += value.byteLength;
-    if (bytes > requestLimit) { await reader.cancel(); throw new HttpError('Keep your cover image under 5 MB.', 413); }
+    if (bytes > requestLimit) { await reader.cancel(); throw new HttpError('Keep your cover image under 4 MB.', 413); }
     chunks.push(value);
   }
   try { return await new Response(Buffer.concat(chunks), { headers: { 'content-type': contentType } }).formData(); }
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
     const alt = typeof altValue === 'string' ? altValue.trim() : '';
     if (!alt || alt.length > 300) throw new HttpError('Describe the cover image in 300 characters or fewer.');
     if (!(file instanceof File) || file.size === 0) throw new HttpError('Choose an image.');
-    if (file.size > fileLimit) throw new HttpError('Keep your cover image under 5 MB.', 413);
+    if (file.size > fileLimit) throw new HttpError('Keep your cover image under 4 MB.', 413);
     if (!['image/jpeg', 'image/png', 'image/webp', 'image/avif'].includes(file.type)) throw new HttpError('Choose a JPG, PNG, WebP, or AVIF image.');
     let output: Buffer;
     try {

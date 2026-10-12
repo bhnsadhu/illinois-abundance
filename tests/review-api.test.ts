@@ -165,7 +165,7 @@ describe('private cover uploads and public delivery', () => {
     expect((await upload(imageRequest(svg))).status).toBe(400);
     expect((await upload(imageRequest(svg, 'image/svg+xml'))).status).toBe(400);
     expect((await upload(imageRequest(svg, 'image/png', ''))).status).toBe(400);
-    expect((await upload(imageRequest(new Uint8Array(5 * 1024 * 1024 + 1)))).status).toBe(413);
+    expect((await upload(imageRequest(new Uint8Array(4 * 1024 * 1024 + 1)))).status).toBe(413);
     mocks.reviewer.mockResolvedValue(null);
     expect((await upload(imageRequest(svg))).status).toBe(401);
     expect(storage.size).toBe(0);
