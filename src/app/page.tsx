@@ -16,8 +16,10 @@ export default async function Home() {
 
   return <div className={`container ${styles.home}`}>
     <header className={styles.heading}>
-      <h1>Latest</h1>
-      <p>Student writing on local policy<br className={styles.desktopBreak}/> in Champaign Urbana.</p>
+      <p className={styles.introLabel}>Illinois Abundance · A student publication</p>
+      <h1>Champaign Urbana.<br/><span>With room for more.</span></h1>
+      <p>Student perspectives on housing, transportation,<br className={styles.desktopBreak}/> and the decisions that shape the place we call home.</p>
+      <div className={styles.introActions}><Link className="button" href="/latest">Explore the writing</Link><Link className="text-link" href="/about">Meet Illinois Abundance <ArrowRight size={17}/></Link></div>
     </header>
 
     {featured ? <section className={styles.feature} aria-labelledby="featured-title">
@@ -62,7 +64,7 @@ export default async function Home() {
     <section className={styles.participate} aria-label="Get involved">
       <div className={styles.write}>
         <span className={styles.label}>Write for us</span>
-        <h2>What would you change<br/> about this place?</h2>
+        <h2>What would you change about this place?</h2>
         <p>Rent, the bus ride to class, a city council decision. If there’s something you want to write about, send it in. A student reviewer will help you edit it.</p>
         <Link className="text-link" href="/write">Send us a piece <ArrowRight size={17}/></Link>
       </div>
@@ -81,7 +83,7 @@ export default async function Home() {
     </section>
 
     <section className={styles.subscribe} id="subscribe" aria-labelledby="subscribe-heading">
-      <div><h2 id="subscribe-heading">Get the email</h2><p>New writing and upcoming teach ins.<br/>Unsubscribe whenever you like.</p></div>
+      <div><span className={styles.label}>Stay in the loop</span><h2 id="subscribe-heading">Good ideas.<br/>In your inbox.</h2><p>New writing and upcoming teach ins.<br/>Unsubscribe whenever you like.</p></div>
       <SubscriptionForm compact/>
     </section>
   </div>;
