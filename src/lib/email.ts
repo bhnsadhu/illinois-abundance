@@ -22,9 +22,9 @@ export async function sendMail(mail: Mail): Promise<string> {
   if (mail.unsubscribeUrl && !unsubscribe) throw new Error('Invalid unsubscribe link.');
   const wordmark = escapeHtml(new URL('/brand/logo-wordmark-horizontal.png', site.url).href);
   const footer = unsubscribe
-    ? `<p><a href="${escapeHtml(unsubscribe)}" style="color:#246159">Unsubscribe in one click</a></p>`
-    : `<p>Questions? <a href="mailto:${escapeHtml(site.contact)}" style="color:#246159">Email Illinois Abundance</a>.</p>`;
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"></head><body style="margin:0;background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif"><main style="max-width:560px;margin:32px auto;padding:40px 24px;background:#fff;border-radius:24px"><a href="${escapeHtml(site.url)}"><img src="${wordmark}" alt="Illinois Abundance" width="240" style="display:block;width:240px;max-width:100%;height:auto;margin-bottom:40px"></a><div style="font-size:17px;line-height:1.65">${mail.html}</div><footer style="margin-top:40px;padding-top:16px;color:#626268;font-size:13px;line-height:1.6">${footer}<p>Student writing on local policy in Champaign Urbana.</p></footer></main></body></html>`;
+    ? `<p><a href="${escapeHtml(unsubscribe)}" style="color:#244e49">Unsubscribe in one click</a></p>`
+    : `<p>Questions? <a href="mailto:${escapeHtml(site.contact)}" style="color:#244e49">Email Illinois Abundance</a>.</p>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"></head><body style="margin:0;background:#fffbe4;color:#202722;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif"><main style="max-width:560px;margin:32px auto;padding:40px 24px;background:#fffef8;border-radius:24px"><a href="${escapeHtml(site.url)}"><img src="${wordmark}" alt="Illinois Abundance" width="240" style="display:block;width:240px;max-width:100%;height:auto;margin-bottom:40px"></a><div style="font-size:17px;line-height:1.65">${mail.html}</div><footer style="margin-top:40px;padding-top:16px;color:#5b635e;font-size:13px;line-height:1.6">${footer}<p>Student writing on local policy in Champaign Urbana.</p></footer></main></body></html>`;
   const { data, error } = await new Resend(apiKey).emails.send({
     from,
     to: mail.to,
