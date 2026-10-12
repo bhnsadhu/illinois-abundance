@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" fill="none">
+  <title>Better ways to get there</title>
+  <desc>A hand drawn orange train crossing a teal bridge above a bicycle lane.</desc>
+  <path d="M93 370C46 263 181 127 337 105C497 82 704 147 731 278C758 411 553 479 365 470C221 464 132 455 93 370Z" fill="#E7E7CC"/>
+  <circle cx="171" cy="147" r="37" fill="#D9B749"/>
+  <g stroke="#121515" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M83 322L717 316L719 342L85 348Z" fill="#98C6C3"/>
+    <path d="M110 348L110 426L145 427L145 350M365 346L365 429L400 429L400 345M647 343L647 425L681 425L681 343" fill="#98C6C3"/>
+    <path d="M160 349C173 408 337 408 350 347M414 346C430 405 616 405 632 345"/>
+    <path d="M141 291L138 220Q139 193 169 193L566 190Q606 190 630 224L650 256L650 291Z" fill="#ED5F1E"/>
+    <path d="M140 266L643 263M241 195L242 288M375 194L377 287M511 192L513 286" stroke-width="4"/>
+    <path d="M161 214L219 213L220 244L160 245Z M262 213L353 212L354 243L263 244Z M398 212L489 212L490 242L399 243Z M536 211L567 211Q584 212 597 227L608 241L536 241Z" fill="#FFFBE4"/>
+    <circle cx="189" cy="295" r="17" fill="#121515"/>
+    <circle cx="323" cy="294" r="17" fill="#121515"/>
+    <circle cx="456" cy="294" r="17" fill="#121515"/>
+    <circle cx="591" cy="292" r="17" fill="#121515"/>
+    <path d="M113 313L680 309M451 186L465 166L488 165L500 185M478 165L490 136M91 140L707 133"/>
+    <path d="M87 443C255 440 558 445 715 438"/>
+    <path d="M121 475L198 474M263 474L338 474M404 474L479 473M549 472L626 471" stroke-width="4"/>
+    <circle cx="496" cy="425" r="29" fill="#FFFBE4"/>
+    <circle cx="589" cy="424" r="29" fill="#FFFBE4"/>
+    <path d="M496 425L532 379L560 424L496 425L521 371M532 379L568 378L589 424M560 424L568 378L574 363L590 363M511 368L534 368" stroke-width="5"/>
+    <path d="M196 173L208 173M202 167L202 179M661 180L675 180M668 173L668 187" stroke-width="4"/>
+  </g>
+</svg>

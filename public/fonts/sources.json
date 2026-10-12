@@ -1,0 +1,17 @@
+{
+  "PatrickHand-Regular": {
+    "family": "Patrick Hand",
+    "weight": "400",
+    "source": "https://github.com/google/fonts/tree/main/ofl/patrickhand",
+    "license": "SIL Open Font License 1.1",
+    "licenseFile": "PatrickHand-OFL.txt"
+  },
+  "DMSans-Variable": {
+    "family": "DM Sans",
+    "weight": "100 1000",
+    "axes": "opsz,wght",
+    "source": "https://github.com/google/fonts/tree/main/ofl/dmsans",
+    "license": "SIL Open Font License 1.1",
+    "licenseFile": "DMSans-OFL.txt"
+  }
+}

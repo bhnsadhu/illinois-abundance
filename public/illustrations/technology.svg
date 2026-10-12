@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" fill="none">
+  <title>Good tools for the common good</title>
+  <desc>A hand drawn teal laptop with a mustard browser window, connected to little civic buildings.</desc>
+  <path d="M94 391C44 269 140 142 296 110C450 78 648 106 709 232C766 350 695 452 542 478C359 509 143 490 94 391Z" fill="#EAE5CC"/>
+  <g stroke="#121515" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M223 389L220 202Q220 186 239 185L558 180Q577 180 578 199L581 387Z" fill="#98C6C3"/>
+    <path d="M245 209L553 204L557 361L248 366Z" fill="#FFFBE4"/>
+    <path d="M222 388L581 384L639 433Q642 446 624 447L174 451Q157 450 162 438Z" fill="#98C6C3"/>
+    <path d="M254 409L551 406M287 429L513 426M356 410L353 428M448 408L452 426" stroke-width="4"/>
+    <path d="M285 237L513 234L515 333L287 337Z" fill="#D9B749"/>
+    <path d="M286 257L513 254" stroke-width="4"/>
+    <circle cx="299" cy="246" r="3" fill="#121515" stroke="none"/>
+    <circle cx="311" cy="246" r="3" fill="#121515" stroke="none"/>
+    <circle cx="323" cy="246" r="3" fill="#121515" stroke="none"/>
+    <path d="M342 276L324 293L342 309M454 274L473 290L455 308M411 271L390 314" stroke-width="5"/>
+    <path d="M252 178L252 151L179 151L179 257M578 272L632 272L632 172M479 175L479 121L546 121" stroke-width="4" stroke-dasharray="9 10"/>
+    <path d="M126 332L125 276L176 246L226 274L228 330Z" fill="#ED5F1E"/>
+    <path d="M113 279L176 239L237 275L230 287L176 253L120 292Z" fill="#FFFBE4"/>
+    <path d="M144 287L159 287L159 306L144 306Z M194 286L209 286L209 305L194 305Z M171 331L171 301L188 301L188 331" fill="#FFFBE4" stroke-width="4"/>
+    <path d="M596 215L596 130L668 127L670 213Z" fill="#ED5F1E"/>
+    <path d="M588 133L677 130L677 118L588 121Z" fill="#FFFBE4"/>
+    <path d="M612 149L625 149L625 165L612 165Z M642 148L655 148L655 164L642 164Z M613 180L626 180L626 197L613 197Z M643 179L656 179L656 196L643 196Z" fill="#FFFBE4" stroke-width="3"/>
+    <circle cx="558" cy="121" r="12" fill="#98C6C3"/>
+    <path d="M98 463L706 459M198 481L249 481M483 483L547 483M329 130L343 130M336 123L336 137M668 343L682 343M675 336L675 350" stroke-width="4"/>
+    <path d="M105 168C120 154 143 154 158 168M113 181C124 172 139 172 150 181M129 194L133 194" stroke-width="5"/>
+  </g>
+</svg>
