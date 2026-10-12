@@ -149,6 +149,20 @@ describe('review mutation HTTP endpoint', () => {
 });
 
 describe('private cover uploads and public delivery', () => {
+  it('saves an uploaded photo with a draft, publishes it, and allows removing it later', async () => {
+    const png = await sharp({ create: { width: 80, height: 56, channels: 3, background: '#98c6c3' } }).png().toBuffer();
+    const uploaded = await upload(imageRequest(png));
+    const photo = await uploaded.json();
+    const changes = { ...publish, cover_url: photo.url, cover_alt: photo.alt };
+    expect((await mutate(request({ action: 'save', version: 1, changes }), context)).status).toBe(200);
+    expect((await db.query('select cover_url,cover_alt from posts where id=$1', [postId])).rows[0]).toEqual({ cover_url: photo.url, cover_alt: photo.alt });
+    expect((await db.query('select id from public_posts')).rows).toHaveLength(0);
+    expect((await mutate(request({ action: 'publish', version: 2, changes }), context)).status).toBe(200);
+    expect((await db.query('select cover_url,cover_alt from public_posts')).rows[0]).toEqual({ cover_url: photo.url, cover_alt: photo.alt });
+    expect((await mutate(request({ action: 'save', version: 3, changes: { ...publish, cover_url: null, cover_alt: null } }), context)).status).toBe(200);
+    expect((await db.query('select cover_url,cover_alt from public_posts')).rows[0]).toEqual({ cover_url: null, cover_alt: null });
+  });
+
   it('re-encodes valid pixels, removes metadata, bounds dimensions, and returns only a local opaque URL', async () => {
     const png = await sharp({ create: { width: 2000, height: 1400, channels: 3, background: '#98c6c3' } }).png().withMetadata({ exif: { IFD0: { Artist: 'Private image creator' } } }).toBuffer();
     const response = await upload(imageRequest(png));

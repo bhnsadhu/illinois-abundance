@@ -250,6 +250,7 @@
 
 .editor-grid > div { min-width: 0; }
 .editor-grid > div > label { margin-bottom: 12px; }
+.editor-fields { min-width: 0; margin: 0; padding: 0; border: 0; }
 .editor-form textarea { background: var(--paper); }
 .editor-form textarea[name=final_body] { padding: 24px; line-height: 1.8; }
 
@@ -300,14 +301,51 @@
 
 .editor-actions .text-button { color: var(--muted); }
 .editor-messages .alert { margin-bottom: 16px; }
-.cover-preview { margin-top: 20px; }
+.editor-photo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 32px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--paper);
+}
+
+.editor-photo:has(.cover-preview) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.editor-photo-settings { min-width: 0; }
+.editor-photo h2 { margin: 0 0 8px; font-size: 28px; }
+.editor-photo h2 .muted { margin-left: 8px; font-family: var(--body); font-size: 13px; }
+.editor-photo label[hidden] { display: none; }
+.editor-photo .field-hint { max-width: 60ch; }
+.editor-photo input[type=file] { padding: 8px; font-size: 14px; }
+.editor-photo input::file-selector-button {
+  min-height: 36px;
+  margin-right: 12px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--soft-cream);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.editor-photo .text-button { min-height: 44px; }
+.cover-preview { min-width: 0; }
 
 .cover-preview img {
   width: 100%;
-  max-height: 240px;
+  height: auto;
+  max-height: 320px;
   object-fit: contain;
   border-radius: 20px;
   background: var(--soft-cream);
+}
+
+@media (max-width: 767px) {
+  .editor-photo, .editor-photo:has(.cover-preview) { grid-template-columns: minmax(0, 1fr); padding: 20px; }
+  .editor-photo .cover-preview { grid-row: 1; }
 }
 
 .admin-nav {

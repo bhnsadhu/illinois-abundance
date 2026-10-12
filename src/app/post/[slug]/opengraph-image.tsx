@@ -11,5 +11,5 @@ export const contentType = 'image/png';
 export default async function OpenGraphImage({ params }: { params: Promise<{ slug: string }> }) {
   const story = await getStory((await params).slug);
   if (!story) return new Response('Story not found.', { status: 404, headers: { 'Cache-Control': 'no-store' } });
-  return createShareImage(shareContent(story), 'opengraph');
+  return createShareImage(shareContent(story));
 }

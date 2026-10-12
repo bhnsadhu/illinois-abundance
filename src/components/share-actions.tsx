@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Copy, Download } from '@/components/icons';
+import { Check, Copy } from '@/components/icons';
 
 export function ShareActions({ slug }: { slug: string }) {
   const [status, setStatus] = useState<'idle' | 'copied' | 'error'>('idle');
@@ -16,7 +16,6 @@ export function ShareActions({ slug }: { slug: string }) {
       <button type="button" className="button button-outline button-small" onClick={copyLink}>
         {status === 'copied' ? <Check size={16}/> : <Copy size={16}/>} {status === 'copied' ? 'Link copied' : 'Copy link'}
       </button>
-      <a href={`/post/${slug}/share.png`} download={`${slug}.png`} className="text-link"><Download size={16}/> Get the Instagram card</a>
     </div>
     <span className="share-status" role="status">{status === 'error' ? 'Could not copy. You can copy the address from your browser.' : status === 'copied' ? 'Ready to share.' : ''}</span>
   </div>;

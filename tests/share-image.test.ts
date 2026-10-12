@@ -10,7 +10,6 @@ vi.mock('@/lib/share-image', () => ({ createShareImage: vi.fn(async () => new Re
 import { getStory } from '@/lib/data';
 import { createShareImage } from '@/lib/share-image';
 import OpenGraphImage from '@/app/post/[slug]/opengraph-image';
-import { GET as instagramImage } from '@/app/post/[slug]/share.png/route';
 
 const story: Story = { ...samplePosts[0], topic: sampleTopics[0], writer: sampleWriters[0] };
 beforeEach(() => vi.clearAllMocks());
@@ -29,17 +28,10 @@ describe('public share images', () => {
   it('returns an uncacheable 404 when the public loader withholds a draft or removed story', async () => {
     vi.mocked(getStory).mockResolvedValue(undefined);
     const params = Promise.resolve({ slug: 'unpublished-story' });
-    for (const response of [await OpenGraphImage({ params }), await instagramImage(new Request('http://localhost/post/unpublished-story/share.png'), { params })]) {
-      expect(response.status).toBe(404);
-      expect(response.headers.get('Cache-Control')).toBe('no-store');
-    }
+    const response = await OpenGraphImage({ params });
+    expect(response.status).toBe(404);
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
     expect(createShareImage).not.toHaveBeenCalled();
-  });
-
-  it('uses an attachment filename that cannot inject HTTP headers', async () => {
-    vi.mocked(getStory).mockResolvedValue({ ...story, slug: 'a-story\r\nInjected: value' });
-    await instagramImage(new Request('http://localhost/post/a-story/share.png'), { params: Promise.resolve({ slug: 'a-story' }) });
-    expect(createShareImage).toHaveBeenCalledWith(shareContent(story), 'instagram', { 'Content-Disposition': 'attachment; filename="a-storyInjectedvalue.png"' });
   });
 });
 
@@ -47,9 +39,7 @@ describe('headline fitting', () => {
   it('also contains the longest allowed unbroken byline and topic', () => {
     for (const [text, width, height, maximum, ratio] of [
       [`Written by ${'W'.repeat(160)}`, 1088, 52, 21, 1.3],
-      [`Written by ${'W'.repeat(160)}`, 940, 86, 29, 1.3],
       ['W'.repeat(80), 610, 39, 21, 1.15],
-      ['W'.repeat(80), 940, 43, 24, 1.15],
     ] as const) {
       const result = fitHeadline(text, width, height, maximum, bodyMetrics, ratio, 12);
       expect(result.lines.length * result.lineHeight).toBeLessThanOrEqual(height);
@@ -58,13 +48,11 @@ describe('headline fitting', () => {
     }
   });
   for (const headline of ['Let’s make room for more neighbors.', 'W'.repeat(200), 'More welcoming neighborhoods need room for homes, useful shops, comfortable sidewalks, and the public places that give everyone a reason to stay. What would it take to build that kind of future together?'.slice(0, 200)]) {
-    it(`keeps all ${headline.length} characters within both image layouts`, () => {
-      for (const [width, height, maximum] of [[610, 304, 88], [940, 380, 112]]) {
-        const result = fitHeadline(headline, width, height, maximum, metrics);
-        expect(result.lines.length * result.lineHeight).toBeLessThanOrEqual(height);
-        result.lines.forEach(line => expect(textWidth(line, result.fontSize, metrics)).toBeLessThanOrEqual(width));
-        expect(result.lines.join('').replace(/\s/g, '')).toBe(headline.replace(/\s/g, ''));
-      }
+    it(`keeps all ${headline.length} characters within the link preview`, () => {
+      const result = fitHeadline(headline, 610, 304, 88, metrics);
+      expect(result.lines.length * result.lineHeight).toBeLessThanOrEqual(304);
+      result.lines.forEach(line => expect(textWidth(line, result.fontSize, metrics)).toBeLessThanOrEqual(610));
+      expect(result.lines.join('').replace(/\s/g, '')).toBe(headline.replace(/\s/g, ''));
     });
   }
 });
