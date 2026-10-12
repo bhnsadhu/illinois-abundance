@@ -16,7 +16,6 @@ export function Header() {
         <Link className="wordmark" href="/" aria-label="Illinois Abundance home" onClick={() => setOpen(false)}>
           <Image src="/brand/logo-wordmark-horizontal.png" alt="Illinois Abundance" width={1439} height={132} sizes="(max-width: 767px) 210px, 290px" priority/>
         </Link>
-        <p>A student group at UIUC</p>
       </div>
       <nav className="desktop-nav" aria-label="Main navigation">{links.map(([label, href]) => <Link key={href} href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</Link>)}</nav>
       <div className="nav-actions">
