@@ -76,6 +76,12 @@ Preview deployments should have their **own database branch, private store, send
 
 Cover uploads accept still JPG, PNG, WebP, or AVIF images up to **4 MB**, require alt text, and are decoded and re-encoded as WebP with metadata removed. The limit leaves room for multipart overhead within [Vercel's function request limit](https://vercel.com/docs/functions/limitations).
 
+## Email design and previews
+
+All application emails use the shared templates in `src/lib/email-templates.ts`: submission codes, submission receipts, newsletter confirmations, and digests. They use the site's cream, orange, and teal palette, wordmark, handwritten headings where supported, inbox preview text, and a plain-text version. The core layout uses presentation tables and inline styles, with readable fallbacks when remote images, fonts, or styles are blocked. Replies go to `CONTACT_EMAIL`; subscriber messages retain their individual unsubscribe links and one-click unsubscribe headers. Newsletter features remain hidden until restored through the existing feature switches.
+
+Run `npm run preview:emails` to generate local examples in `.vercel/email-previews/index.html`. This command sends nothing and needs no database or email credentials. Keep the local site running for its logo and font assets, or set `NEXT_PUBLIC_SITE_URL=https://abundance.bhanusadhu.com` when running the command to use the public assets. Previews include all message types, an event-only digest, a long-name case, subject lines, inbox preview copy, and plain text. These browser previews do not replace rendering checks in actual email clients.
+
 ## Review and administration
 
 The footer has separate **Admin sign in** (`/login/admin`) and **Reviewer sign in** (`/login`) links. Only the exact `ADMIN_EMAIL` and optional `SECOND_ADMIN_EMAIL` have admin privileges, and both require active accounts. Admins also have every reviewer permission. Reviewers can edit and publish stories; they cannot manage accounts, topics, writers, events, or other admin tools. Use `/admin/reviewers` to create a reviewer with a name, email, and initial password; share those credentials directly. There is no public signup or login email. Existing reviewers need an admin-assigned password before they can use password sign-in.

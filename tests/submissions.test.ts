@@ -236,7 +236,7 @@ describe('submission HTTP routes with real PostgreSQL', () => {
 
   it('uses the wordmark and unsubscribe headers in the shared email helper', async () => {
     const unsubscribeUrl = new URL('/unsubscribe?token=test-token', site.url).href;
-    await sendMail({ to: 'digest@example.test', subject: 'This week', html: '<p>New writing.</p>', text: 'New writing.', idempotencyKey: 'digest/test', unsubscribeUrl });
+    await sendMail({ to: 'digest@example.test', subject: 'This week', preview: 'New student writing.', eyebrow: 'FROM CAMPUS', title: 'A little more possibility.', html: '<p>New writing.</p>', text: 'New writing.', idempotencyKey: 'digest/test', unsubscribeUrl });
     const message = delivered.get('digest/test')!;
     expect(message.html).toContain('/brand/logo-wordmark-horizontal.png');
     expect(message.html).not.toContain('logo-source.png');

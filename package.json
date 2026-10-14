@@ -13,7 +13,8 @@
     "migrate": "node --env-file=.env.local --import tsx scripts/migrate.ts",
     "seed": "node --env-file=.env.local --import tsx scripts/seed.ts",
     "test:db": "vitest run tests/database.test.ts",
-    "setup:admin": "node --env-file=.env.local --import tsx scripts/setup-admin.ts"
+    "setup:admin": "node --env-file=.env.local --import tsx scripts/setup-admin.ts",
+    "preview:emails": "node --import tsx scripts/preview-emails.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

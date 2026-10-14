@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { generateCode, hashCode } from '@/lib/codes';
 import { site } from '@/lib/config';
 import { sendMail } from '@/lib/email';
-import { escapeHtml } from '@/lib/format';
+import { submissionCodeMail, submissionReceiptMail } from '@/lib/email-templates';
 import { assertOrigin, limitedJson, rateLimit, requestIp, secret } from '@/lib/security';
 import { serviceDatabase } from '@/lib/database/service';
 import { submissionSchema } from '@/lib/validation';
@@ -103,9 +103,7 @@ async function issueCode(id: string, email: string, name: string, body: string) 
   });
   if (error) throw new SubmissionError('We could not prepare your code. Please try again.', 503);
   await sendMail({
-    to: email, subject: 'Your Illinois Abundance code',
-    html: `<h1 style="font-size:30px;line-height:1.15">One last step.</h1><p>Enter this code to send your piece to our reviewers:</p><p style="font-size:36px;letter-spacing:8px;font-weight:bold">${code}</p><p>It expires in 10 minutes. If you did not request it, you can ignore this email.</p>`,
-    text: `Your Illinois Abundance code is ${code}. It expires in 10 minutes. Enter it on the site to send your piece to our reviewers. If you did not request it, you can ignore this email.`,
+    to: email, ...submissionCodeMail(code),
     idempotencyKey: `submission-code/${id}/${hash}`,
   });
 }
@@ -115,9 +113,7 @@ async function confirmSavedSubmission(value: Challenge) {
   try {
     await limit('submission-confirmation', value.email, 5, 3600);
     await sendMail({
-      to: value.email, subject: 'We got your piece',
-      html: `<h1 style="font-size:30px;line-height:1.15">Got it, ${escapeHtml(value.author_name)}.</h1><p>One of our reviewers will contact you soon. Your original submission is saved, and we will work on any edits with you by email.</p><p>Your piece will only appear on the site after a reviewer publishes it. You can ask us to take it down any time.</p>`,
-      text: `Got it, ${value.author_name}. One of our reviewers will contact you soon. Your original submission is saved, and we will work on any edits with you by email. Your piece will only appear on the site after a reviewer publishes it. You can ask us to take it down any time.`,
+      to: value.email, ...submissionReceiptMail(value.author_name),
       idempotencyKey: `submission-confirmation/${value.post_id}`,
     });
     const { error } = await serviceDatabase().from('email_verifications')

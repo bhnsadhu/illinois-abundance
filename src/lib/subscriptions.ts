@@ -4,7 +4,7 @@ import { apiFailure, guardRateLimit, HttpError, privateJson, readJson, requireOr
 import { site } from './config';
 import { serviceDatabase } from './database/service';
 import { sendMail } from './email';
-import { escapeHtml } from './format';
+import { subscriptionConfirmationMail } from './email-templates';
 import { newToken, requestIp } from './security';
 import { emailSchema } from './validation';
 
@@ -25,9 +25,7 @@ export async function requestSubscription(request: Request) {
     if (error || !data) throw new HttpError('We could not start your subscription. Please try again.', 503);
     if (!data.confirmed) {
       const confirm = new URL(`/subscribe/confirm?token=${data.token}`, site.url).href;
-      await sendMail({ to: email, subject: 'Confirm your Illinois Abundance subscription',
-        html: `<h1 style="font-size:30px;line-height:1.15">A little more possibility.</h1><p>New student writing and upcoming teach ins, sent occasionally.</p><p><a href="${escapeHtml(confirm)}" style="color:#315c59">Confirm my subscription</a></p><p>If you did not request this, you can ignore this email or unsubscribe below.</p>`,
-        text: `Confirm your Illinois Abundance subscription: ${confirm}\nNew student writing and upcoming teach ins, sent occasionally. If you did not request this, you can ignore this email or unsubscribe below.`,
+      await sendMail({ to: email, ...subscriptionConfirmationMail(confirm),
         unsubscribeUrl: unsubscribeUrl(data.token), idempotencyKey: `subscription-confirmation/${data.token}`,
       });
     }

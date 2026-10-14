@@ -5,10 +5,9 @@ import { z } from 'zod';
 import { getReviewer, requireAdmin } from './auth';
 import { isAdminEmail } from './admin-access';
 import { apiFailure, guardRateLimit, HttpError, privateJson, readJson, requireOrigin } from './api';
-import { site } from './config';
 import { serviceDatabase } from './database/service';
 import { sendMail } from './email';
-import { escapeHtml, formatDate } from './format';
+import { digestMail } from './email-templates';
 import { privateHash, safeEqual } from './security';
 import { unsubscribeUrl } from './subscriptions';
 
@@ -86,16 +85,6 @@ async function getDigest(id: string): Promise<DigestRow> {
   return data;
 }
 
-function digestMail(snapshot: DigestSnapshot) {
-  const postsHtml = snapshot.posts.map(post => `<article style="margin:28px 0"><h2 style="font-size:24px;line-height:1.2;margin-bottom:10px"><a href="${escapeHtml(new URL(`/post/${post.slug}`, site.url).href)}" style="color:#315c59">${escapeHtml(post.headline)}</a></h2><p>${escapeHtml(post.short_version)}</p></article>`).join('');
-  const event = snapshot.event;
-  const eventHtml = event ? `<section style="margin-top:32px;padding-top:24px;border-top:1px solid #dedac4"><h2 style="font-size:24px;line-height:1.2">Next teach in: ${escapeHtml(event.title)}</h2><p>${escapeHtml(formatDate(event.starts_at, { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }))} · ${escapeHtml(event.location)}</p><p>${escapeHtml(event.description)}</p><p><a href="${escapeHtml(new URL('/events', site.url).href)}" style="color:#315c59">See the details</a></p></section>` : '';
-  return {
-    html: `<h1 style="font-size:32px;line-height:1.15">A little more possibility.</h1><p>Here is what is new at Illinois Abundance.</p>${postsHtml}${eventHtml}`,
-    text: `A little more possibility.\n\n${snapshot.posts.map(post => `${post.headline}\n${post.short_version}\n${new URL(`/post/${post.slug}`, site.url).href}`).join('\n\n')}${event ? `\n\nNext teach in: ${event.title}\n${formatDate(event.starts_at, { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })} · ${event.location}\n${event.description}\n${new URL('/events', site.url).href}` : ''}`,
-  };
-}
-
 async function sendBatch(digest: DigestRow): Promise<DigestProgress> {
   if (digest.status === 'sent') return progress(digest);
   // Removed or edited content must be reviewed again before any unsent batch.
@@ -120,7 +109,7 @@ async function sendBatch(digest: DigestRow): Promise<DigestProgress> {
       let providerId: string | null = null;
       if (subscribed.data) {
         try {
-          providerId = await sendMail({ to: recipient.email, subject: 'This week at Illinois Abundance', ...mail,
+          providerId = await sendMail({ to: recipient.email, ...mail,
             unsubscribeUrl: unsubscribeUrl(recipient.token), idempotencyKey: `digest/${digest.id}/${sha256(recipient.email)}` });
           deliveryStatus = 'sent';
         } catch { deliveryStatus = 'failed'; }
