@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { hiddenDestination } from '@/hidden/features';
+import { getUncachedVisibility } from '@/lib/site-visibility';
 
-export function proxy(request: NextRequest) {
-  const destination = hiddenDestination(request.nextUrl.pathname);
+export async function proxy(request: NextRequest) {
+  const destination = hiddenDestination(request.nextUrl.pathname) ? hiddenDestination(request.nextUrl.pathname,await getUncachedVisibility()) : null;
   if (destination) {
     const response = request.nextUrl.pathname.startsWith('/api/') || !['GET', 'HEAD'].includes(request.method)
       ? NextResponse.json({ error: 'Not found.' }, { status: 404 })

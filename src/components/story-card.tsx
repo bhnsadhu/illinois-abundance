@@ -14,7 +14,7 @@ export function StoryCard({ story }: { story: Story }) {
         <div className="story-card-labels"><span className="topic-label">{story.topic.name}</span>{story.is_sample && <span className="sample-label">Sample story</span>}</div>
         <h3>{story.headline}</h3>
         <p className="story-card-deck">{story.short_version}</p>
-        <Author name={story.byline || story.author_name} date={story.published_at}/>
+        <Author avatar={story.writer?.avatar_url} name={story.byline || story.author_name} date={story.published_at}/>
       </div>
     </Link>
   </article>;

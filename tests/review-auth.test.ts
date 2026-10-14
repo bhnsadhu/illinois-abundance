@@ -278,8 +278,8 @@ describe('password authentication and account lifecycle', () => {
     expect((await db.query('select * from reviewer_sessions')).rows).toHaveLength(0);
     expect(mocks.cookieSet).toHaveBeenCalledWith(REVIEWER_COOKIE, '', expect.objectContaining({ httpOnly: true, maxAge: 0 }));
   });
-  it('marks private routes no-store', () => {
-    const response = proxy(new NextRequest(new URL('/account', site.url)));
+  it('marks private routes no-store', async () => {
+    const response = await proxy(new NextRequest(new URL('/account', site.url)));
     expect(response.headers.get('cache-control')).toBe('private, no-store'); expect(response.headers.get('pragma')).toBe('no-cache');
     expect(response.headers.get('set-cookie')).toBeNull();
   });

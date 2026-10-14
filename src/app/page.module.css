@@ -89,3 +89,6 @@
 @media (prefers-reduced-motion: reduce) {
   .topic:hover, .topic:active { transform: none; }
 }
+
+.intro { white-space: pre-line; }
+.participate > :only-child { grid-column: 1 / -1; }

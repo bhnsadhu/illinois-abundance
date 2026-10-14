@@ -690,3 +690,6 @@
     transform: none;
   }
 }
+.author-avatar, .writer-avatar, .writer-monogram { overflow: hidden; }
+.author-avatar img, .writer-avatar img, .writer-monogram img { width: 100%; height: 100%; object-fit: cover; }
+.about-hero > :only-child, .next-event > :only-child { grid-column: 1 / -1; }

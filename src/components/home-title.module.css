@@ -1,7 +1,7 @@
 .title { text-wrap: balance; }
 .line { display: block; }
 .accent { font-size: 1.1em; color: var(--orange); }
-.word { display: inline-block; white-space: nowrap; }
+.word { display: inline-block; max-width: 100%; white-space: normal; }
 .letter { display: inline-block; }
 
 /* A single write-on at page entry. Each glyph already occupies its final

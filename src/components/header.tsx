@@ -5,10 +5,12 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Search, Menu, X } from './icons';
 import { isPathHidden } from '@/hidden/features';
+import { siteContentDefaults, contentVisibility, type SiteContent } from '@/lib/site-content-schema';
 
-const links = [['Stories', '/latest'], ['Learn', '/learn'], ['Events', '/events'], ['Show up', '/show-up'], ['About', '/about']].filter(([, href]) => !isPathHidden(href));
 
-export function Header() {
+export function Header({branding=siteContentDefaults.branding,navigation=siteContentDefaults.navigation,visibility=siteContentDefaults.visibility}:{branding?:SiteContent['branding'];navigation?:SiteContent['navigation'];visibility?:SiteContent['visibility']}) {
+  const hidden=contentVisibility({...siteContentDefaults,visibility});
+  const links=navigation.links.filter(({href})=>!isPathHidden(href,hidden));
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   const header = useRef<HTMLElement>(null);
@@ -37,20 +39,20 @@ export function Header() {
   }}>
     <div className="nav-wrap">
       <div className="masthead-brand">
-        <Link className="wordmark" href="/" aria-label="Illinois Abundance home" onClick={() => setOpen(false)}>
-          <Image src="/brand/logo-wordmark-horizontal.png" alt="Illinois Abundance" width={1439} height={132} sizes="(max-width: 767px) 195px, 225px" priority/>
+        <Link className="wordmark" href="/" aria-label={`${branding.name} home`} onClick={() => setOpen(false)}>
+          {branding.logoUrl?<Image src={branding.logoUrl} alt={branding.logoAlt} width={1439} height={132} sizes="(max-width: 767px) 195px, 225px" priority unoptimized/>:branding.name}
         </Link>
       </div>
-      <nav className="desktop-nav" aria-label="Main navigation">{links.map(([label, href]) => <Link key={href} href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</Link>)}</nav>
+      <nav className="desktop-nav" aria-label="Main navigation">{links.map(({label, href}) => <Link key={`${href}-${label}`} href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</Link>)}</nav>
       <div className="nav-actions">
         <Link href="/search" className="icon-button" aria-label="Search stories" onClick={() => setOpen(false)}><Search size={19}/></Link>
-        <Link className="nav-write" href="/write">Write for us</Link>
+        <Link className="nav-write" href={navigation.writeHref}>{navigation.writeLabel}</Link>
         <button ref={menuButton} className="icon-button mobile-toggle" aria-expanded={open} aria-controls="mobile-nav" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen(!open)}>{open ? <X size={20}/> : <Menu size={20}/>}</button>
       </div>
     </div>
     <nav id="mobile-nav" className="mobile-nav" data-open={open} inert={!open} aria-label="Mobile navigation">
-      {links.map(([label, href]) => <Link key={href} href={href} aria-current={pathname === href ? 'page' : undefined} onClick={() => setOpen(false)}>{label}<ArrowRight size={16}/></Link>)}
-      <Link href="/write" onClick={() => setOpen(false)}>Write for us <ArrowRight size={16}/></Link>
+      {links.map(({label, href}) => <Link key={`${href}-${label}`} href={href} aria-current={pathname === href ? 'page' : undefined} onClick={() => setOpen(false)}>{label}<ArrowRight size={16}/></Link>)}
+      <Link href={navigation.writeHref} onClick={() => setOpen(false)}>{navigation.writeLabel} <ArrowRight size={16}/></Link>
     </nav>
   </header>;
 }

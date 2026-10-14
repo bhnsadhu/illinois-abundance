@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { emailSchema } from './validation';
+import {imagePathSchema} from './site-content-schema';
 import { passwordSchema } from './password-schema';
 
 const slug = z.string().trim().min(1).max(160).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Use lowercase words separated by hyphens for the link.');
@@ -14,16 +15,17 @@ export const adminMutationSchema = z.object({
 }).strict();
 export const subscriberRemovalSchema = z.object({ email: emailSchema }).strict();
 
+const imageFields={image_url:nullable(imagePathSchema).optional(),image_alt:nullable(z.string().trim().max(300)).optional()};
 const schemas = {
   reviewers: z.object({ email: emailSchema, name: z.string().trim().min(1).max(160), is_active: z.boolean(),
     password: z.union([passwordSchema, z.literal('')]).optional() }).strict(),
-  topics: z.object({ slug, name: z.string().trim().min(1).max(80), description: z.string().trim().max(600), sort_order: z.number().int().min(-10000).max(10000), is_active: z.boolean() }).strict(),
+  topics: z.object({ slug, name: z.string().trim().min(1).max(80), description: z.string().trim().max(600), sort_order: z.number().int().min(-10000).max(10000), is_active: z.boolean(),...imageFields }).strict(),
   events: z.object({
     slug, title: z.string().trim().min(1).max(200), description: z.string().trim().max(10000), starts_at: dateTime,
     ends_at: nullable(dateTime), location: z.string().trim().min(1).max(300), rsvp_url: nullable(safeUrl),
-    recap_post_id: nullable(z.uuid()), is_published: z.boolean(),
+    recap_post_id: nullable(z.uuid()), is_published: z.boolean(),...imageFields,
   }).strict().refine(value => !value.ends_at || Date.parse(value.ends_at) > Date.parse(value.starts_at), { message: 'The end must be after the start.', path: ['ends_at'] }),
-  writers: z.object({ slug, name: z.string().trim().min(1).max(160), bio: z.string().trim().max(2000) }).strict(),
+  writers: z.object({ slug, name: z.string().trim().min(1).max(160), bio: z.string().trim().max(2000),avatar_url:nullable(imagePathSchema).optional(),avatar_alt:nullable(z.string().trim().max(300)).optional() }).strict(),
   learn: z.object({ slug, title: z.string().trim().min(1).max(200), short_version: z.string().trim().max(600), body: z.string().trim().min(1).max(30000), is_published: z.boolean() }).strict(),
   meetings: z.object({ body_name: z.string().trim().min(1).max(200), starts_at: dateTime, location: z.string().trim().min(1).max(300), agenda_url: nullable(safeUrl), is_published: z.boolean() }).strict(),
 } as const;
@@ -43,6 +45,8 @@ const createDefaults: Record<EditableAdminResource, Record<string, unknown>> = {
 /** Defaults apply only to new records; edits must send the full editable form. */
 export function parseAdminValues(resource: EditableAdminResource, values: Record<string, unknown>, updating: boolean): Record<string, unknown> {
   const parsed = schemas[resource].parse(updating ? values : { ...createDefaults[resource], ...values });
+  const media=parsed as Record<string,unknown>;
+  if ((media.image_url&&!media.image_alt)||(media.avatar_url&&!media.avatar_alt))z.string().min(1,'Add an image description.').parse('');
   if (resource === 'reviewers' && !updating) passwordSchema.parse((parsed as {password?: string}).password ?? '');
   return parsed;
 }

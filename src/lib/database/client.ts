@@ -14,7 +14,7 @@ type Filter = { column: string; operator: '=' | '<>' | '>=' | '<=' | '<' | '>' |
 
 const publicViews = new Set([
   'public_posts', 'public_topics', 'public_story_topics', 'public_writers',
-  'public_events', 'public_learn_pages', 'public_meetings',
+  'public_events', 'public_learn_pages', 'public_meetings', 'public_site_content',
 ]);
 
 class InvalidQuery extends Error {

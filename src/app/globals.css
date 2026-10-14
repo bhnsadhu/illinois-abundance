@@ -233,3 +233,13 @@ label:has(input[type=checkbox]) { display: flex; gap: 10px; align-items: center;
   input, textarea, select { border-color: #55555b; }
   .button-outline { border-color: var(--ink); }
 }
+/* Editable copy and uploaded branding must fit without hiding any words. */
+.wordmark, .footer-brand { overflow-wrap: anywhere; font-family: var(--hand); line-height: 1.1; }
+.wordmark img { max-height: 40px; object-fit: contain; object-position: left center; }
+.footer-brand img { max-height: 32px; object-fit: contain; object-position: left center; }
+.desktop-nav { min-width: 0; }
+.desktop-nav a { min-width: 0; overflow-wrap: anywhere; }
+.nav-wrap { height: auto; min-height: 76px; }
+.nav-actions { flex-shrink: 0; }
+.nav-write { white-space: normal; max-width: 180px; overflow-wrap: anywhere; }
+.button, .text-link, .footer-links a, p { overflow-wrap: anywhere; }

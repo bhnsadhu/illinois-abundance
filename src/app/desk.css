@@ -685,3 +685,22 @@
 }
 
 .password-form { max-width: 560px; }
+
+.site-content-layout { display: grid; grid-template-columns: 210px minmax(0,1fr); gap: 32px; align-items: start; }
+.site-content-nav { display: grid; gap: 4px; position: sticky; top: 100px; max-height: calc(100dvh - 120px); overflow-y: auto; }
+.site-content-nav button { text-align: left; padding: 12px 16px; min-height: 44px; border-radius: 12px; color: var(--muted); }
+.site-content-nav button[aria-current] { background: var(--paper); color: var(--ink); font-weight: 600; }
+.site-content-panel { min-width: 0; padding: 32px; background: var(--paper); border-radius: 24px; }
+.site-content-panel h2 { font-size: 32px; }
+.site-content-save { display: flex; gap: 16px 24px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--control-line); padding-top: 24px; margin-top: 32px; }
+.site-content-save .muted { font-size: 12px; }
+.site-list-field { margin: 0 0 28px; min-width: 0; border: 0; padding: 0; }
+.site-list-field legend, .site-field-label { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+.site-list-item { padding: 24px; background: var(--soft-cream); border-radius: 16px; margin-bottom: 16px; }
+.site-list-actions, .site-image-actions { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+.site-image-field { margin-bottom: 28px; }
+.site-field-label { display: block; }
+.site-image-preview { display: block; max-width: 100%; width: auto; max-height: 180px; object-fit: contain; margin-bottom: 16px; border-radius: 12px; }
+.site-image-field input[hidden] { display: none; }
+.site-toggle { min-height: 44px; }
+@media (max-width: 900px) { .site-content-layout { grid-template-columns: 1fr; gap: 20px; }.site-content-nav { position: static; max-height: none; display: flex; overflow-x: auto; padding-bottom: 8px; }.site-content-nav button { white-space: nowrap; }.site-content-panel { padding: 24px 20px; }.site-content-panel .section-heading { flex-wrap: wrap; }.site-list-item { padding: 20px 16px; } }

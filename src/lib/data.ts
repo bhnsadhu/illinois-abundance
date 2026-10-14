@@ -12,10 +12,10 @@ function publicCache<Args extends unknown[], Result>(fn: (...args: Args) => Prom
 }
 
 const fields = {
-  topics: 'id,slug,name,description,sort_order,is_active,is_sample',
+  topics: 'id,slug,name,description,sort_order,is_active,is_sample,image_url,image_alt',
   writers: 'id,slug,name,bio,avatar_url,avatar_alt,is_sample',
   posts: 'id,slug,author_name,final_body,headline,short_version,sources,topic_id,byline,writer_id,cover_url,cover_alt,published_at,updated_at,is_sample',
-  events: 'id,slug,title,description,starts_at,ends_at,location,rsvp_url,recap_post_id,is_published,is_sample',
+  events: 'id,slug,title,description,starts_at,ends_at,location,rsvp_url,recap_post_id,is_published,is_sample,image_url,image_alt',
   learn_pages: 'id,slug,title,short_version,body,is_published,is_sample,created_at,updated_at',
   meetings: 'id,body_name,starts_at,location,agenda_url,is_published,is_sample',
 } as const;
@@ -91,7 +91,7 @@ export const getEventGroups = publicCache(async () => {
   return {events, upcoming:events.filter(event=>eventEnd(event)>now), past:events.filter(event=>eventEnd(event)<=now).reverse()};
 });
 export function illustrationFor(slug: string) { return `/illustrations/${['housing','infrastructure','energy','healthcare','education','technology'].includes(slug) ? slug : 'housing'}.svg`; }
-export function coverFor(story: Story) { return story.cover_url || illustrationFor(story.topic.slug); }
-export function coverAlt(story: Story) { return story.cover_alt || `Hand drawn illustration about ${story.topic.name.toLowerCase()}`; }
+export function coverFor(story: Story) { return story.cover_url || story.topic.image_url || illustrationFor(story.topic.slug); }
+export function coverAlt(story: Story) { return story.cover_alt || story.topic.image_alt || `Hand drawn illustration about ${story.topic.name.toLowerCase()}`; }
 
 export async function getNextEvent() { const now=Date.now(); return (await getEvents()).find(event=>Date.parse(event.starts_at)>now); }

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import {siteContentDefaults,type SiteContent} from '@/lib/site-content-schema';
 import { Check, Copy } from '@/components/icons';
 
-export function ShareActions({ slug }: { slug: string }) {
+export function ShareActions({ slug,copy=siteContentDefaults.reader }: { slug: string;copy?:SiteContent['reader'] }) {
   const [status, setStatus] = useState<'idle' | 'copied' | 'error'>('idle');
   async function copyLink() {
     try {
@@ -14,9 +15,9 @@ export function ShareActions({ slug }: { slug: string }) {
   return <div className="share-actions">
     <div className="share-buttons">
       <button type="button" className="button button-outline button-small" onClick={copyLink}>
-        {status === 'copied' ? <Check size={16}/> : <Copy size={16}/>} {status === 'copied' ? 'Link copied' : 'Copy link'}
+        {status === 'copied' ? <Check size={16}/> : <Copy size={16}/>} {status === 'copied' ? copy.copySuccess : copy.copyLabel}
       </button>
     </div>
-    <span className="share-status" role="status">{status === 'error' ? 'Could not copy. You can copy the address from your browser.' : status === 'copied' ? 'Ready to share.' : ''}</span>
+    <span className="share-status" role="status">{status === 'error' ? copy.copyError : status === 'copied' ? 'Ready to share.' : ''}</span>
   </div>;
 }

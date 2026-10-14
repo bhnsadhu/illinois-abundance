@@ -144,7 +144,7 @@ describe('double opt-in subscriptions', () => {
   it('unsubscribes idempotently by GET helper or RFC8058 POST without requiring a browser origin', async () => {
     await subscriber();
     const request = new NextRequest(new URL(`/unsubscribe?token=${token}`, site.url), { method: 'POST', body: 'List-Unsubscribe=One-Click' });
-    expect(proxy(request).headers.get('x-middleware-rewrite')).toContain(`/api/unsubscribe?token=${token}`);
+    expect((await proxy(request)).headers.get('x-middleware-rewrite')).toContain(`/api/unsubscribe?token=${token}`);
     expect(await (await unsubscribe(request)).json()).toEqual({ ok: true });
     expect(await getSubscriptionResult(token, 'unsubscribe')).toBe('unsubscribed');
     expect((await db.query('select * from subscribers')).rows).toHaveLength(0);

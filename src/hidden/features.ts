@@ -7,7 +7,7 @@ export const hiddenFeatures = {
 };
 
 type Feature = keyof typeof hiddenFeatures;
-type Visibility = Record<Feature, boolean>;
+export type Visibility = Record<Feature, boolean>;
 
 const routes: Record<Feature, { paths: string[]; returnTo: string }> = {
   learn: { paths: ['/learn', '/admin/learn', '/api/admin/learn'], returnTo: '/latest' },
@@ -29,6 +29,6 @@ export function hiddenDestination(pathname: string, visibility: Visibility = hid
   return null;
 }
 
-export function isPathHidden(pathname: string): boolean {
-  return hiddenDestination(pathname) !== null;
+export function isPathHidden(pathname: string, visibility: Visibility = hiddenFeatures): boolean {
+  return hiddenDestination(pathname, visibility) !== null;
 }
