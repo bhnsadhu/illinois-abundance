@@ -21,8 +21,8 @@ export function LoginForm({ role = 'reviewer' }: { role?: 'admin' | 'reviewer' }
     } catch (error) { setError(error instanceof Error ? error.message : 'Please try again.'); setBusy(false); }
   }
   return <form className="form-card login-form" onSubmit={submit}>
-    <label>Email address<input name="email" type="email" autoComplete="username" autoCapitalize="none" maxLength={254} placeholder={role === 'admin' ? 'Your admin email' : 'Your reviewer email'} required/></label>
-    <label>Password<input name="password" type="password" autoComplete="current-password" maxLength={128} required/></label>
+    <label><span className="sr-only">Email address</span><input name="email" type="email" autoComplete="username" autoCapitalize="none" maxLength={254} placeholder="Email address" required/></label>
+    <label><span className="sr-only">Password</span><input name="password" type="password" autoComplete="current-password" maxLength={128} placeholder="Password" required/></label>
     <div className="honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off"/></label></div>
     {error && <p className="alert alert-error" role="alert">{error}</p>}
     <button className="button full-width" disabled={busy}>{busy ? 'Signing in…' : role === 'admin' ? 'Sign in as admin' : 'Sign in as reviewer'}<ArrowRight size={17}/></button>

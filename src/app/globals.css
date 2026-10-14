@@ -142,6 +142,7 @@ label:has(input[type=checkbox]) { display: flex; gap: 10px; align-items: center;
 .login-sent-title { font-size: 30px; margin: 25px 0 14px; }
 .login-note { margin: 20px 0 0; text-align: center; }
 .login-form { text-align: left; }
+.login-form > label > input { margin-top: 0; }
 .subscribe-fields label { margin-bottom: 17px; }
 .subscribe-fields > .button { width: 100%; margin-bottom: 15px; }
 .subscribe-success-title { font-size: 30px; margin-bottom: 14px; }
