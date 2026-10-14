@@ -52,10 +52,9 @@ export default async function Home() {
     </section>}
 
     <section className={styles.topics} aria-labelledby="topics-heading">
-      <div className={styles.sectionHeading}><h2 id="topics-heading">Topics</h2><p>What we write about</p></div>
+      <div className={styles.sectionHeading}><h2 id="topics-heading">Topics</h2></div>
       <div className={styles.topicList}>
-        {topics.map((topic, index) => <Link key={topic.id} href={`/topic/${topic.slug}`} className={styles.topic}>
-          <span className={styles.topicNumber}>{String(index + 1).padStart(2, '0')}</span>
+        {topics.map(topic => <Link key={topic.id} href={`/topic/${topic.slug}`} className={styles.topic}>
           <div><h3>{topic.name}</h3><p>{topic.description}</p></div>
           <ArrowRight size={18}/>
         </Link>)}
@@ -64,21 +63,20 @@ export default async function Home() {
 
     <section className={styles.participate} aria-label="Get involved">
       <div className={styles.write}>
-        <span className={styles.label}>Write for us</span>
-        <h2>What would you change about this place?</h2>
-        <p>Rent, the bus ride to class, a city council decision. If there’s something you want to write about, send it in. A student reviewer will help you edit it.</p>
+        <h2>Write for us</h2>
+        <p>Share a local story or idea. A student reviewer will help you get it ready to publish.</p>
         <Link className="text-link" href="/write">Send us a piece <ArrowRight size={17}/></Link>
       </div>
       <div className={styles.event}>
-        <span className={styles.label}>Next campus event</span>
-        <h2>{nextEvent ? nextEvent.title : 'We’re planning the next one.'}</h2>
+        {nextEvent && <span className={styles.label}>Next campus event</span>}
+        <h2>{nextEvent ? nextEvent.title : 'Campus events'}</h2>
         {nextEvent ? <>
           <div className={styles.eventDetails}>
             <time dateTime={nextEvent.starts_at}>{formatDate(nextEvent.starts_at, { month: 'long', day: 'numeric' })} at {formatDate(nextEvent.starts_at, { month: undefined, day: undefined, hour: 'numeric', minute: '2-digit' })}</time>
             <span>{nextEvent.location}</span>
           </div>
           {nextEvent.is_sample && <p className={styles.sampleNote}>Sample event. Details are for demonstration.</p>}
-        </> : <p>Upcoming dates and locations will be posted here. You don’t need any policy background to come along.</p>}
+        </> : <p>New dates will appear here when they’re confirmed.</p>}
         <Link href="/events" className="text-link">View events <ArrowRight size={17}/></Link>
       </div>
     </section>

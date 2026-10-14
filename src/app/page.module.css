@@ -17,12 +17,10 @@
 .sectionHeading { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
 .sectionHeading h2 { font-size: 36px; margin: 0; line-height: 1.15; }
 .sectionHeading > a { display: inline-flex; align-items: center; min-height: 44px; gap: 10px; font-size: 14px; color: var(--deep-teal); font-weight: 500; }
-.sectionHeading > p { font-size: 14px; color: var(--muted); margin: 0; }
 .recent :global(.story-grid) { column-gap: var(--column-gap); }
 .topics { margin-top: 88px; }
 .topicList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--column-gap); }
 .topic { display: grid; grid-template-columns: minmax(0, 1fr) 20px; align-items: start; gap: 20px 16px; padding: 30px; background: var(--paper); border-radius: 24px; transition: transform 180ms ease, box-shadow 180ms ease; }
-.topicNumber { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; grid-column: 1 / -1; }
 .topic h3 { font-size: 22px; line-height: 1.2; margin: 0 0 12px; }
 .topic p { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.6; }
 .topic > svg { margin-top: 4px; color: var(--deep-teal); }
@@ -78,11 +76,9 @@
   .sectionHeading { gap: 12px; margin-bottom: 22px; }
   .sectionHeading h2 { font-size: 28px; }
   .sectionHeading > a { font-size: 12px; white-space: nowrap; gap: 6px; }
-  .sectionHeading > p { display: none; }
   .recent :global(.story-grid) { grid-template-columns: 1fr; gap: 20px; }
   .topicList { grid-template-columns: 1fr; gap: 12px; }
   .topic { padding: 24px; gap: 12px; }
-  .topicNumber { display: none; }
   .topic h3 { font-size: 22px; margin-bottom: 8px; }
   .participate { grid-template-columns: 1fr; gap: 20px; }
   .write, .event { padding: 32px 24px; border-radius: 24px; }

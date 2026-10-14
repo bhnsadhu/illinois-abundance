@@ -26,7 +26,7 @@ export function LoginForm({ role = 'reviewer' }: { role?: 'admin' | 'reviewer' }
     <div className="honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off"/></label></div>
     {error && <p className="alert alert-error" role="alert">{error}</p>}
     <button className="button full-width" disabled={busy}>{busy ? 'Signing in…' : role === 'admin' ? 'Sign in as admin' : 'Sign in as reviewer'}<ArrowRight size={17}/></button>
-    <p className="consent-copy login-note">{role === 'reviewer' ? 'Use the email and password your admin gave you. Ask your admin if you need a password reset.' : 'Use your admin email and password.'}</p>
+    {role === 'reviewer' && <p className="consent-copy login-note">Need a password reset? Ask your admin.</p>}
     <p className="login-note"><Link className="text-link" href={role === 'admin' ? '/login' : '/login/admin'}>{role === 'admin' ? 'Reviewer sign in' : 'Admin sign in'}</Link></p>
   </form>;
 }

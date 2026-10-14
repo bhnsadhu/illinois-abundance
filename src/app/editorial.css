@@ -219,10 +219,6 @@
   padding-block: 88px 72px;
 }
 
-.topic-heading .eyebrow {
-  margin-bottom: 20px;
-}
-
 .topic-heading h1 {
   margin-bottom: 22px;
   font-size: clamp(52px, 6.5vw, 88px);
@@ -241,13 +237,6 @@
   width: 100%;
   max-height: 360px;
   object-fit: contain;
-}
-
-.topic-story-count {
-  display: block;
-  margin-top: 24px;
-  color: var(--muted);
-  font-size: 13px;
 }
 
 .article-heading {
@@ -492,11 +481,7 @@
   line-height: 1.05;
 }
 
-.about-hero .eyebrow {
-  margin-bottom: 22px;
-}
-
-.about-hero > div > p:not(.eyebrow) {
+.about-hero > div > p {
   max-width: 43ch;
   margin-bottom: 0;
   color: var(--muted);
@@ -525,20 +510,12 @@
 
 .about-section {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) minmax(0, 1.15fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
   align-items: start;
   gap: 32px;
   padding: 44px;
   border-radius: 28px;
   background: var(--paper);
-}
-
-.about-section-number {
-  padding-top: 3px;
-  color: var(--deep-teal);
-  font-size: 15px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
 }
 
 .about-section h2 {
@@ -640,9 +617,9 @@
   .article-cover { height: 400px; }
   .about-hero { gap: 24px; padding-block: 64px; }
   .about-hero h1 { font-size: 52px; }
-  .about-hero > div > p:not(.eyebrow) { font-size: 18px; }
+  .about-hero > div > p { font-size: 18px; }
   .about-hero-art { min-height: 340px; padding: 16px; }
-  .about-section { grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; padding: 32px; }
+  .about-section { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; padding: 32px; }
   .about-section h2 { font-size: 27px; }
   .about-section > p { font-size: 15px; }
   .about-write h2 { font-size: 42px; }
@@ -652,8 +629,6 @@
   .topic-heading { grid-template-columns: 1fr; gap: 24px; padding-block: 48px; text-align: center; }
   .topic-heading h1 { font-size: clamp(44px, 11vw, 64px); }
   .topic-heading p { margin-inline: auto; font-size: 18px; }
-  .topic-heading .eyebrow { justify-content: center; margin-bottom: 16px; }
-  .topic-story-count { margin-top: 18px; font-size: 12px; }
   .topic-heading img { max-width: 400px; max-height: 260px; justify-self: center; }
   .topic-filters { gap: 8px; margin-bottom: 32px; }
   .topic-filters a { padding: 10px 16px; font-size: 12px; }
@@ -681,14 +656,12 @@
   .related-stories .section-heading h2 { font-size: 32px; }
   .about-hero { grid-template-columns: 1fr; gap: 32px; padding-block: 48px; text-align: center; }
   .about-hero h1 { max-width: 17ch; margin-inline: auto; font-size: clamp(42px, 11vw, 60px); }
-  .about-hero .eyebrow { justify-content: center; }
-  .about-hero > div > p:not(.eyebrow) { margin-inline: auto; font-size: 18px; }
+  .about-hero > div > p { margin-inline: auto; font-size: 18px; }
   .about-hero-art { min-height: 0; padding: 12px; border-radius: 24px; }
   .about-hero-art img { max-height: 320px; object-fit: contain; }
-  .about-section { grid-template-columns: 24px minmax(0, 1fr); gap: 16px; padding: 28px 24px; border-radius: 24px; }
+  .about-section { grid-template-columns: 1fr; gap: 16px; padding: 28px 24px; border-radius: 24px; }
   .about-section h2 { max-width: 20ch; font-size: 27px; }
-  .about-section > p { grid-column: 2; font-size: 15px; }
-  .about-section-number { font-size: 13px; }
+  .about-section > p { font-size: 15px; }
   .about-write { grid-template-columns: 1fr; gap: 32px; margin-top: 48px; padding-block: 16px; }
   .about-write h2 { max-width: 14ch; font-size: 40px; }
   .about-write li { font-size: 14px; }

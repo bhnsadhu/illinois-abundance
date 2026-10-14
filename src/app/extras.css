@@ -44,10 +44,6 @@
   overflow-wrap: anywhere;
 }
 
-.writer-heading .eyebrow {
-  margin-bottom: 18px;
-}
-
 .writer-monogram {
   display: grid;
   flex-shrink: 0;
@@ -517,7 +513,6 @@
   .writer-heading { flex-direction: column; align-items: center; gap: 24px; padding: 48px 0 40px; text-align: center; }
   .writer-monogram { width: 96px; height: 96px; font-size: 34px; }
   .writer-heading h1 { font-size: 44px; }
-  .writer-heading .eyebrow { justify-content: center; margin-bottom: 14px; }
   .writer-bio { font-size: 17px; }
   .story-search { gap: 10px; padding: 7px 7px 7px 16px; }
   .story-search > svg { width: 18px; }
