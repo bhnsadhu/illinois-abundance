@@ -5,6 +5,7 @@ import { hashSessionToken, REVIEWER_COOKIE, reviewerCookieOptions } from '@/lib/
 import { verifyPassword } from '@/lib/passwords';
 import { serviceDatabase } from '@/lib/database/service';
 import { emailSchema } from '@/lib/validation';
+import { isAdminEmail } from '@/lib/admin-access';
 
 export const runtime = 'nodejs';
 const schema = z.object({
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
       .select('id,password_hash,is_active').eq('email', input.email).maybeSingle();
     if (error) throw new HttpError('Please try again in a moment.', 503);
     const matches = await verifyPassword(input.password, reviewer?.password_hash);
-    const isAdmin = input.email === process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    const isAdmin = isAdminEmail(input.email);
     if (!matches || !reviewer?.is_active || (input.role === 'admin' && !isAdmin)) {
       throw new HttpError('Email or password is incorrect for this sign in.', 401);
     }

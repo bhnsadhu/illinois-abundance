@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { serviceDatabase } from '@/lib/database/service';
 import { privateHash } from '@/lib/security';
 import { site } from '@/lib/config';
+import { isAdminEmail } from '@/lib/admin-access';
 
 export type Reviewer = { id: string; name: string; email: string; isAdmin: boolean };
 type ReviewerRow = { id: string; name: string; email: string; is_active: boolean };
@@ -29,7 +30,7 @@ export async function getReviewer(): Promise<Reviewer | null> {
     // The opaque cookie proves possession of an unexpired server session; the
     // current membership list, not cached claims, grants editorial permissions.
     const email = String(session.email).trim().toLowerCase();
-    const isAdmin = Boolean(process.env.ADMIN_EMAIL?.trim()) && email === process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    const isAdmin = isAdminEmail(email);
     const { data, error: lookupError } = await db.from<ReviewerRow>('reviewers').select('id,name,email,is_active')
       .eq('email', email).eq('is_active', true).maybeSingle();
     return !lookupError && data ? { id: data.id, name: data.name, email, isAdmin } : null;

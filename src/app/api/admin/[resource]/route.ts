@@ -5,6 +5,7 @@ import { apiFailure, guardRateLimit, HttpError, privateJson, readJson, requireOr
 import { serviceDatabase } from '@/lib/database/service';
 import type { DatabaseError } from '@/lib/database/client';
 import { hashPassword } from '@/lib/passwords';
+import { isAdminEmail } from '@/lib/admin-access';
 
 function databaseFailure(error: DatabaseError | null) {
   if (!error) return;
@@ -24,9 +25,8 @@ export async function POST(request: Request, context: { params: Promise<{ resour
   try {
     requireOrigin(request);
     const reviewer = await getReviewer();
-    const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
     if (!reviewer) throw new HttpError('Sign in as the site admin to continue.', 401);
-    if (!reviewer.isAdmin || !adminEmail || reviewer.email !== adminEmail) throw new HttpError('Only the site admin can make this change.', 403);
+    if (!reviewer.isAdmin || !isAdminEmail(reviewer.email)) throw new HttpError('Only a site admin can make this change.', 403);
     const resource = adminResourceSchema.safeParse((await context.params).resource);
     if (!resource.success) throw new HttpError('That admin section could not be found.', 404);
     const input = adminMutationSchema.parse(await readJson(request, 160000));
@@ -52,23 +52,24 @@ export async function POST(request: Request, context: { params: Promise<{ resour
     if (input.action === 'delete' && (!input.id || Object.keys(input.values).length)) throw new HttpError('Choose the record to remove.');
     const values = input.action === 'save' ? parseAdminValues(resource.data, input.values, Boolean(input.id)) : null;
     if (resource.data === 'reviewers') {
-      if (values?.email === adminEmail && values.is_active !== true) throw new HttpError('The configured site admin must remain active.');
+      const targetsAdmin = typeof values?.email === 'string' && isAdminEmail(values.email);
+      if (targetsAdmin && values?.is_active !== true) throw new HttpError('Configured site admins must remain active.');
       let existingEmail: string | undefined;
       if (input.id) {
         const existing = await db.from<{ email: string }>('reviewers').select('email').eq('id', input.id).maybeSingle();
         databaseFailure(existing.error);
         if (!existing.data) throw new HttpError('That reviewer could not be found.', 404);
         existingEmail = existing.data.email;
-        if (existing.data.email === adminEmail && (input.action === 'delete' || values?.email !== adminEmail || values.is_active !== true)) {
-          throw new HttpError('The configured site admin cannot be removed or reassigned.');
+        if (isAdminEmail(existingEmail) && (input.action === 'delete' || values?.email !== existingEmail || values.is_active !== true)) {
+          throw new HttpError('Configured site admins cannot be removed or reassigned.');
         }
       }
-      if (values?.email === adminEmail && existingEmail !== adminEmail) throw new HttpError('The admin identity cannot be assigned to a reviewer.');
+      if (targetsAdmin && existingEmail !== values?.email) throw new HttpError('An admin identity cannot be assigned to a reviewer.');
       if (values) {
         const password = values.password;
         delete values.password;
         if (password) {
-          if (existingEmail === adminEmail) throw new HttpError('Use Change password to update your own admin password.');
+          if (existingEmail && isAdminEmail(existingEmail)) throw new HttpError('Admins must use Change password to update their own password.');
           values.password_hash = await hashPassword(String(password));
         }
       }

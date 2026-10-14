@@ -7,6 +7,7 @@ import { hashPassword, verifyPassword } from '@/lib/passwords';
 import { POST as login } from '@/app/api/login/route';
 import { POST as changePassword } from '@/app/api/account/password/route';
 import { POST as adminMutation } from '@/app/api/admin/[resource]/route';
+import { POST as reviewMutation } from '@/app/api/review/[id]/route';
 import { GET as callback } from '@/app/auth/callback/route';
 import { POST as logout } from '@/app/api/logout/route';
 import { proxy } from '@/proxy';
@@ -70,6 +71,7 @@ beforeEach(async () => {
   databaseCalls = 0; unavailable = false;
   vi.stubEnv('DATABASE_URL', 'postgresql://test-only.invalid/never-connect');
   vi.stubEnv('ADMIN_EMAIL', adminEmail);
+  vi.stubEnv('SECOND_ADMIN_EMAIL', '');
   vi.stubEnv('RESEND_API_KEY', '');
   vi.stubEnv('CODE_PEPPER', 'test-pepper-longer-than-thirty-two-characters');
   mocks.cookieGet.mockReset().mockReturnValue(undefined); mocks.cookieSet.mockReset();
@@ -120,6 +122,57 @@ describe('password authentication and account lifecycle', () => {
     await expect(requireAdmin()).rejects.toThrow('NEXT_REDIRECT');
     mocks.cookieGet.mockReturnValue(undefined);
     await expect(requireReviewer()).rejects.toThrow('NEXT_REDIRECT');
+  });
+  it('gives the second configured admin full access and rechecks that slot on every request', async () => {
+    vi.stubEnv('SECOND_ADMIN_EMAIL', reviewerEmail);
+    const response = await signIn(reviewerEmail, password, 'admin');
+    expect(await response.json()).toEqual({ ok: true, redirect: '/admin' });
+    mocks.cookieGet.mockReturnValue({ value: response.cookies.get(REVIEWER_COOKIE)!.value });
+    expect(await requireAdmin()).toMatchObject({ id: reviewerId, isAdmin: true });
+    expect(await requireReviewer()).toMatchObject({ id: reviewerId, isAdmin: true });
+    expect((await resetByAdmin({ email: 'third@example.test', name: 'Third reviewer', is_active: true, password })).status).toBe(200);
+    expect((await signIn('third@example.test', password, 'admin')).status).toBe(401);
+    vi.stubEnv('SECOND_ADMIN_EMAIL', '');
+    expect(await requireReviewer()).toMatchObject({ isAdmin: false });
+    await expect(requireAdmin()).rejects.toThrow('NEXT_REDIRECT');
+    expect((await resetByAdmin({ email: 'fourth@example.test', name: 'Fourth reviewer', is_active: true, password })).status).toBe(403);
+    vi.stubEnv('SECOND_ADMIN_EMAIL', reviewerEmail);
+    await db.query('update reviewers set is_active=false where id=$1', [reviewerId]);
+    expect(await getReviewer()).toBeNull();
+    expect((await signIn(reviewerEmail, password, 'admin')).status).toBe(401);
+  });
+  it('lets admins use reviewer sign-in and rejects client-supplied privileges', async () => {
+    expect(await (await signIn(adminEmail)).json()).toEqual({ ok: true, redirect: '/admin' });
+    await createSession();
+    for (const resource of ['reviewers', 'topics', 'events', 'writers', 'samples']) {
+      const response = await adminMutation(post('/api/admin/' + resource, { action: 'save', values: {} }), { params: Promise.resolve({ resource }) });
+      expect(response.status).toBe(403);
+    }
+    expect((await login(post('/api/login', { email: reviewerEmail, password, role: 'reviewer', isAdmin: true }))).status).toBe(400);
+    await db.exec('delete from reviewer_sessions'); await createSession(adminEmail);
+    for (const privilege of [{ isAdmin: true }, { role: 'admin' }]) {
+      expect((await resetByAdmin({ email: 'extra@example.test', name: 'Extra reviewer', is_active: true, password, ...privilege })).status).toBe(400);
+    }
+  });
+  it('lets both admins claim, edit, publish, and unpublish while preserving the private original', async () => {
+    vi.stubEnv('SECOND_ADMIN_EMAIL', reviewerEmail);
+    const topicId = '10000000-0000-4000-8000-000000000001';
+    await db.query('insert into topics(id,slug,name) values($1,$2,$3)', [topicId, 'campus', 'Campus']);
+    for (const email of [adminEmail, reviewerEmail]) {
+      await db.exec('delete from reviewer_sessions'); await createSession(email);
+      const id = (await db.query<{ id: string }>("insert into posts(author_name) values('Test writer') returning id")).rows[0].id;
+      await db.query('insert into submission_private(post_id,author_email,original_body) values($1,$2,$3)', [id, 'writer@illinois.edu', 'The private unchanged original.']);
+      let version = 1;
+      const changes = { headline: 'Admin review test', short_version: 'A complete editorial workflow.', final_body: 'The agreed final version of this campus story is ready for readers.', byline: 'Test writer', topic_id: topicId, sources: [] };
+      for (const action of ['claim', 'save', 'publish', 'unpublish']) {
+        const response = await reviewMutation(post('/api/review/' + id, { action, version, changes: ['save', 'publish'].includes(action) ? changes : {} }), { params: Promise.resolve({ id }) });
+        expect(response.status).toBe(200);
+        const result = await response.json(); expect(result.version).toBe(version + 1); version = result.version;
+        if (action === 'publish') expect((await db.query('select id from public_posts where id=$1', [id])).rows).toHaveLength(1);
+      }
+      expect((await db.query('select id from public_posts where id=$1', [id])).rows).toHaveLength(0);
+      expect((await db.query('select original_body from submission_private where post_id=$1', [id])).rows).toEqual([{ original_body: 'The private unchanged original.' }]);
+    }
   });
   it('changes either role’s password, rotates the current session, and rejects the old password', async () => {
     for (const email of [reviewerEmail, adminEmail]) {

@@ -69,6 +69,7 @@ beforeEach(async () => {
   await db.query('insert into reviewers(id,email,name) values($1,$2,$3)', [adminId, adminEmail, 'Site admin']);
   vi.stubEnv('DATABASE_URL', 'postgresql://admin-only.invalid/no-network');
   vi.stubEnv('ADMIN_EMAIL', adminEmail);
+  vi.stubEnv('SECOND_ADMIN_EMAIL', '');
   vi.stubEnv('CODE_PEPPER', 'admin-test-pepper-longer-than-thirty-two-characters');
   mocks.reviewer.mockReset().mockResolvedValue(admin);
   mocks.revalidateTag.mockReset(); mocks.revalidatePath.mockReset();
@@ -154,6 +155,30 @@ describe('admin content HTTP actions', () => {
     ];
     for (const input of attempts) expect((await call('reviewers', input)).status).toBe(400);
     expect((await db.query('select email,is_active from reviewers where id=$1', [adminId])).rows[0]).toEqual({ email: adminEmail, is_active: true });
+  });
+
+  it('protects both admin identities from deletion, reassignment, takeover, and roster password resets', async () => {
+    const secondEmail = 'second@example.test';
+    const secondId = await create('reviewers', { ...fixtures.reviewers, email: secondEmail });
+    const ordinaryId = await create('reviewers');
+    vi.stubEnv('SECOND_ADMIN_EMAIL', secondEmail);
+    for (const actor of [admin, { id: secondId, name: 'Second admin', email: secondEmail, isAdmin: true }]) {
+      mocks.reviewer.mockResolvedValue(actor);
+      for (const [id, email] of [[adminId, adminEmail], [secondId, secondEmail]]) {
+        for (const input of [
+          { action: 'delete', id },
+          { action: 'save', id, values: { name: 'Admin', email, is_active: false } },
+          { action: 'save', id, values: { name: 'Admin', email: 'changed@example.test', is_active: true } },
+          { action: 'save', id, values: { name: 'Admin', email, is_active: true, password: 'Changed password 2026' } },
+          { action: 'save', id: ordinaryId, values: { name: 'Takeover', email, is_active: true } },
+          { action: 'save', values: { ...fixtures.reviewers, email } },
+        ]) expect((await call('reviewers', input)).status).toBe(400);
+      }
+      expect((await call('reviewers', { action: 'save', id: ordinaryId, values: { ...fixtures.reviewers, name: 'Updated by an admin' } })).status).toBe(200);
+    }
+    expect((await db.query('select email,is_active from reviewers where id=any($1)', [[adminId, secondId]])).rows).toEqual(expect.arrayContaining([
+      { email: adminEmail, is_active: true }, { email: secondEmail, is_active: true },
+    ]));
   });
 
   it('returns friendly conflicts for duplicate links and referenced records without removing original submissions', async () => {

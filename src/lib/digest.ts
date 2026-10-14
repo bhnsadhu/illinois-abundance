@@ -3,6 +3,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 import { z } from 'zod';
 import { getReviewer, requireAdmin } from './auth';
+import { isAdminEmail } from './admin-access';
 import { apiFailure, guardRateLimit, HttpError, privateJson, readJson, requireOrigin } from './api';
 import { site } from './config';
 import { serviceDatabase } from './database/service';
@@ -142,7 +143,7 @@ export async function sendDigest(request: Request) {
     requireOrigin(request);
     const reviewer = await getReviewer();
     if (!reviewer) throw new HttpError('Sign in as the site admin to send a digest.', 401);
-    if (!reviewer.isAdmin || reviewer.email !== process.env.ADMIN_EMAIL?.trim().toLowerCase()) throw new HttpError('Only the site admin can send a digest.', 403);
+    if (!reviewer.isAdmin || !isAdminEmail(reviewer.email)) throw new HttpError('Only a site admin can send a digest.', 403);
     const action = actionSchema.parse(await readJson(request, 4096));
     if (!process.env.RESEND_API_KEY || !process.env.MAIL_FROM) throw new HttpError('Email is not connected yet. Please try again soon.', 503);
     await guardRateLimit('digest-send', reviewer.id, 120, 300);

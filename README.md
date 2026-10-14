@@ -1,6 +1,6 @@
 # Illinois Abundance
 
-Student writing on local policy in Champaign Urbana. Readers need no account. Students verify an Illinois email before submitting; reviewers edit and publish; one configured admin manages publishing, reviewer accounts, and campus events.
+Student writing on local policy in Champaign Urbana. Readers need no account. Students verify an Illinois email before submitting; reviewers edit and publish; up to two configured admins manage publishing, reviewer accounts, and campus events.
 
 Current scope: stories and campus events on both the public site and the admin side. Learn, public meetings, newsletter tools, and exports are preserved behind switches in [`src/hidden/features.ts`](src/hidden/features.ts). See [`src/hidden/README.md`](src/hidden/README.md) for the retained code and restoration steps. No stored content or subscriber data is removed.
 
@@ -32,7 +32,7 @@ Open **http://localhost:3000**, matching `NEXT_PUBLIC_SITE_URL`. Without a datab
 1. **Neon:** reuse the existing project, or create a Free plan project through the [Vercel Neon integration](https://vercel.com/marketplace/neon/neon) or the Neon console. Choose a region close to the app. Copy its pooled connection into `DATABASE_URL` and its direct connection into `DATABASE_URL_UNPOOLED`. Use the project owner role for migrations and the current server adapter. The direct hostname must not contain `-pooler`. Review current service limits before launch; a free database does not make the entire stack unlimited.
 2. **Private covers:** create a Vercel Blob store with **Private** access, attach it to the Vercel project, and set `BLOB_READ_WRITE_TOKEN` locally and in the deployment. The application streams approved covers through `/covers/...`; it never gives readers a storage credential. Follow the [private Blob setup](https://vercel.com/docs/vercel-blob/private-storage).
 3. **Resend:** add the sending domain and publish the DNS records supplied by Resend. Wait for verification before using that domain in `MAIL_FROM`. Create an API key with **Sending access**, restricted to that domain, and store it as `RESEND_API_KEY`. [Resend documents these key permissions](https://resend.com/changelog/new-api-key-permissions). Domain verification and school inbox delivery are separate checks.
-4. **Site identity:** set the canonical URL, contact address, and exactly one `ADMIN_EMAIL`. Generate separate random secrets for `CODE_PEPPER` and `VIEW_SALT`; each must contain at least 32 characters. For each secret, generate a new value locally:
+4. **Site identity:** set the canonical URL, contact address, and a primary `ADMIN_EMAIL` and, optionally, one `SECOND_ADMIN_EMAIL`. Each setting accepts one exact email address, never a list. Generate separate random secrets for `CODE_PEPPER` and `VIEW_SALT`; each must contain at least 32 characters. For each secret, generate a new value locally:
 
 ```sh
 node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
@@ -49,7 +49,8 @@ Keep generated values in the environment manager, never in source, screenshots, 
 | `RESEND_API_KEY` | Domain-restricted sending key. |
 | `MAIL_FROM` | Verified sender, for example `Illinois Abundance <hello@illinoisabundance.org>`. |
 | `CONTACT_EMAIL` | Public contact and removal-request mailbox. |
-| `ADMIN_EMAIL` | The one email with admin privileges. Other reviewers are managed in the admin UI. |
+| `ADMIN_EMAIL` | Primary admin email. Must match an active reviewer account. |
+| `SECOND_ADMIN_EMAIL` | Optional second admin email. Blank until the second account is ready. |
 | `CODE_PEPPER` | HMAC secret for verification codes, login/session hashes, signed digest previews, and rate-limit keys. |
 | `VIEW_SALT` | Separate HMAC secret for daily view estimates. |
 | `SEED_SAMPLE_CONTENT` | `true` allows sample seeding and the disconnected preview. Use `false` for launch. |
@@ -77,7 +78,7 @@ Cover uploads accept still JPG, PNG, WebP, or AVIF images up to **4 MB**, requir
 
 ## Review and administration
 
-The footer has separate **Admin sign in** (`/login/admin`) and **Reviewer sign in** (`/login`) links. The configured `ADMIN_EMAIL` is the only admin. Use `/admin/reviewers` to create a reviewer with a name, email, and initial password; share those credentials directly. There is no public signup or login email. Existing reviewers need an admin-assigned password before they can use password sign-in.
+The footer has separate **Admin sign in** (`/login/admin`) and **Reviewer sign in** (`/login`) links. Only the exact `ADMIN_EMAIL` and optional `SECOND_ADMIN_EMAIL` have admin privileges, and both require active accounts. Admins also have every reviewer permission. Reviewers can edit and publish stories; they cannot manage accounts, topics, writers, events, or other admin tools. Use `/admin/reviewers` to create a reviewer with a name, email, and initial password; share those credentials directly. There is no public signup or login email. Existing reviewers need an admin-assigned password before they can use password sign-in.
 
 Passwords must be 12–128 characters and are stored only as salted scrypt hashes. When editing a reviewer, leave Password blank to keep it or enter a new one to reset it. Admins change their own password through **Change password** (`/account`), as can reviewers. This requires the current password and confirmation of the new one. Changing your password signs out other sessions; an admin reset, email change, deactivation, or deletion revokes all affected sessions. Sessions expire after seven days and current roster membership is checked on every private request.
 
@@ -87,7 +88,9 @@ The password migration retires existing email login links. Roll it out together 
 
 In `/review`, claim a submission, email the author from your own inbox, and paste the agreed final version. Publishing requires a headline, short version, body, byline, and active topic. Revision checks prevent a second reviewer from silently overwriting a concurrent edit. Editing the published version leaves the original unchanged. To honor a removal request, **unpublish** it and confirm the public link is no longer available.
 
-The admin manages topics, writers, events, explainers, meetings, subscribers, statistics, and CSV exports. The configured admin cannot be removed, disabled, or reassigned through the roster UI. To hand over administration, update `ADMIN_EMAIL` in the deployment and redeploy, verify the new admin can sign in, then deactivate the previous admin's reviewer row if they should no longer review. Changing the environment removes their admin privilege; it does not automatically remove ordinary reviewer membership.
+To add Karthika later, first create her account in `/admin/reviewers`, then set `SECOND_ADMIN_EMAIL` to that exact email in Vercel and redeploy. She can then use Admin sign in with the assigned password and change it in `/account`. Leave the second setting blank until then. Roster forms cannot promote reviewers or create extra admins.
+
+Admins manage topics, writers, events, reviewer accounts, and statistics; the other tools remain hidden. Neither configured admin can be removed, disabled, reassigned, or have their password reset through the roster UI. To hand over either admin slot, update its environment setting and redeploy, verify the new admin can sign in, then deactivate the previous account if it should no longer review. Removing an email from configuration removes its admin privilege on the next request, while ordinary reviewer membership remains until deactivated.
 
 ## Subscriptions and the manual digest (currently hidden)
 
