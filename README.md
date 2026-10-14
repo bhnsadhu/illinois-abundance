@@ -127,15 +127,19 @@ npm run check
 npm run test:db
 ```
 
-Final validation passed **155 tests**, lint, typecheck, and production build. Tests include PostgreSQL/RLS behavior using PGlite, HTTP handlers using the production SQL adapter with mocked Neon transport, authentication, submission verification, private covers, admin permissions, digest retries, share images, and a submit → verify → claim → publish → homepage workflow. Mail delivery is mocked. Passing those tests does not verify a real school inbox, DNS, production service quotas, or physical phone behavior; viewport emulation is not a hardware test.
+Validation for application commit `a55c86f` passed **168 tests**, lint, typecheck, and production build. Tests include PostgreSQL/RLS behavior using PGlite, HTTP handlers using the production SQL adapter with mocked Neon transport, authentication, submission verification, private covers, both configured admin identities, reviewer permission boundaries, digest retries, share images, and a submit → verify → claim → publish → homepage workflow. Mail delivery is mocked in the automated suite. Passing those tests does not verify a real school inbox, DNS, production service quotas, or physical phone behavior; viewport emulation is not a hardware test.
+
+On **October 13, 2026**, an owner-authorized live check used separate browser sessions for the admin, a temporary reviewer, the submitting author, and an anonymous reader. The owner supplied the code received at an Illinois inbox. Submission, reviewer claim, editing, optional photo upload, draft saving, publication, and admin unpublishing all passed. The published article, home, latest stories, and RSS exposed neither the original submission nor its email. Stale edits returned a conflict. The database confirmed the original was unchanged and the receipt email was accepted for sending; receipt inbox delivery was not independently checked.
+
+The live check also verified admin-created reviewer credentials, reviewer password changes, admin resets, session revocation, deactivation, and deletion. Reviewer requests to active admin pages and mutation APIs were denied, while the admin could use review actions. The second admin slot was covered by automated tests and remains unconfigured. Cleanup removed the temporary reviewer and test writer profile, signed out the test admin session, and confirmed the test story, photo, and writer URLs returned 404 and disappeared from public listings, RSS, sitemap, and search. The test submission remains unpublished in the private review desk because verified originals are retained permanently.
 
 Local production-build Lighthouse performance scores were **100 desktop / 94 mobile** for home and **100 desktop / 91 mobile** for an article. All four runs recorded zero layout shift. These are measured snapshots, not guarantees across devices or network conditions.
 
 Before announcing the site:
 
-- [ ] Confirm the production origin, verified sender, contact mailbox, sole admin, and environment scopes.
+- [ ] Confirm the production origin, verified sender, contact mailbox, primary and optional second admin identities, and environment scopes.
 - [ ] Use an isolated preview to test a real `@illinois.edu` code, wrong/expired code, resend, and the saved-submission receipt. Check spam folders and mail-provider delivery records.
-- [ ] Test real admin/reviewer magic links, a revoked reviewer, publish/edit/unpublish, and private cover access.
+- [ ] Test admin/reviewer password sign-in, password changes and resets, a revoked reviewer, publish/edit/unpublish, and private cover access.
 - [ ] Confirm a subscription, unsubscribe through the email link and email-client action, and send a digest only to consenting test recipients in the isolated environment.
 - [ ] Publish real articles first. Review bylines, sources, alt text, dates, RSVP/agenda links, removal contact, and share images.
 - [ ] Set `SEED_SAMPLE_CONTENT=false`, use the admin's **Delete sample content** action, and verify the public pages contain the intended real content. Do not rerun sample seeding afterward.
