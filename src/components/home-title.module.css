@@ -1,0 +1,22 @@
+.title { text-wrap: balance; }
+.line { display: block; }
+.accent { font-size: 1.1em; color: var(--orange); }
+.word { display: inline-block; white-space: nowrap; }
+.letter { display: inline-block; }
+
+/* A single write-on at page entry. Each glyph already occupies its final
+   space, so revealing ink never moves the title or the content below it. */
+@media (prefers-reduced-motion: no-preference) {
+  .letter { animation: write-on 200ms linear both; }
+}
+
+@keyframes write-on {
+  from { clip-path: inset(-.2em calc(100% + .15em) -.2em -.15em); }
+  to { clip-path: inset(-.2em -.15em -.2em -.15em); }
+}
+
+/* The complete heading is also the default for printing, reduced motion,
+   and clients without animation support. No script is needed to reveal it. */
+@media print {
+  .letter { animation: none; }
+}

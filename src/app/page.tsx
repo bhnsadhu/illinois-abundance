@@ -4,6 +4,7 @@ import { ArrowRight } from '@/components/icons';
 import { SubscriptionForm } from '@/components/subscription-form';
 import { StoryCard } from '@/components/story-card';
 import { Author } from '@/components/author';
+import { HomeTitle } from '@/components/home-title';
 import { getStories, getTopics, getNextEvent, coverFor, coverAlt } from '@/lib/data';
 import { formatDate } from '@/lib/format';
 import { hiddenFeatures } from '@/hidden/features';
@@ -17,7 +18,7 @@ export default async function Home() {
 
   return <div className={`container ${styles.home}`}>
     <header className={styles.heading}>
-      <h1>Champaign Urbana.<br/><span>With room for more.</span></h1>
+      <HomeTitle/>
       <p>Student stories about housing, transit, and life here.<br className={styles.desktopBreak}/> Campus events hosted by Illinois Abundance.</p>
       <div className={styles.introActions}><Link className="button" href="/latest">Read the stories</Link><Link className="text-link" href="/events">Come to a campus event <ArrowRight size={17}/></Link></div>
     </header>
