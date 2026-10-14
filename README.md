@@ -94,7 +94,7 @@ The password migration retires existing email login links. Roll it out together 
 
 In `/review`, claim a submission, email the author from your own inbox, and paste the agreed final version. Publishing requires a headline, short version, body, byline, and active topic. Revision checks prevent a second reviewer from silently overwriting a concurrent edit. Editing the published version leaves the original unchanged. To honor a removal request, **unpublish** it and confirm the public link is no longer available.
 
-To add Karthika later, first create her account in `/admin/reviewers`, then set `SECOND_ADMIN_EMAIL` to that exact email in Vercel and redeploy. She can then use Admin sign in with the assigned password and change it in `/account`. Leave the second setting blank until then. Roster forms cannot promote reviewers or create extra admins.
+Karthika’s account is provisioned as the second production admin through `SECOND_ADMIN_EMAIL`. She uses Admin sign in with her own password and can change it in `/account`. Admin identities remain in deployment configuration; credentials must never be committed. Roster forms cannot promote reviewers or create extra admins.
 
 Admins manage topics, writers, events, reviewer accounts, and statistics; the other tools remain hidden. Neither configured admin can be removed, disabled, reassigned, or have their password reset through the roster UI. To hand over either admin slot, update its environment setting and redeploy, verify the new admin can sign in, then deactivate the previous account if it should no longer review. Removing an email from configuration removes its admin privilege on the next request, while ordinary reviewer membership remains until deactivated.
 
