@@ -1,4 +1,3 @@
 .title { text-wrap: pretty; }
 .line { display: block; }
-.gardenLine { display: flex; align-items: center; gap: 10px; }
 .accent { color: var(--orange); }

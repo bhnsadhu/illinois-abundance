@@ -70,7 +70,7 @@ test('reduced motion and small screens preserve usable content', async ({ page }
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto('/');
-  expect(await page.locator('h1 svg').evaluate(svg => svg.getAnimations({ subtree: true }).length)).toBe(0);
+  expect(await page.locator('main').evaluate(main => main.getAnimations({ subtree: true }).length)).toBe(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
   await expect(page.locator('main').getByRole('link', { name: 'Publish with us', exact: false }).first()).toBeVisible();
 });

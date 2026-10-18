@@ -9,7 +9,6 @@ import { Author } from '@/components/author';
 import { EventJoinLink } from '@/components/event-join-link';
 import { EventRecurrence } from '@/components/event-recurrence';
 import { HomeTitle } from '@/components/home-title';
-import { Sprout } from '@/components/sprout';
 import { getStories, getTopics, getNextEvent, coverFor, coverAlt } from '@/lib/data';
 import { eventLocation } from '@/lib/event-links';
 import { eventDate } from '@/lib/syndication';
@@ -76,7 +75,7 @@ export default async function Home() {
 
     {visibility.homeRecent && stories.length > 1 && <Reveal className={styles.recent} aria-labelledby="recent-heading">
       <div className={styles.sectionHeading}>
-        <h2 id="recent-heading" className={styles.growingHeading}>{home.recentTitle}<Sprout/></h2>
+        <h2 id="recent-heading">{home.recentTitle}</h2>
         <Link href="/latest">{home.allStoriesLabel} <ArrowRight size={16}/></Link>
       </div>
       <div className="story-grid">{stories.slice(1, 4).map(story => <StoryCard key={story.id} story={story} headingLevel={3}/>)}</div>

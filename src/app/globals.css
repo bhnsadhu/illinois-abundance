@@ -110,8 +110,6 @@ svg { flex-shrink: 0; }
 /* Shared forms: consistent labels, clear input boundaries, and immediate feedback. */
 .write-heading { display: flex; align-items: center; gap: 32px; margin-bottom: 48px; }
 .write-heading > div { min-width: 0; }
-.sprout { width: 80px; height: 88px; flex-shrink: 0; }
-.write-heading > .sprout { width: 120px; height: 132px; }
 .write-heading h1 { font-size: clamp(42px, 5vw, 64px); max-width: 640px; }
 .write-heading p { max-width: 55ch; margin-bottom: 0; color: var(--muted); font-size: 17px; }
 .form-card { background: var(--paper); border-radius: 24px; padding: 40px; max-width: 100%; }
@@ -138,8 +136,6 @@ label:has(input[type=checkbox]) { display: flex; gap: 10px; align-items: center;
 .full-width { width: 100%; }
 .resend-copy { text-align: center; font-size: 13px; margin-top: 26px; }
 .resend-copy p { margin-bottom: 5px; color: var(--muted); }
-.success-mark .sprout { width: 44px; height: 48px; }
-.success-mark { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 50%; background: #e2eee9; color: var(--deep-teal); margin: 0 auto 28px; }
 .success-state h1 { margin-bottom: 25px; }
 .success-state .button { margin-top: 20px; }
 .success-state p { font-size: 17px; }
@@ -203,7 +199,6 @@ label:has(input[type=checkbox]) { display: flex; gap: 10px; align-items: center;
   .footer-links { gap: 16px; font-size: 12px; }
   .empty-state { padding: 36px 24px; }
   .write-heading { display: block; margin-bottom: 32px; }
-  .write-heading > .sprout { width: 64px; height: 70px; margin-top: 8px; }
   .write-heading h1 { font-size: 42px; }
   .write-heading p { font-size: 16px; }
   .form-card { padding: 28px 22px; border-radius: 20px; }
