@@ -38,6 +38,18 @@ describe('site content editing',()=>{
   expect(parseSiteSection('home',{...siteContentDefaults.home,newsItems:[]})).toMatchObject({newsItems:[]});
   expect(()=>parseSiteSection('home',{...siteContentDefaults.home,newsItems:[{...siteContentDefaults.home.newsItems[0],href:'javascript:alert(1)'}]})).toThrow();
  });
+ it('carries the garden theme into saved defaults while preserving editorial changes',()=>{
+  expect(upgradeLegacySiteSection('write',{title:'Write for Illinois Abundance.',successBody:'One of our reviewers will contact you soon.'})).toMatchObject({title:siteContentDefaults.write.title,successBody:siteContentDefaults.write.successBody});
+  const oldAbout={sections:[structuredClone(siteContentDefaults.about.sections[0])],writeTitle:'Write for us'};
+  const upgraded=upgradeLegacySiteSection('about',oldAbout);
+  expect(upgraded).toEqual({sections:siteContentDefaults.about.sections,writeTitle:siteContentDefaults.about.writeTitle});
+  expect(upgradeLegacySiteSection('about',upgraded)).toEqual(upgraded);
+  expect(oldAbout.sections).toHaveLength(1);
+  const custom={sections:[{title:oldAbout.sections[0].title,body:'Our editor’s explanation.'}],writeTitle:'Send your pitch'};
+  expect(upgradeLegacySiteSection('about',custom)).toEqual(custom);
+  expect(upgradeLegacySiteSection('about',{sections:[]})).toEqual({sections:[]});
+  expect(upgradeLegacySiteSection('write',{title:'A custom invitation',successBody:'We will reply by Friday.'})).toEqual({title:'A custom invitation',successBody:'We will reply by Friday.'});
+ });
  it('requires an authenticated configured admin and same-origin request',async()=>{
   mocks.reviewer.mockResolvedValue(null);expect((await call(body())).status).toBe(401);
   mocks.reviewer.mockResolvedValue({id,email:'reviewer@example.test',isAdmin:false});expect((await call(body())).status).toBe(403);
