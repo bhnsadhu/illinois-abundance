@@ -30,7 +30,7 @@ let queue: Promise<unknown> = Promise.resolve();
 let anonymousTransactions = 0;
 const observedSql: string[] = [];
 
-// Only the external Neon transport is replaced. Production query generation,
+// External database, calendar, and email transports are replaced. Production query generation,
 // role reduction, authentication, validation, and route handlers all run here.
 // A real transaction owns every SET LOCAL ROLE, including concurrent Home reads.
 function enqueue<T>(action: () => Promise<T>): Promise<T> {
@@ -68,6 +68,7 @@ function request(path: string, body: unknown, cookie?: string) {
 }
 
 beforeAll(async () => {
+  vi.stubGlobal('fetch', vi.fn(async () => new Response('BEGIN:VCALENDAR\r\nVERSION:2.0\r\nEND:VCALENDAR')));
   vi.stubEnv('DATABASE_URL', 'postgresql://workflow-only.invalid/no-network');
   vi.stubEnv('CODE_PEPPER', 'workflow-test-pepper-longer-than-thirty-two-characters');
   vi.stubEnv('RESEND_API_KEY', 'mock-mail-only');
@@ -81,7 +82,7 @@ beforeAll(async () => {
   await db.exec(await readFile(new URL('../db/seed.sql', import.meta.url), 'utf8'));
   await db.query('insert into reviewers(id,email,name,password_hash) values($1,$2,$3,$4)', ['70000000-0000-4000-8000-000000000019', 'editor@illinois.edu', 'Workflow Editor', await hashPassword('Workflow password 2026')]);
 }, 30000);
-afterAll(async () => { await queue; await db.close(); vi.unstubAllEnvs(); });
+afterAll(async () => { await queue; await db.close(); vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 it('takes a real submission through verification and review into public Home HTML, without exposing its private archive', async () => {
   const form = {

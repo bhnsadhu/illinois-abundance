@@ -46,6 +46,7 @@ export function eventCalendar(event: Event, origin: string, generatedAt = new Da
     `LOCATION:${calendarText(event.location)}`,`URL:${base}/events#event-${event.id}`,'END:VEVENT','END:VCALENDAR',
   ].map(foldCalendarLine).join('\r\n')+'\r\n';
 }
-export function eventDate(value: string): string {
+export function eventDate(value: string, allDay = false): string {
+  if (allDay) return new Intl.DateTimeFormat('en-US', {weekday:'short',month:'long',day:'numeric',year:'numeric',timeZone:'America/Chicago'}).format(new Date(value)) + ' · All day';
   return new Intl.DateTimeFormat('en-US',{weekday:'short',month:'long',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/Chicago',timeZoneName:'short'}).format(new Date(value));
 }

@@ -1,12 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight } from '@/components/icons';
+import { ArrowRight, ArrowUpRight, CalendarDays, MapPin } from '@/components/icons';
 import { SubscriptionForm } from '@/components/subscription-form';
 import { StoryCard } from '@/components/story-card';
 import { Author } from '@/components/author';
 import { HomeTitle } from '@/components/home-title';
 import { getStories, getTopics, getNextEvent, coverFor, coverAlt } from '@/lib/data';
-import { formatDate } from '@/lib/format';
+import { eventDate } from '@/lib/syndication';
+import { googleCalendarHref } from '@/lib/google-calendar';
 import { getSiteContent } from '@/lib/site-content';
 import styles from './page.module.css';
 
@@ -18,11 +19,31 @@ export default async function Home() {
   const featured = stories[0];
 
   return <div className={`container ${styles.home}`}>
-    <header className={styles.heading}>
-      <HomeTitle firstLine={home.firstLine} secondLine={home.secondLine}/>
-      <p className={styles.intro}>{home.intro}</p>
-      <div className={styles.introActions}><Link className="button" href={home.primaryHref}>{home.primaryLabel}</Link><Link className="text-link" href={home.secondaryHref}>{home.secondaryLabel} <ArrowRight size={17}/></Link></div>
-    </header>
+    <div className={styles.hero}>
+      <header className={styles.heading}>
+        <HomeTitle firstLine={home.firstLine} secondLine={home.secondLine}/>
+        <p className={styles.intro}>{home.intro}</p>
+        <div className={styles.introActions}>
+          <Link className="button" href={home.primaryHref}>{home.primaryLabel}</Link>
+          {visibility.homeWrite && <Link className="button button-outline" href={home.secondaryHref}>{home.secondaryLabel} <ArrowRight size={17}/></Link>}
+        </div>
+      </header>
+      {visibility.homeEvent && <section className={styles.event} aria-labelledby="next-event-title">
+        <h2 id="next-event-title">{home.eventLabel}</h2>
+        {nextEvent ? <>
+          <h3>{nextEvent.title}</h3>
+          <div className={styles.eventDetails}>
+            <p><CalendarDays size={18}/><time dateTime={nextEvent.starts_at}>{eventDate(nextEvent.starts_at, nextEvent.all_day)}</time></p>
+            {nextEvent.location && <p><MapPin size={18}/><span>{nextEvent.location}</span></p>}
+          </div>
+          {nextEvent.is_sample && <p className={styles.sampleNote}>Sample event. Details are for demonstration.</p>}
+        </> : <p>{home.eventEmptyBody}</p>}
+        <div className={styles.eventActions}>
+          <Link href={nextEvent && home.eventLinkHref === '/events' ? `/events#event-${nextEvent.id}` : home.eventLinkHref} className="text-link">{home.eventLinkLabel} <ArrowRight size={17}/></Link>
+          <a href={googleCalendarHref} className="text-link" target="_blank" rel="noopener noreferrer">Google Calendar <ArrowUpRight size={16}/></a>
+        </div>
+      </section>}
+    </div>
 
     {visibility.homeFeatured && (featured ? <section className={styles.feature} aria-labelledby="featured-title">
       <div className={styles.featureCopy}>
@@ -52,6 +73,16 @@ export default async function Home() {
       <div className="story-grid">{stories.slice(1, 4).map(story => <StoryCard key={story.id} story={story}/>)}</div>
     </section>}
 
+    {home.newsItems.length > 0 && <section className={styles.news} aria-labelledby="news-heading">
+      <div className={styles.sectionHeading}><h2 id="news-heading">{home.newsTitle}</h2></div>
+      <p className={styles.newsIntro}>{home.newsIntro}</p>
+      <div className={styles.newsList}>{home.newsItems.map((item, index) => <article className={styles.newsItem} key={`${item.href}-${index}`}>
+        <h3><a href={item.href} target="_blank" rel="noopener noreferrer">{item.title} <ArrowUpRight size={17}/></a></h3>
+        <p>{item.description}</p>
+        <div className={styles.newsSource}><span>{item.publisher}</span><span>{item.dateLabel}</span></div>
+      </article>)}</div>
+    </section>}
+
     {visibility.homeTopics && <section className={styles.topics} aria-labelledby="topics-heading">
       <div className={styles.sectionHeading}><h2 id="topics-heading">{home.topicsTitle}</h2></div>
       <div className={styles.topicList}>
@@ -60,26 +91,6 @@ export default async function Home() {
           <ArrowRight size={18}/>
         </Link>)}
       </div>
-    </section>}
-
-    {(visibility.homeWrite || visibility.homeEvent) && <section className={styles.participate} aria-label="Get involved">
-      {visibility.homeWrite && <div className={styles.write}>
-        <h2>{home.writeTitle}</h2>
-        <p>{home.writeDescription}</p>
-        <Link className="text-link" href={home.writeLinkHref}>{home.writeLinkLabel} <ArrowRight size={17}/></Link>
-      </div>}
-      {visibility.homeEvent && <div className={styles.event}>
-        {nextEvent && <span className={styles.label}>{home.eventLabel}</span>}
-        <h2>{nextEvent ? nextEvent.title : home.eventEmptyTitle}</h2>
-        {nextEvent ? <>
-          <div className={styles.eventDetails}>
-            <time dateTime={nextEvent.starts_at}>{formatDate(nextEvent.starts_at, { month: 'long', day: 'numeric' })} at {formatDate(nextEvent.starts_at, { month: undefined, day: undefined, hour: 'numeric', minute: '2-digit' })}</time>
-            <span>{nextEvent.location}</span>
-          </div>
-          {nextEvent.is_sample && <p className={styles.sampleNote}>Sample event. Details are for demonstration.</p>}
-        </> : <p>{home.eventEmptyBody}</p>}
-        <Link href={home.eventLinkHref} className="text-link">{home.eventLinkLabel} <ArrowRight size={17}/></Link>
-      </div>}
     </section>}
 
     {visibility.newsletter && visibility.homeNewsletter && <section className={styles.subscribe} id="subscribe" aria-labelledby="subscribe-heading">

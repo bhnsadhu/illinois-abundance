@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import { content } from './content';
+import { localNews } from './local-news';
 
 export const siteContentDefaults = {
-  branding: { name: 'Illinois Abundance', description: content.description, contactEmail: 'bhnsadhu@gmail.com', logoUrl: '/brand/logo-wordmark-horizontal.png', logoAlt: 'Illinois Abundance', faviconUrl: '/brand/favicon.png', shareTitle: 'Champaign Urbana. With room for more.', shareDescription: content.description },
+  branding: { name: 'Illinois Abundance', description: content.description, contactEmail: 'bhnsadhu@gmail.com', logoUrl: '/brand/logo-wordmark-horizontal.png', logoAlt: 'Illinois Abundance', faviconUrl: '/brand/favicon.png', shareTitle: 'Champaign Urbana. Cultivating our Garden', shareDescription: content.description },
   navigation: { links: [{ label: 'Stories', href: '/latest' }, { label: 'Learn', href: '/learn' }, { label: 'Events', href: '/events' }, { label: 'Show up', href: '/show-up' }, { label: 'About', href: '/about' }], writeLabel: 'Write for us', writeHref: '/write', contactLabel: 'Contact', reviewerLabel: 'Reviewer sign in', adminLabel: 'Admin sign in', footerLinks: [] as {label:string;href:string}[] },
-  home: { firstLine: 'Champaign Urbana.', secondLine: 'With room for more.', intro: 'Student stories about housing, transit, and life here.\nCampus events hosted by Illinois Abundance.', primaryLabel: 'Read the stories', primaryHref: '/latest', secondaryLabel: 'Come to a campus event', secondaryHref: '/events', recentTitle: 'Recent writing', allStoriesLabel: 'All stories', topicsTitle: 'Topics', writeTitle: 'Write for us', writeDescription: 'Share a local story or idea. A student reviewer will help you get it ready to publish.', writeLinkLabel: 'Send us a piece', writeLinkHref: '/write', eventLabel: 'Next campus event', eventEmptyTitle: 'Campus events', eventEmptyBody: 'New dates will appear here when they’re confirmed.', eventLinkLabel: 'View events', eventLinkHref: '/events', emptyTitle: 'Nothing here yet.', emptyBody: 'Have something to say about Champaign Urbana? Send us a piece.', emptyLinkLabel: 'Write for us' },
+  home: { firstLine: 'Champaign Urbana.', secondLine: 'Cultivating our Garden', intro: 'Student stories about housing, transit, and life here.\nCampus events hosted by Illinois Abundance.', primaryLabel: 'Read the stories', primaryHref: '/latest', secondaryLabel: 'Write the stories', secondaryHref: '/write', newsTitle: 'Around Champaign Urbana', newsIntro: 'Local reporting worth reading, selected by Illinois Abundance.', newsItems: localNews, recentTitle: 'Recent writing', allStoriesLabel: 'All stories', topicsTitle: 'Topics', writeTitle: 'Write for us', writeDescription: 'Share a local story or idea. A student reviewer will help you get it ready to publish.', writeLinkLabel: 'Send us a piece', writeLinkHref: '/write', eventLabel: 'Our next event', eventEmptyTitle: 'Campus events', eventEmptyBody: 'New dates will appear here when they’re confirmed.', eventLinkLabel: 'View events', eventLinkHref: '/events', emptyTitle: 'Nothing here yet.', emptyBody: 'Have something to say about Champaign Urbana? Send us a piece.', emptyLinkLabel: 'Write for us' },
   about: { title: content.about.title, intro: content.about.intro, socialLabel: 'Follow us on Instagram', socialHref: 'https://www.instagram.com/illinoisabundance/', imageUrl: '/illustrations/housing.svg', imageAlt: 'A welcoming neighborhood with homes, a bicycle, and a tree', sections: content.about.sections, writeTitle: 'Write for us', steps: content.about.steps.map(text=>({text})), writeLinkLabel: 'Start writing' },
   stories: { title: 'All stories', intro: content.description, topicEmptyTitle: 'No stories yet.', topicEmptyAction: 'Write the first story', emptyTitle: 'Nothing here yet.', emptyBody: 'Send us a piece about a local issue.', emptyAction: 'Write for us', endTitle: 'You’ve reached the end.', backLabel: 'Back to the latest' },
   events: { ...content.events, rsvpLabel:'RSVP',calendarLabel:'Add to calendar',recapLabel:'Read the recap', imageUrl: '/illustrations/education.svg', imageAlt: 'Hand drawn books and a notebook' },
@@ -23,11 +24,11 @@ export const siteSections = Object.keys(siteContentDefaults) as SiteSection[];
 export const siteSectionSchema = z.enum(siteSections);
 export type ContentField = { key:string; label:string; type:'text'|'textarea'|'email'|'link'|'image'|'toggle'|'list'; max:number; fields?:ContentField[]; item?:Record<string,unknown> };
 export const sectionLabels:Record<SiteSection,string>={branding:'Branding & contact',navigation:'Navigation & footer',home:'Homepage',about:'About',stories:'Story directory',events:'Events',write:'Submissions',search:'Search',reader:'Story & writer pages',access:'Sign-in pages',learn:'Guides',showUp:'Local meetings',newsletter:'Newsletter',visibility:'Section visibility'};
-const labelOverrides:Record<string,string>={logoUrl:'Logo',faviconUrl:'Browser icon',imageUrl:'Image',imageAlt:'Image description',logoAlt:'Logo description',contactEmail:'Contact email',firstLine:'Title — first line',secondLine:'Title — second line',intro:'Description',href:'Link',socialHref:'Social link',homeFeatured:'Homepage: featured story',homeRecent:'Homepage: recent stories',homeTopics:'Homepage: topics',homeWrite:'Homepage: writing invitation',homeEvent:'Homepage: next event',homeNewsletter:'Homepage: newsletter invitation',learn:'Guides',meetings:'Local meetings',newsletter:'Newsletter',exports:'Content exports'};
+const labelOverrides:Record<string,string>={logoUrl:'Logo',faviconUrl:'Browser icon',imageUrl:'Image',imageAlt:'Image description',logoAlt:'Logo description',contactEmail:'Contact email',newsItems:'Curated news (original summaries and source links)',publisher:'Publication',dateLabel:'Publication date',firstLine:'Title — first line',secondLine:'Title — second line',intro:'Description',href:'Link',socialHref:'Social link',homeFeatured:'Homepage: featured story',homeRecent:'Homepage: recent stories',homeTopics:'Homepage: topics',homeWrite:'Homepage: writing invitation',homeEvent:'Homepage: next event',homeNewsletter:'Homepage: newsletter invitation',learn:'Guides',meetings:'Local meetings',newsletter:'Newsletter',exports:'Content exports'};
 const longFields=/intro|description|body|disclosure|consent|hint|notice/i;
 function fieldsFor(values:Record<string,unknown>):ContentField[]{return Object.entries(values).map(([key,value])=>{
   const type:ContentField['type']=typeof value==='boolean'?'toggle':Array.isArray(value)?'list':/Url$/.test(key)?'image':/Email$/.test(key)?'email':/Href$|^href$/.test(key)?'link':longFields.test(key)?'textarea':'text';
-  const item=Array.isArray(value)?(value[0]||{label:'',href:'/'}) as Record<string,unknown>:undefined;
+  const item=Array.isArray(value)?(key==='newsItems'?{title:'',description:'',publisher:'',dateLabel:'',href:'https://'}:(value[0]||{label:'',href:'/'})) as Record<string,unknown>:undefined;
   return {key,label:labelOverrides[key]||key.replace(/([A-Z])/g,' $1').replace(/^./,c=>c.toUpperCase()),type,max:/firstLine|secondLine/.test(key)?100:type==='textarea'?5000:type==='link'||type==='image'?2000:300,...(item?{item,fields:fieldsFor(item)}:{})};
 });}
 export const sectionFields=Object.fromEntries(siteSections.map(key=>[key,fieldsFor(siteContentDefaults[key])])) as Record<SiteSection,ContentField[]>;
@@ -49,3 +50,18 @@ function objectSchema(fields:ContentField[]){return z.object(Object.fromEntries(
 export function parseSiteSection(section:SiteSection,value:unknown):Record<string,unknown>{return objectSchema(sectionFields[section]).parse(value);}
 export const siteContentMutationSchema=z.object({section:siteSectionSchema,version:z.number().int().nonnegative(),values:z.record(z.string(),z.unknown())}).strict();
 export function contentVisibility(content:SiteContent){return {learn:!content.visibility.learn,meetings:!content.visibility.meetings,newsletter:!content.visibility.newsletter,exports:!content.visibility.exports};}
+
+/** Carry forward previous shipped defaults while preserving custom editorial copy. */
+export function upgradeLegacySiteSection(section: SiteSection, values: Record<string, unknown>) {
+  const updated = {...values};
+  if (section === 'home') {
+    if (updated.secondLine === 'With room for more.') updated.secondLine = siteContentDefaults.home.secondLine;
+    if (updated.secondaryLabel === 'Come to a campus event' && updated.secondaryHref === '/events') {
+      updated.secondaryLabel = siteContentDefaults.home.secondaryLabel;
+      updated.secondaryHref = siteContentDefaults.home.secondaryHref;
+    }
+    if (updated.eventLabel === 'Next campus event') updated.eventLabel = siteContentDefaults.home.eventLabel;
+  }
+  if (section === 'branding' && updated.shareTitle === 'Champaign Urbana. With room for more.') updated.shareTitle = siteContentDefaults.branding.shareTitle;
+  return updated;
+}

@@ -3,7 +3,7 @@ import {PGlite} from '@electric-sql/pglite';
 import {afterAll,afterEach,beforeAll,beforeEach,describe,expect,it,vi} from 'vitest';
 import {POST} from '@/app/api/admin/site-content/route';
 import {createDatabase} from '@/lib/database/client';
-import {contentLinkSchema,imagePathSchema,parseSiteSection,siteContentDefaults,siteSections} from '@/lib/site-content-schema';
+import {contentLinkSchema,imagePathSchema,parseSiteSection,upgradeLegacySiteSection, siteContentDefaults,siteSections} from '@/lib/site-content-schema';
 import {site} from '@/lib/config';
 const mocks=vi.hoisted(()=>({reviewer:vi.fn(),tag:vi.fn(),path:vi.fn()}));
 vi.mock('@/lib/auth',()=>({getReviewer:mocks.reviewer}));
@@ -27,6 +27,14 @@ describe('site content editing',()=>{
   expect(()=>parseSiteSection('branding',{...siteContentDefaults.branding,ADMIN_EMAIL:'new@example.test'})).toThrow();
   expect(()=>parseSiteSection('navigation',{...siteContentDefaults.navigation,links:Array(13).fill({label:'Item',href:'/about'})})).toThrow();
   for(const path of ['https://example.test/image.png','/media/../../secret.webp','/covers/private.webp','/brand/../../secret.png'])expect(imagePathSchema.safeParse(path).success).toBe(false);
+ });
+ it('updates previous homepage defaults without replacing custom copy or removing curated links',()=>{
+  const legacy={firstLine:'Our community',secondLine:'With room for more.',secondaryLabel:'Come to a campus event',secondaryHref:'/events'};
+  expect(upgradeLegacySiteSection('home',legacy)).toEqual({...legacy,secondLine:'Cultivating our Garden',secondaryLabel:'Write the stories',secondaryHref:'/write'});
+  const custom={secondLine:'A custom headline',secondaryLabel:'Pitch a story',secondaryHref:'/about',newsItems:[]};
+  expect(upgradeLegacySiteSection('home',custom)).toEqual(custom);
+  expect(parseSiteSection('home',{...siteContentDefaults.home,newsItems:[]})).toMatchObject({newsItems:[]});
+  expect(()=>parseSiteSection('home',{...siteContentDefaults.home,newsItems:[{...siteContentDefaults.home.newsItems[0],href:'javascript:alert(1)'}]})).toThrow();
  });
  it('requires an authenticated configured admin and same-origin request',async()=>{
   mocks.reviewer.mockResolvedValue(null);expect((await call(body())).status).toBe(401);

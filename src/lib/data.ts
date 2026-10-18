@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache';
 import { publicDatabase } from './database/public';
 import { samplesEnabled } from './config';
 import { eventEnd } from './syndication';
+import { getGoogleCalendarEvents, mergeCalendarEvents } from './google-calendar';
 import type { Topic, Writer, PublicPost, Story, Event, LearnPage, Meeting } from './types';
 import { sampleTopics, sampleWriters, samplePosts, sampleEvents, sampleLearnPages, sampleMeetings } from './sample-data';
 
@@ -87,11 +88,13 @@ export const getLearnPages = publicCache(async () => (await publicRows<LearnPage
 export const getMeetings = publicCache(async () => (await publicRows<Meeting>('meetings',sampleMeetings)).filter(m=>m.is_published).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)));
 export const getUpcomingMeetings = publicCache(async () => { const now=Date.now(); return (await getMeetings()).filter(meeting=>Date.parse(meeting.starts_at)>=now); });
 export const getEventGroups = publicCache(async () => {
-  const now=Date.now(), events=await getEvents();
+  const now=Date.now();
+  const [local, calendar]=await Promise.all([getEvents(),getGoogleCalendarEvents()]);
+  const events=mergeCalendarEvents(local,calendar);
   return {events, upcoming:events.filter(event=>eventEnd(event)>now), past:events.filter(event=>eventEnd(event)<=now).reverse()};
 });
 export function illustrationFor(slug: string) { return `/illustrations/${['housing','infrastructure','energy','healthcare','education','technology'].includes(slug) ? slug : 'housing'}.svg`; }
 export function coverFor(story: Story) { return story.cover_url || story.topic.image_url || illustrationFor(story.topic.slug); }
 export function coverAlt(story: Story) { return story.cover_alt || story.topic.image_alt || `Hand drawn illustration about ${story.topic.name.toLowerCase()}`; }
 
-export async function getNextEvent() { const now=Date.now(); return (await getEvents()).find(event=>Date.parse(event.starts_at)>now); }
+export async function getNextEvent() { return (await getEventGroups()).upcoming[0]; }
