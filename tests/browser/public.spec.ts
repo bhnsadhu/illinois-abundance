@@ -116,3 +116,13 @@ test('public pages do not attempt dynamic code evaluation', async ({ page }) => 
   await page.waitForLoadState('networkidle');
   expect(violations).toEqual([]);
 });
+
+test('article view counting finishes without holding a background connection open', async ({ page }) => {
+  const finished = page.waitForEvent('requestfinished', {
+    predicate: request => new URL(request.url()).pathname === '/api/views',
+    timeout: 5000,
+  });
+  // The isolated server returns a real service-unavailable response; no live data is written.
+  await Promise.all([finished, page.goto('/post/room-for-more-neighbors')]);
+  await expect(page.locator('.article-heading h1')).toBeVisible();
+});
