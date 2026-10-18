@@ -2,4 +2,4 @@
 .line { display: block; }
 .accent { color: var(--orange); }
 
-.gardenLine { display: flex; align-items: center; gap: 12px; }
+.gardenLine { display: flex; align-items: flex-start; gap: 12px; }
