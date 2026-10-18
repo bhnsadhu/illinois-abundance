@@ -1,3 +1,4 @@
+import { PublicationLabel } from '@/components/publication-label';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -37,12 +38,12 @@ export default async function PostPage({ params }: Props) {
     <article className="editorial-article">
       <header className="article-heading container">
         <Link href="/latest" className="text-link article-back"><ArrowLeft size={15}/> {reader.allStoriesLabel}</Link>
-        <div className="article-kicker"><Link className="topic-label" href={`/topic/${story.topic.slug}`}>{story.topic.name}</Link><span aria-hidden="true">·</span><time dateTime={story.published_at}>{formatDate(story.published_at, { year: 'numeric' })}</time>{story.is_sample && <span className="sample-label">Sample story</span>}</div>
+        <div className="article-kicker"><Link className="topic-label" href={`/topic/${story.topic.slug}`}>{story.topic.name}</Link><span aria-hidden="true">·</span><time dateTime={story.published_at}>{formatDate(story.published_at, { year: 'numeric' })}</time><PublicationLabel sample={story.is_sample}/></div>
         <h1>{story.headline}</h1>
         <p className="article-deck">{story.short_version}</p>
         <Author avatar={story.writer?.avatar_url} name={author} href={story.writer ? `/writer/${story.writer.slug}` : undefined} readTime={readTime(story.final_body)}/>
       </header>
-      <div className={`article-cover container topic-color-${story.topic.slug}`}><Image src={coverFor(story)} alt={coverAlt(story)} width={800} height={560} priority sizes="(max-width: 767px) 100vw, 1100px" unoptimized={Boolean(story.cover_url)}/></div>
+      <div className={`article-cover container topic-color-${story.topic.slug}`}><Image src={coverFor(story)} alt={coverAlt(story)} width={800} height={560} loading="eager" sizes="(max-width: 767px) 100vw, 1100px" unoptimized={Boolean(story.cover_url)}/></div>
       <div className="article-reading">
         <BodyText body={story.final_body}/>
         {sources.length > 0 && <section className="article-sources" aria-labelledby="sources-heading"><h2 id="sources-heading">{reader.sourcesLabel}</h2><ul>{sources.map((source, i) => <li key={`${source.url}-${i}`}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.label}<ArrowUpRight size={15} aria-label="Opens in a new tab"/></a></li>)}</ul></section>}

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Sprout } from './sprout';
-import { siteContentDefaults, type SiteContent } from '@/lib/site-content-schema';
+import { siteContentDefaults, type SiteContent } from '@/lib/site-content-model';
 
 export function Footer({branding=siteContentDefaults.branding,navigation=siteContentDefaults.navigation}:{branding?:SiteContent['branding'];navigation?:SiteContent['navigation']}) {
   return <footer className="site-footer">

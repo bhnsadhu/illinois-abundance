@@ -1,7 +1,7 @@
 'use client';
 import { readApiResponse } from '@/lib/client-response';
 import {useEffect,useRef,useState} from 'react';
-import {siteContentDefaults,type SiteContent} from '@/lib/site-content-schema';
+import {siteContentDefaults,type SiteContent} from '@/lib/site-content-model';
 import {ArrowRight} from './icons';
 export function SubscriptionForm({compact=false,copy=siteContentDefaults.newsletter}:{compact?:boolean;copy?:SiteContent['newsletter']}){
   const [busy,setBusy]=useState(false);const [sent,setSent]=useState(false);const [error,setError]=useState('');const feedback=useRef<HTMLDivElement>(null);

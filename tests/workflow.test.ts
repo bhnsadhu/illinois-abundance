@@ -136,6 +136,8 @@ it('takes a real submission through verification and review into public Home HTM
   // Public rendering is anonymous even while the request has a reviewer cookie.
   const html = renderToStaticMarkup(await Home());
   expect(html).toContain(edited.headline);
+  expect(html).toContain('Published by Illinois Abundance');
+  expect(html).not.toContain('Sample story');
   expect(html).toContain(edited.short_version);
   expect(html).toContain(`/post/${result.slug}`);
   expect(html).toContain('Student Writer');

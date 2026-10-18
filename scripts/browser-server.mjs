@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { readFile, readdir, utimes } from 'node:fs/promises';
 
 // Never let browser tests load .env.local's live database, mail, or storage.
 const env = {
@@ -20,4 +21,14 @@ function run(args) {
   });
 }
 await run(['build']);
+if (process.env.BROWSER_TEST_WARM_CACHE === 'true') {
+  // Reproduce concurrent revalidation during a deployment with an existing cache.
+  const directory = '.next/cache/fetch-cache';
+  for (const file of await readdir(directory)) {
+    const path = `${directory}/${file}`;
+    const entry = JSON.parse(await readFile(path, 'utf8'));
+    if (entry.tags?.includes('public-content')) await utimes(path, new Date(), new Date(Date.now() - 120_000));
+  }
+  await run(['build']);
+}
 await run(['start', '--hostname', '127.0.0.1', '--port', '3100']);

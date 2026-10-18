@@ -103,3 +103,16 @@ test('security policy permits selected-image previews', async ({ page }) => {
   });
   expect(loaded).toBe(2);
 });
+
+test('public pages do not attempt dynamic code evaluation', async ({ page }) => {
+  const client = await page.context().newCDPSession(page);
+  const violations: string[] = [];
+  await client.send('Audits.enable');
+  client.on('Audits.issueAdded', ({ issue }) => {
+    if (issue.code === 'ContentSecurityPolicyIssue') violations.push(issue.details.contentSecurityPolicyIssueDetails?.violatedDirective || issue.code);
+  });
+  await page.goto('/');
+  await expect(page.locator('h1')).toBeVisible();
+  await page.waitForLoadState('networkidle');
+  expect(violations).toEqual([]);
+});

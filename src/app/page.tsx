@@ -1,3 +1,4 @@
+import { PublicationLabel } from '@/components/publication-label';
 import Image from 'next/image';
 import { Reveal } from '@/components/reveal';
 import Link from 'next/link';
@@ -56,7 +57,7 @@ export default async function Home() {
       <div className={styles.featureCopy}>
         <div className={styles.kicker}>
           <Link href={`/topic/${featured.topic.slug}`}>{featured.topic.name}</Link>
-          {featured.is_sample && <span>Sample story</span>}
+          <PublicationLabel sample={featured.is_sample}/>
         </div>
         <h2 id="featured-title"><Link href={`/post/${featured.slug}`}>{featured.headline}</Link></h2>
         <p>{featured.short_version}</p>
@@ -64,7 +65,7 @@ export default async function Home() {
         <Link className={styles.readLink} href={`/post/${featured.slug}`}>{reader.readStory} <ArrowRight size={18}/></Link>
       </div>
       <Link href={`/post/${featured.slug}`} className={`${styles.featureVisual} topic-color-${featured.topic.slug}`} tabIndex={-1} aria-hidden="true">
-        <Image src={coverFor(featured)} alt={coverAlt(featured)} width={800} height={560} priority unoptimized/>
+        <Image src={coverFor(featured)} alt={coverAlt(featured)} width={800} height={560} loading="eager" unoptimized/>
       </Link>
     </section> : <section className="empty-state">
       <h2>{home.emptyTitle}</h2>

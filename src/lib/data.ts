@@ -33,10 +33,14 @@ async function publicRows<T>(table: keyof typeof fields, samples: T[]): Promise<
   }
 }
 export const getTopics = publicCache('getTopics', async () => (await publicRows<Topic>('topics', sampleTopics)).filter(t=>t.is_active).sort((a,b)=>a.sort_order-b.sort_order));
-export const getStoryTopics = publicCache('getStoryTopics', async ():Promise<Topic[]> => { const db=publicDatabase(); if(!db)return sampleTopics; const {data,error}=await db.from('public_story_topics').select(fields.topics); if(error)throw new Error('Public content is temporarily unavailable.');return data as Topic[]; });
-export const getWriters = publicCache('getWriters', async () => publicRows<Writer>('writers', sampleWriters));
+// Aggregates cache their complete result. Use request-memoized loaders inside
+// them so nested persistent cache writes cannot race a concurrent directory read.
+const loadStoryTopics = cache(async ():Promise<Topic[]> => { const db=publicDatabase(); if(!db)return sampleTopics; const {data,error}=await db.from('public_story_topics').select(fields.topics); if(error)throw new Error('Public content is temporarily unavailable.');return data as Topic[]; });
+const loadWriters = cache(async () => publicRows<Writer>('writers', sampleWriters));
+export const getStoryTopics = publicCache('getStoryTopics', loadStoryTopics);
+export const getWriters = publicCache('getWriters', loadWriters);
 async function attachStories(posts: PublicPost[]): Promise<Story[]> {
- const [topics,writers]=await Promise.all([getStoryTopics(),getWriters()]);
+ const [topics,writers]=await Promise.all([loadStoryTopics(),loadWriters()]);
  return posts.flatMap(post=>{const topic=topics.find(t=>t.id===post.topic_id);return topic?[{...post,topic,writer:writers.find(w=>w.id===post.writer_id)||null}]:[];});
 }
 async function storyRows(limit?: number, offset = 0, filter?: { column: 'topic_id' | 'writer_id'; value: string }): Promise<PublicPost[]> {
@@ -84,13 +88,15 @@ export const getStory = publicCache('getStory', async (slug:string):Promise<Stor
  const db=publicDatabase();if(!db){const post=samplesEnabled()?samplePosts.find(p=>p.slug===slug):undefined;return post?(await attachStories([post]))[0]:undefined;}
  const {data,error}=await db.from('public_posts').select(fields.posts).eq('slug',slug).maybeSingle();if(error)throw new Error('Stories are temporarily unavailable.');return !data?undefined:(await attachStories([data as PublicPost]))[0];
 });
-export const getEvents = publicCache('getEvents', async () => (await publicRows<Event>('events',sampleEvents)).filter(e=>e.is_published).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)));
+const loadEvents = cache(async () => (await publicRows<Event>('events',sampleEvents)).filter(e=>e.is_published).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)));
+export const getEvents = publicCache('getEvents', loadEvents);
 export const getLearnPages = publicCache('getLearnPages', async () => (await publicRows<LearnPage>('learn_pages',sampleLearnPages)).filter(p=>p.is_published));
-export const getMeetings = publicCache('getMeetings', async () => (await publicRows<Meeting>('meetings',sampleMeetings)).filter(m=>m.is_published).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)));
-export const getUpcomingMeetings = publicCache('getUpcomingMeetings', async () => { const now=Date.now(); return (await getMeetings()).filter(meeting=>Date.parse(meeting.starts_at)>=now); });
+const loadMeetings = cache(async () => (await publicRows<Meeting>('meetings',sampleMeetings)).filter(m=>m.is_published).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)));
+export const getMeetings = publicCache('getMeetings', loadMeetings);
+export const getUpcomingMeetings = publicCache('getUpcomingMeetings', async () => { const now=Date.now(); return (await loadMeetings()).filter(meeting=>Date.parse(meeting.starts_at)>=now); });
 export const getEventGroups = publicCache('getEventGroups', async () => {
   const now=Date.now();
-  const [local, calendar]=await Promise.all([getEvents(),getGoogleCalendarEvents()]);
+  const [local, calendar]=await Promise.all([loadEvents(),getGoogleCalendarEvents()]);
   const events=mergeCalendarEvents(local,calendar);
   return {events, upcoming:events.filter(event=>eventEnd(event)>now), past:events.filter(event=>eventEnd(event)<=now).reverse()};
 });

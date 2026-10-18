@@ -3,7 +3,7 @@ import { readApiResponse } from '@/lib/client-response';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {siteContentDefaults,type SiteContent} from '@/lib/site-content-schema';
+import {siteContentDefaults,type SiteContent} from '@/lib/site-content-model';
 import { ArrowRight } from './icons';
 
 export function LoginForm({ role = 'reviewer',copy=siteContentDefaults.access }: { role?: 'admin' | 'reviewer';copy?:SiteContent['access'] }) {

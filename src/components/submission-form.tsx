@@ -2,7 +2,7 @@
 import { readApiResponse } from '@/lib/client-response';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {siteContentDefaults,type SiteContent} from '@/lib/site-content-schema';
+import {siteContentDefaults,type SiteContent} from '@/lib/site-content-model';
 import { ArrowRight } from './icons';
 export function SubmissionForm({copy=siteContentDefaults.write}:{copy?:SiteContent['write']}) {
  const router=useRouter();const [body,setBody]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('');

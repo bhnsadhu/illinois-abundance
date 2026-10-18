@@ -1,3 +1,4 @@
+import { PublicationLabel } from '@/components/publication-label';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Author } from '@/components/author';
@@ -12,7 +13,7 @@ export function StoryCard({ story, headingLevel = 2 }: { story: Story; headingLe
         <Image src={coverFor(story)} alt={coverAlt(story)} width={800} height={560} sizes="(max-width: 640px) 100vw, (max-width: 1023px) 50vw, 33vw" unoptimized={Boolean(story.cover_url)} />
       </div>
       <div className="story-card-copy">
-        <div className="story-card-labels"><span className="topic-label">{story.topic.name}</span>{story.is_sample && <span className="sample-label">Sample story</span>}</div>
+        <div className="story-card-labels"><span className="topic-label">{story.topic.name}</span><PublicationLabel sample={story.is_sample}/></div>
         <Heading className="story-card-title">{story.headline}</Heading>
         <p className="story-card-deck">{story.short_version}</p>
         <Author avatar={story.writer?.avatar_url} name={story.byline || story.author_name} date={story.published_at}/>

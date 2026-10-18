@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {siteContentDefaults,type SiteContent} from '@/lib/site-content-schema';
+import {siteContentDefaults,type SiteContent} from '@/lib/site-content-model';
 import { Check, Copy } from '@/components/icons';
 
 export function ShareActions({ slug,copy=siteContentDefaults.reader }: { slug: string;copy?:SiteContent['reader'] }) {

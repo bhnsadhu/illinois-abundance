@@ -26,7 +26,7 @@ export default async function TopicPage({ params }: Props) {
   return <div className="container editorial-index">
     <header className="topic-heading">
       <div><h1>{topic.name}</h1><p>{topic.description}</p></div>
-      <Image src={topic.image_url||`/illustrations/${illustration}.svg`} unoptimized width={800} height={560} alt={topic.image_alt||`Hand drawn illustration about ${topic.name.toLowerCase()}`} priority sizes="(max-width: 767px) 85vw, 40vw"/>
+      <Image src={topic.image_url||`/illustrations/${illustration}.svg`} unoptimized width={800} height={560} alt={topic.image_alt||`Hand drawn illustration about ${topic.name.toLowerCase()}`} loading="eager" sizes="(max-width: 767px) 85vw, 40vw"/>
     </header>
     <nav className="topic-filters" aria-label="Explore stories by topic"><Link href="/latest">All stories</Link>{topics.map(item => <Link key={item.id} href={`/topic/${item.slug}`} aria-current={item.id === topic.id ? 'page' : undefined}>{item.name}</Link>)}</nav>
     {stories.length ? <div className="story-grid">{stories.map(story => <StoryCard key={story.id} story={story}/>)}</div> : <div className="empty-state"><h2>{copy.topicEmptyTitle}</h2><Link href="/write" className="button">{copy.topicEmptyAction} <ArrowRight size={16}/></Link></div>}

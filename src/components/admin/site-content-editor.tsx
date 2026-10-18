@@ -3,7 +3,7 @@ import { readApiResponse } from '@/lib/client-response';
 import {useEffect,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {ImageField} from './image-field';
-import {sectionFields,sectionLabels,siteContentDefaults,siteSections,type ContentField,type SiteContent,type SiteSection} from '@/lib/site-content-schema';
+import {sectionFields,sectionLabels,siteContentDefaults,siteSections,type ContentField,type SiteContent,type SiteSection} from '@/lib/site-content-model';
 type Values=Record<string,unknown>;
 function Fields({fields,values,setValues,disabled,onBusy,prefix}:{fields:ContentField[];values:Values;setValues:(next:Values)=>void;disabled:boolean;onBusy:(busy:boolean)=>void;prefix:string}){
  return <>{fields.map(field=>{const value=values[field.key],id=`${prefix}-${field.key}`;const change=(next:unknown)=>setValues({...values,[field.key]:next});
