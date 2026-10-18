@@ -59,7 +59,7 @@ p { margin-bottom: 1.2em; }
 svg { flex-shrink: 0; }
 .container, .nav-wrap { width: min(var(--page-width), calc(100% - 2 * var(--page-gutter))); margin-inline: auto; }
 .narrow { max-width: 760px; }
-.orange { color: var(--accent); }
+.orange { color: var(--orange); }
 .muted { color: var(--muted); }
 .eyebrow { font-size: 12px; line-height: 1.5; font-weight: 600; letter-spacing: .035em; display: flex; align-items: center; gap: 9px; }
 .status-dot { width: 6px; height: 6px; background: var(--orange); border-radius: 50%; display: inline-block; flex-shrink: 0; }
