@@ -76,7 +76,7 @@ describe('stories and campus events scope', () => {
     expect(admin).toContain('Manage events');
     expect(admin).not.toMatch(/Confirmed subscribers|Manage explainers|Export content/);
     const home = renderToStaticMarkup(await Home());
-    expect(home).toContain('Write the stories');
+    expect(home).toContain('Publish with us');
     expect(home).toContain('Our next event');
     expect(home).not.toContain('id="subscribe"');
     expect(home).not.toContain('In your inbox');

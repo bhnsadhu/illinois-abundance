@@ -2,6 +2,7 @@ import 'server-only';
 import { createHash } from 'node:crypto';
 import { Temporal } from 'temporal-polyfill';
 import ical, { type ParameterValue } from 'node-ical';
+import { googleMeetUrl } from './event-links';
 import type { Event } from './types';
 
 // This calendar is public. Only the public feed is read; no account access is needed.
@@ -39,6 +40,7 @@ export async function parseCalendarEvents(source: string, now = new Date()): Pro
         location: plainText(event.location),
         rsvp_url: null, recap_post_id: null, is_published: true, is_sample: false,
         all_day: instance.isFullDay, calendar_url: googleCalendarHref,
+        join_url: googleMeetUrl(event['GOOGLE-CONFERENCE'], event.url, event.location, event.description),
       });
     }
   }
@@ -61,6 +63,11 @@ export async function getGoogleCalendarEvents(): Promise<Event[]> {
 export function mergeCalendarEvents(local: Event[], calendar: Event[]): Event[] {
   const key = (event: Event) => `${Date.parse(event.starts_at)}:${event.title.trim().toLowerCase()}`;
   const localKeys = new Set(local.filter(event => !event.is_sample).map(key));
-  return [...local.filter(event => !calendar.length || !event.is_sample), ...calendar.filter(event => !localKeys.has(key(event)))]
+  const calendarByKey = new Map(calendar.map(event => [key(event), event]));
+  const localEvents = local.filter(event => !calendar.length || !event.is_sample).map(event => {
+    const remote = calendarByKey.get(key(event));
+    return remote?.join_url && !event.join_url ? {...event, join_url: remote.join_url} : event;
+  });
+  return [...localEvents, ...calendar.filter(event => !localKeys.has(key(event)))]
     .sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at));
 }

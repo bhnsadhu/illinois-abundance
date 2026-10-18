@@ -30,7 +30,9 @@ describe('site content editing',()=>{
  });
  it('updates previous homepage defaults without replacing custom copy or removing curated links',()=>{
   const legacy={firstLine:'Our community',secondLine:'With room for more.',secondaryLabel:'Come to a campus event',secondaryHref:'/events'};
-  expect(upgradeLegacySiteSection('home',legacy)).toEqual({...legacy,secondLine:'Cultivating our Garden',secondaryLabel:'Write the stories',secondaryHref:'/write'});
+  expect(upgradeLegacySiteSection('home',legacy)).toEqual({...legacy,secondLine:'Cultivating our Garden',secondaryLabel:'Publish with us',secondaryHref:'/write'});
+  expect(upgradeLegacySiteSection('home',{secondaryLabel:'Write the stories',secondaryHref:'/write'})).toEqual({secondaryLabel:'Publish with us',secondaryHref:'/write'});
+  expect(upgradeLegacySiteSection('navigation',{writeLabel:'Write for us',writeHref:'/write'})).toEqual({writeLabel:'Publish with us',writeHref:'/write'});
   const custom={secondLine:'A custom headline',secondaryLabel:'Pitch a story',secondaryHref:'/about',newsItems:[]};
   expect(upgradeLegacySiteSection('home',custom)).toEqual(custom);
   expect(parseSiteSection('home',{...siteContentDefaults.home,newsItems:[]})).toMatchObject({newsItems:[]});

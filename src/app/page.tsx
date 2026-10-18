@@ -4,8 +4,10 @@ import { ArrowRight, ArrowUpRight, CalendarDays, MapPin } from '@/components/ico
 import { SubscriptionForm } from '@/components/subscription-form';
 import { StoryCard } from '@/components/story-card';
 import { Author } from '@/components/author';
+import { EventJoinLink } from '@/components/event-join-link';
 import { HomeTitle } from '@/components/home-title';
 import { getStories, getTopics, getNextEvent, coverFor, coverAlt } from '@/lib/data';
+import { eventLocation } from '@/lib/event-links';
 import { eventDate } from '@/lib/syndication';
 import { googleCalendarHref } from '@/lib/google-calendar';
 import { getSiteContent } from '@/lib/site-content';
@@ -17,6 +19,7 @@ export default async function Home() {
   const [stories, topics, nextEvent, content] = await Promise.all([getStories(4), getTopics(), getNextEvent(), getSiteContent()]);
   const {home,visibility,reader,newsletter}=content;
   const featured = stories[0];
+  const location = nextEvent ? eventLocation(nextEvent) : '';
 
   return <div className={`container ${styles.home}`}>
     <div className={styles.hero}>
@@ -34,11 +37,12 @@ export default async function Home() {
           <h3>{nextEvent.title}</h3>
           <div className={styles.eventDetails}>
             <p><CalendarDays size={18}/><time dateTime={nextEvent.starts_at}>{eventDate(nextEvent.starts_at, nextEvent.all_day)}</time></p>
-            {nextEvent.location && <p><MapPin size={18}/><span>{nextEvent.location}</span></p>}
+            {location && <p><MapPin size={18}/><span>{location}</span></p>}
           </div>
           {nextEvent.is_sample && <p className={styles.sampleNote}>Sample event. Details are for demonstration.</p>}
         </> : <p>{home.eventEmptyBody}</p>}
         <div className={styles.eventActions}>
+          <EventJoinLink href={nextEvent?.join_url} label={content.events.joinLabel}/>
           <Link href={nextEvent && home.eventLinkHref === '/events' ? `/events#event-${nextEvent.id}` : home.eventLinkHref} className="text-link">{home.eventLinkLabel} <ArrowRight size={17}/></Link>
           <a href={googleCalendarHref} className="text-link" target="_blank" rel="noopener noreferrer">Google Calendar <ArrowUpRight size={16}/></a>
         </div>

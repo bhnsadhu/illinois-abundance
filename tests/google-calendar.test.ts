@@ -16,6 +16,18 @@ describe('public Google Calendar', () => {
     expect((await parseCalendarEvents(source, now))[0].id).toBe(events[0].id);
   });
 
+  it('extracts join links from conference metadata, locations and descriptions', async () => {
+    const room='https://meet.google.com/abc-defg-hij';
+    for (const field of ['X-GOOGLE-CONFERENCE','URL','LOCATION','DESCRIPTION']) {
+      const [parsed]=await parseCalendarEvents(feed(event(`${field}:${room}`)),now);
+      expect(parsed.join_url).toBe(room);
+    }
+    const [parsed]=await parseCalendarEvents(feed(event('X-GOOGLE-CONFERENCE:https://meet.google.com/abc-defg-hij\r\nDESCRIPTION:Join https://meet.google.com/xyz-abcd-efg')),now);
+    expect(parsed.join_url).toBe(room);
+    const local={...parsed,id:'local',location:'Campus library',join_url:undefined};
+    expect(mergeCalendarEvents([local],[parsed])).toEqual([{...local,join_url:room}]);
+  });
+
   it('expands weekly meetings across daylight saving and honors exclusions, moved and cancelled occurrences', async () => {
     const source = feed(
       'UID:weekly\r\nDTSTART;TZID=America/Chicago:20261022T163000\r\nDTEND;TZID=America/Chicago:20261022T173000\r\nRRULE:FREQ=WEEKLY;COUNT=5\r\nEXDATE;TZID=America/Chicago:20261029T163000\r\nSUMMARY:Weekly meeting',
