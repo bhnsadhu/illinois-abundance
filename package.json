@@ -14,7 +14,8 @@
     "seed": "node --env-file=.env.local --import tsx scripts/seed.ts",
     "test:db": "vitest run tests/database.test.ts",
     "setup:admin": "node --env-file=.env.local --import tsx scripts/setup-admin.ts",
-    "preview:emails": "node --import tsx scripts/preview-emails.ts"
+    "preview:emails": "node --import tsx scripts/preview-emails.ts",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
@@ -37,6 +38,7 @@
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "axe-core": "^4.14.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.4.0",
     "tailwindcss": "^4.3.3",

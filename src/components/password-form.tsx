@@ -1,4 +1,5 @@
 'use client';
+import { readApiResponse } from '@/lib/client-response';
 import { useState } from 'react';
 export function PasswordForm({ email }: { email: string }) {
   const [busy, setBusy] = useState(false);
@@ -13,7 +14,7 @@ export function PasswordForm({ email }: { email: string }) {
     try {
       const response = await fetch('/api/account/password', { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword: data.get('currentPassword'), newPassword: data.get('newPassword'), confirmPassword: data.get('confirmPassword') }) });
-      const result = await response.json();
+      const result = await readApiResponse(response);
       if (!response.ok) throw new Error(result.error || 'Please try again.');
       form.reset(); setSaved(true);
     } catch (error) { setError(error instanceof Error ? error.message : 'Please try again.'); }

@@ -1,4 +1,5 @@
 'use client';
+import { readApiResponse } from '@/lib/client-response';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -96,7 +97,7 @@ export function ReviewEditor({ post, topics, writers }: { post: ReviewPost; topi
         body.set('file', file);
         body.set('alt', photoAlt);
         const response = await fetch('/api/covers', { method: 'POST', body });
-        const result = await response.json();
+        const result = await readApiResponse(response);
         if (!response.ok) throw new Error(result.error || 'We couldn’t upload that photo. Please try again.');
         uploading = false;
         photoUrl = result.url;
@@ -116,7 +117,7 @@ export function ReviewEditor({ post, topics, writers }: { post: ReviewPost; topi
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, version: dirty ? version : Math.max(version, post.version), changes }),
       });
-      const result = await response.json();
+      const result = await readApiResponse(response);
       if (!response.ok) throw new Error(result.error || 'We couldn’t save that change.');
       setVersion(result.version);
       // Declining or unpublishing leaves local content edits unsaved.

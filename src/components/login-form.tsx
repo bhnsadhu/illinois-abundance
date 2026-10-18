@@ -1,4 +1,5 @@
 'use client';
+import { readApiResponse } from '@/lib/client-response';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -15,7 +16,7 @@ export function LoginForm({ role = 'reviewer',copy=siteContentDefaults.access }:
     try {
       const response = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: data.get('email'), password: data.get('password'), role, website: data.get('website') }) });
-      const result = await response.json();
+      const result = await readApiResponse(response);
       if (!response.ok) throw new Error(result.error || 'Please try again in a moment.');
       router.replace(result.redirect === '/admin' ? '/admin' : '/review');
       router.refresh();

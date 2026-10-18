@@ -27,6 +27,14 @@ npm run dev
 
 Open **http://localhost:3000**, matching `NEXT_PUBLIC_SITE_URL`. Without a database, `SEED_SAMPLE_CONTENT=true` provides a labeled reading preview; submissions, authentication, subscriptions, and admin work require connected services. Missing services return a useful failure instead of pretending to save or send.
 
+## Automated production checks
+
+Run `npm run check` for lint, TypeScript, the unit/database integration suite, and a production build. Run `npx playwright install chromium` once, then `npm run test:browser` for desktop and mobile checks against a production server on port 3100. The browser runner explicitly disables live database, mail, and storage credentials, builds with sample content, and uses controlled API responses for form interactions. It never sends verification emails or publishes test articles. The separate PostgreSQL integration suite exercises the real route handlers, verification, password sessions, review, publication, and private-data boundaries.
+
+Browser checks cover page accessibility, keyboard navigation, search, sharing, form recovery, code verification, protected routes, image previews, reduced motion, and mobile overflow. GitHub Actions runs these checks on pushes to `main` and pull requests, audits production dependencies, and retains failure screenshots/traces for seven days. A failed check should block release review. Repository branch-protection settings are managed separately.
+
+The full dependency audit currently reports [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) in `braces`, reached through the Next.js ESLint development dependency. No patched version was available at the October 18, 2026 audit. Public requests do not supply glob patterns to this linting path; `npm audit --omit=dev` is clean. Recheck the full audit when updating tooling; do not downgrade Next.js merely to suppress the advisory.
+
 ## Connect the services
 
 1. **Neon:** reuse the existing project, or create a Free plan project through the [Vercel Neon integration](https://vercel.com/marketplace/neon/neon) or the Neon console. Choose a region close to the app. Copy its pooled connection into `DATABASE_URL` and its direct connection into `DATABASE_URL_UNPOOLED`. Use the project owner role for migrations and the current server adapter. The direct hostname must not contain `-pooler`. Review current service limits before launch; a free database does not make the entire stack unlimited.
