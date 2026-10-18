@@ -65,7 +65,7 @@ export default async function Home() {
         <Link className={styles.readLink} href={`/post/${featured.slug}`}>{reader.readStory} <ArrowRight size={18}/></Link>
       </div>
       <Link href={`/post/${featured.slug}`} className={`${styles.featureVisual} topic-color-${featured.topic.slug}`} tabIndex={-1} aria-hidden="true">
-        <Image src={coverFor(featured)} alt={coverAlt(featured)} width={800} height={560} loading="eager" unoptimized/>
+        <Image src={coverFor(featured)} alt={coverAlt(featured)} className={featured.cover_url ? undefined : styles.featureArtwork} width={800} height={560} loading="eager" unoptimized/>
       </Link>
     </section> : <section className="empty-state">
       <h2>{home.emptyTitle}</h2>

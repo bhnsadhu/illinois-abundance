@@ -122,6 +122,32 @@
   margin-left: auto;
 }
 
+/* Shared rows keep labels, headlines, summaries, and bylines aligned as copy wraps. */
+@supports (grid-template-rows: subgrid) {
+  @media (min-width: 641px) {
+    .story-card,
+    .story-card-link {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 5;
+      row-gap: 0;
+    }
+
+    .story-card-copy {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 4;
+      row-gap: 0;
+    }
+
+    .story-card-labels,
+    .story-card .story-card-title,
+    .story-card-deck {
+      align-self: start;
+    }
+  }
+}
+
 .topic-color-housing { background: var(--soft-teal); }
 .topic-color-infrastructure { background: #f3eddf; }
 .topic-color-energy { background: #edf0e5; }
