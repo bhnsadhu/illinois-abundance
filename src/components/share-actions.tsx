@@ -15,7 +15,10 @@ export function ShareActions({ slug,copy=siteContentDefaults.reader }: { slug: s
   return <div className="share-actions">
     <div className="share-buttons">
       <button type="button" className="button button-outline button-small" onClick={copyLink}>
-        {status === 'copied' ? <Check size={16}/> : <Copy size={16}/>} {status === 'copied' ? copy.copySuccess : copy.copyLabel}
+        <span className="copy-feedback">
+          <span aria-hidden={status === 'copied'}><Copy size={16}/>{copy.copyLabel}</span>
+          <span aria-hidden={status !== 'copied'}><Check size={16}/>{copy.copySuccess}</span>
+        </span>
       </button>
     </div>
     <span className="share-status" role="status">{status === 'error' ? copy.copyError : status === 'copied' ? 'Ready to share.' : ''}</span>

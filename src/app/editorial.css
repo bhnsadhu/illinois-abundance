@@ -4,11 +4,11 @@
 }
 
 .editorial-index > .page-heading {
-  text-align: center;
+  text-align: left;
 }
 
 .editorial-index > .page-heading p {
-  margin-inline: auto;
+  margin-inline: 0;
 }
 
 .topic-label {
@@ -45,7 +45,7 @@
   border-radius: 24px;
   background: var(--paper);
   box-shadow: 0 3px 14px rgb(29 29 31 / 3%);
-  transition: transform 220ms cubic-bezier(.2, .7, .3, 1), box-shadow 220ms ease;
+  transition: transform var(--duration-ui) var(--ease-out);
 }
 
 .story-card-cover {
@@ -170,7 +170,7 @@
 .topic-filters {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 10px;
   margin: 0 0 48px;
 }
@@ -186,7 +186,7 @@
   color: var(--muted);
   font-size: 13px;
   font-weight: 550;
-  transition: background 160ms ease, color 160ms ease, transform 100ms ease-out;
+  transition: background var(--duration-fast) ease, color var(--duration-fast) ease, transform var(--duration-press) var(--ease-out);
 }
 
 .topic-filters a[aria-current=page] {
@@ -626,9 +626,9 @@
 }
 
 @media (max-width: 767px) {
-  .topic-heading { grid-template-columns: 1fr; gap: 24px; padding-block: 48px; text-align: center; }
+  .topic-heading { grid-template-columns: 1fr; gap: 24px; padding-block: 48px; text-align: left; }
   .topic-heading h1 { font-size: clamp(44px, 11vw, 64px); }
-  .topic-heading p { margin-inline: auto; font-size: 18px; }
+  .topic-heading p { margin-inline: 0; font-size: 18px; }
   .topic-heading img { max-width: 400px; max-height: 260px; justify-self: center; }
   .topic-filters { gap: 8px; margin-bottom: 32px; }
   .topic-filters a { padding: 10px 16px; font-size: 12px; }
@@ -654,9 +654,9 @@
   .related-stories { margin-top: 56px; }
   .related-stories .section-heading { flex-wrap: wrap; row-gap: 12px; }
   .related-stories .section-heading h2 { font-size: 32px; }
-  .about-hero { grid-template-columns: 1fr; gap: 32px; padding-block: 48px; text-align: center; }
-  .about-hero h1 { max-width: 17ch; margin-inline: auto; font-size: clamp(42px, 11vw, 60px); }
-  .about-hero > div > p { margin-inline: auto; font-size: 18px; }
+  .about-hero { grid-template-columns: 1fr; gap: 32px; padding-block: 48px; text-align: left; }
+  .about-hero h1 { max-width: 17ch; margin-inline: 0; font-size: clamp(42px, 11vw, 60px); }
+  .about-hero > div > p { margin-inline: 0; font-size: 18px; }
   .about-hero-art { min-height: 0; padding: 12px; border-radius: 24px; }
   .about-hero-art img { max-height: 320px; object-fit: contain; }
   .about-section { grid-template-columns: 1fr; gap: 16px; padding: 28px 24px; border-radius: 24px; }

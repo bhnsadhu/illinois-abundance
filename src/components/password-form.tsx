@@ -26,6 +26,6 @@ export function PasswordForm({ email }: { email: string }) {
     <label>Confirm new password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={12} maxLength={128} required/></label>
     {error && <p className="alert alert-error" role="alert">{error}</p>}
     {saved && <p className="alert" role="status">Your password has changed. Your other sessions have been signed out.</p>}
-    <button className="button" disabled={busy}>{busy ? 'Changing password…' : 'Change password'}</button>
+    <button className="button" disabled={busy} aria-busy={busy}>{busy ? 'Changing password…' : 'Change password'}</button>
   </form>;
 }

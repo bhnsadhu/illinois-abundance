@@ -26,7 +26,7 @@ export function LoginForm({ role = 'reviewer',copy=siteContentDefaults.access }:
     <label><span className="sr-only">{copy.passwordLabel}</span><input name="password" type="password" autoComplete="current-password" maxLength={128} placeholder={copy.passwordLabel} required/></label>
     <div className="honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off"/></label></div>
     {error && <p className="alert alert-error" role="alert">{error}</p>}
-    <button className="button full-width" disabled={busy}>{busy ? 'Signing in…' : role === 'admin' ? copy.adminButton : copy.reviewerButton}<ArrowRight size={17}/></button>
+    <button className="button full-width" disabled={busy} aria-busy={busy}>{busy ? 'Signing in…' : role === 'admin' ? copy.adminButton : copy.reviewerButton}<ArrowRight size={17}/></button>
     {role === 'reviewer' && <p className="consent-copy login-note">{copy.resetHint}</p>}
     <p className="login-note"><Link className="text-link" href={role === 'admin' ? '/login' : '/login/admin'}>{role === 'admin' ? copy.reviewerTitle : copy.adminTitle}</Link></p>
   </form>;

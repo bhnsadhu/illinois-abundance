@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Reveal } from '@/components/reveal';
 import Link from 'next/link';
 import { ArrowRight, ArrowUpRight, CalendarDays, MapPin } from '@/components/icons';
 import { SubscriptionForm } from '@/components/subscription-form';
@@ -69,15 +70,15 @@ export default async function Home() {
       <Link className="button" href="/write">{home.emptyLinkLabel} <ArrowRight size={18}/></Link>
     </section>)}
 
-    {visibility.homeRecent && stories.length > 1 && <section className={styles.recent} aria-labelledby="recent-heading">
+    {visibility.homeRecent && stories.length > 1 && <Reveal className={styles.recent} aria-labelledby="recent-heading">
       <div className={styles.sectionHeading}>
         <h2 id="recent-heading">{home.recentTitle}</h2>
         <Link href="/latest">{home.allStoriesLabel} <ArrowRight size={16}/></Link>
       </div>
       <div className="story-grid">{stories.slice(1, 4).map(story => <StoryCard key={story.id} story={story}/>)}</div>
-    </section>}
+    </Reveal>}
 
-    {home.newsItems.length > 0 && <section className={styles.news} aria-labelledby="news-heading">
+    {home.newsItems.length > 0 && <Reveal className={styles.news} aria-labelledby="news-heading">
       <div className={styles.sectionHeading}><h2 id="news-heading">{home.newsTitle}</h2></div>
       <p className={styles.newsIntro}>{home.newsIntro}</p>
       <div className={styles.newsList}>{home.newsItems.map((item, index) => <article className={styles.newsItem} key={`${item.href}-${index}`}>
@@ -85,9 +86,9 @@ export default async function Home() {
         <p>{item.description}</p>
         <div className={styles.newsSource}><span>{item.publisher}</span><span>{item.dateLabel}</span></div>
       </article>)}</div>
-    </section>}
+    </Reveal>}
 
-    {visibility.homeTopics && <section className={styles.topics} aria-labelledby="topics-heading">
+    {visibility.homeTopics && <Reveal className={styles.topics} aria-labelledby="topics-heading">
       <div className={styles.sectionHeading}><h2 id="topics-heading">{home.topicsTitle}</h2></div>
       <div className={styles.topicList}>
         {topics.map(topic => <Link key={topic.id} href={`/topic/${topic.slug}`} className={styles.topic}>
@@ -95,11 +96,11 @@ export default async function Home() {
           <ArrowRight size={18}/>
         </Link>)}
       </div>
-    </section>}
+    </Reveal>}
 
-    {visibility.newsletter && visibility.homeNewsletter && <section className={styles.subscribe} id="subscribe" aria-labelledby="subscribe-heading">
+    {visibility.newsletter && visibility.homeNewsletter && <Reveal className={styles.subscribe} id="subscribe" aria-labelledby="subscribe-heading">
       <div><h2 id="subscribe-heading">{newsletter.homeTitle}</h2><p>{newsletter.homeIntro}</p></div>
       <SubscriptionForm copy={content.newsletter} compact/>
-    </section>}
+    </Reveal>}
   </div>;
 }

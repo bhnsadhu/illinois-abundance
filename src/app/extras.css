@@ -4,21 +4,21 @@
 }
 
 .extras-page > .page-heading {
-  text-align: center;
+  text-align: left;
 }
 
 .extras-page > .page-heading .eyebrow {
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .extras-page > .page-heading p:not(.eyebrow) {
   max-width: 55ch;
-  margin-inline: auto;
+  margin-inline: 0;
 }
 
 .extras-page > .page-heading h1 {
   max-width: 18ch;
-  margin-inline: auto;
+  margin-inline: 0;
 }
 
 .extras-section {
@@ -77,12 +77,12 @@
   align-items: center;
   gap: 16px;
   max-width: 800px;
-  margin-inline: auto;
+  margin-inline: 0;
   padding: 8px 8px 8px 24px;
   border: 1px solid var(--control-line);
   border-radius: 999px;
   background: var(--paper);
-  transition: box-shadow 160ms ease, border-color 160ms ease;
+  transition: box-shadow 160ms ease, border-color var(--duration-fast) ease;
 }
 
 .story-search:focus-within {
@@ -118,11 +118,11 @@
 
 .search-hint {
   max-width: 72ch;
-  margin: 20px auto 64px;
+  margin: 20px 0 64px;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.6;
-  text-align: center;
+  text-align: left;
 }
 
 .search-results > .section-heading {
@@ -323,7 +323,7 @@
   border-radius: 24px;
   background: var(--paper);
   box-shadow: 0 3px 14px rgb(29 29 31 / 3%);
-  transition: transform 220ms cubic-bezier(.2, .7, .3, 1), box-shadow 220ms ease;
+  transition: transform var(--duration-ui) var(--ease-out);
 }
 
 .learn-card-top {
@@ -510,7 +510,7 @@
 @media (max-width: 767px) {
   .extras-page > .page-heading h1 { max-width: 16ch; font-size: clamp(40px, 10vw, 56px); }
   .extras-section { margin-top: 56px; }
-  .writer-heading { flex-direction: column; align-items: center; gap: 24px; padding: 48px 0 40px; text-align: center; }
+  .writer-heading { flex-direction: column; align-items: flex-start; gap: 24px; padding: 48px 0 40px; text-align: left; }
   .writer-monogram { width: 96px; height: 96px; font-size: 34px; }
   .writer-heading h1 { font-size: 44px; }
   .writer-bio { font-size: 17px; }
@@ -533,10 +533,10 @@
   .event-row .event-description { font-size: 14px; }
   .event-actions { gap: 12px 20px; margin-top: 24px; }
   .event-actions .text-link { font-size: 12px; }
-  .learn-heading, .show-up-heading { grid-template-columns: 1fr; gap: 28px; padding-block: 48px; text-align: center; }
-  .learn-heading h1, .show-up-heading h1 { max-width: 15ch; margin-inline: auto; font-size: clamp(42px, 11vw, 60px); }
-  .learn-heading .eyebrow, .show-up-heading .eyebrow { justify-content: center; }
-  .learn-heading p:not(.eyebrow), .show-up-heading p:not(.eyebrow) { max-width: 42ch; margin-inline: auto; font-size: 18px; }
+  .learn-heading, .show-up-heading { grid-template-columns: 1fr; gap: 28px; padding-block: 48px; text-align: left; }
+  .learn-heading h1, .show-up-heading h1 { max-width: 15ch; margin-inline: 0; font-size: clamp(42px, 11vw, 60px); }
+  .learn-heading .eyebrow, .show-up-heading .eyebrow { justify-content: flex-start; }
+  .learn-heading p:not(.eyebrow), .show-up-heading p:not(.eyebrow) { max-width: 42ch; margin-inline: 0; font-size: 18px; }
   .learn-heading img, .show-up-heading img { max-width: 400px; max-height: 260px; justify-self: center; }
   .learn-grid { grid-template-columns: 1fr; gap: 20px; }
   .learn-card { padding: 28px; }

@@ -7,6 +7,7 @@ import './globals.css';
 import './editorial.css';
 import './extras.css';
 import './desk.css';
+import './interactions.css';
 export async function generateMetadata():Promise<Metadata> {
  const {branding}=await getSiteContent();
  return {metadataBase:new URL(site.url),title:{default:branding.name,template:`%s · ${branding.name}`},description:branding.description,icons:{icon:branding.faviconUrl||'/brand/favicon.png',apple:branding.faviconUrl||'/brand/apple-touch-icon.png'},openGraph:{siteName:branding.name,locale:'en_US',type:'website',title:branding.shareTitle,description:branding.shareDescription}};

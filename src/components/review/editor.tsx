@@ -170,11 +170,11 @@ export function ReviewEditor({ post, topics, writers }: { post: ReviewPost; topi
     </div>
     <div className="editor-actions">
       <div>
-        <button name="action" value="save" className="button button-outline" disabled={Boolean(busy)}>{busy === 'save' ? 'Saving…' : 'Save changes'}</button>
-        <button name="action" value="decline" className="text-button" disabled={Boolean(busy)}>Decline</button>
-        {status === 'published' && <button name="action" value="unpublish" className="text-button" disabled={Boolean(busy)}>Unpublish</button>}
+        <button name="action" value="save" aria-busy={busy === 'save'} className="button button-outline" disabled={Boolean(busy)}>{busy === 'save' ? 'Saving…' : 'Save changes'}</button>
+        <button name="action" value="decline" aria-busy={busy === 'decline'} className="text-button" disabled={Boolean(busy)}>Decline</button>
+        {status === 'published' && <button name="action" value="unpublish" aria-busy={busy === 'unpublish'} className="text-button" disabled={Boolean(busy)}>Unpublish</button>}
       </div>
-      <button name="action" value="publish" className="button" disabled={Boolean(busy)}>{busy === 'publish' ? 'Publishing…' : status === 'published' ? 'Publish changes' : 'Publish piece'}<ArrowUpRight size={18}/></button>
+      <button name="action" value="publish" aria-busy={busy === 'publish'} className="button" disabled={Boolean(busy)}>{busy === 'publish' ? 'Publishing…' : status === 'published' ? 'Publish changes' : 'Publish piece'}<ArrowUpRight size={18}/></button>
     </div>
   </form>;
 }

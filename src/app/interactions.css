@@ -1,0 +1,119 @@
+/* Shared feedback keeps public pages and the editorial workspace feeling related. */
+:root {
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);
+  --ease-drawer: cubic-bezier(.32, .72, 0, 1);
+  --duration-press: 100ms;
+  --duration-fast: 160ms;
+  --duration-ui: 220ms;
+  --duration-reveal: 600ms;
+}
+
+.reveal[data-reveal=pending] { opacity: 0; transform: translateY(16px); }
+.reveal[data-reveal=visible] {
+  opacity: 1;
+  transform: none;
+  transition: opacity var(--duration-reveal) var(--ease-out), transform var(--duration-reveal) var(--ease-out);
+}
+
+.menu-glyph { position: relative; display: block; width: 20px; height: 20px; }
+.menu-glyph::before, .menu-glyph::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 0;
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform var(--duration-ui) var(--ease-out);
+}
+.menu-glyph::before { transform: translateY(-3px); }
+.menu-glyph::after { transform: translateY(3px); }
+[aria-expanded=true] .menu-glyph::before { transform: rotate(45deg); }
+[aria-expanded=true] .menu-glyph::after { transform: rotate(-45deg); }
+.site-header[data-input=keyboard] .mobile-nav,
+.site-header[data-input=keyboard] .menu-glyph::before,
+.site-header[data-input=keyboard] .menu-glyph::after { transition: none; }
+
+.desktop-nav a { position: relative; }
+.desktop-nav a::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 6px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--deep-teal);
+  opacity: 0;
+  transform: scaleX(.8);
+  transition: opacity var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out);
+}
+.desktop-nav a[aria-current=page]::after { opacity: 1; transform: none; }
+
+:is(a, button) :is(.lucide-arrow-right, .lucide-arrow-up-right, .lucide-arrow-left) {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+.story-card-cover img { transition: transform var(--duration-ui) var(--ease-out); }
+.text-button, :is(.desk-nav, .admin-nav, .site-content-nav) :is(a, button) {
+  transition: color var(--duration-fast) ease, background-color var(--duration-fast) ease;
+}
+
+/* Reserve both labels' space so copying never moves the adjacent controls. */
+.copy-feedback { display: grid; }
+.copy-feedback > span {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: opacity var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out);
+}
+.copy-feedback > [aria-hidden=true] { opacity: 0; transform: translateY(3px); }
+
+button[aria-busy=true] { cursor: wait; }
+button[aria-busy=true]::before {
+  content: '';
+  flex: 0 0 auto;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  vertical-align: middle;
+  animation: busy-spin 700ms linear infinite;
+}
+.text-button[aria-busy=true]::before { margin-right: 8px; }
+button[aria-busy=true] > :is(.lucide-arrow-right, .lucide-arrow-up-right) { display: none; }
+@keyframes busy-spin { to { transform: rotate(360deg); } }
+
+.alert { transition: opacity var(--duration-fast) ease; }
+.success-mark { transition: opacity var(--duration-ui) ease, transform var(--duration-ui) var(--ease-out); }
+@starting-style {
+  .alert { opacity: 0; }
+  .success-mark { opacity: 0; transform: scale(.95); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .desktop-nav a:hover::after { opacity: 1; transform: none; }
+  :is(a, button):hover .lucide-arrow-right { transform: translateX(2px); }
+  :is(a, button):hover .lucide-arrow-up-right { transform: translate(2px, -2px); }
+  :is(a, button):hover .lucide-arrow-left { transform: translateX(-2px); }
+  .story-card-link:hover .story-card-cover img { transform: scale(1.025); }
+}
+
+/* Keyboard interactions are immediate; hover movement belongs to the pointer. */
+:is(a, button):focus-visible,
+:is(a, button):focus-visible :is(.lucide-arrow-right, .lucide-arrow-up-right, .lucide-arrow-left, .story-card-cover img, .copy-feedback > span) {
+  transform: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal[data-reveal] { opacity: 1; transform: none; }
+  :is(a, button) :is(.lucide-arrow-right, .lucide-arrow-up-right, .lucide-arrow-left),
+  .story-card-link .story-card-cover img, .copy-feedback > span { transform: none !important; }
+}
+@media print {
+  .reveal[data-reveal] { opacity: 1; transform: none; }
+}
