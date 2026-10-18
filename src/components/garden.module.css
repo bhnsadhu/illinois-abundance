@@ -1,4 +1,4 @@
-.garden { width: 66px; height: 60px; flex: 0 0 auto; overflow: visible; }
+.garden { width: 156px; height: 140px; flex: 0 0 auto; overflow: visible; }
 .can { transform-origin: 84px 28px; }
 .plant { transform-origin: 44px 64px; }
 .drop { opacity: 0; }
@@ -12,5 +12,5 @@
 @keyframes water { 0%, 100% { transform: rotate(0); } 25%, 65% { transform: rotate(-14deg); } }
 @keyframes sprinkle { 0% { opacity: 0; transform: translateY(-3px); } 20% { opacity: .8; } 85%, 100% { opacity: 0; transform: translate(-4px, 12px); } }
 @keyframes grow { from { transform: scale(.94); } to { transform: scale(1); } }
-@media (max-width: 767px) { .garden { width: 66px; height: 60px; } }
+@media (max-width: 767px) { .garden { width: 112px; height: 100px; } }
 @media print { .can, .drop, .plant { animation: none; } }
