@@ -28,11 +28,11 @@ export default async function Home() {
     <div className={styles.hero}>
       <header className={styles.heading}>
         <HomeTitle firstLine={home.firstLine} secondLine={home.secondLine}/>
-        <p className={styles.intro}>{home.intro}</p>
         <div className={styles.introActions}>
           <Link className="button" href={home.primaryHref}>{home.primaryLabel}</Link>
           {visibility.homeWrite && <Link className="button button-outline" href={home.secondaryHref}>{home.secondaryLabel} <ArrowRight size={17}/></Link>}
         </div>
+        <p className={styles.intro}>{home.intro}</p>
       </header>
       {visibility.homeEvent && <section className={styles.event} aria-labelledby="next-event-title">
         <h2 id="next-event-title">{home.eventLabel}</h2>

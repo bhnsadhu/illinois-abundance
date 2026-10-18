@@ -26,16 +26,17 @@ export const siteContentMutationSchema=z.object({section:siteSectionSchema,versi
 export function upgradeLegacySiteSection(section: SiteSection, values: Record<string, unknown>) {
   const updated = {...values};
   if (section === 'home') {
-    if (updated.secondLine === 'With room for more.') updated.secondLine = siteContentDefaults.home.secondLine;
+    if (updated.secondLine === 'With room for more.' || updated.secondLine === 'Cultivating our Garden') updated.secondLine = siteContentDefaults.home.secondLine;
     if (updated.secondaryLabel === 'Come to a campus event' && updated.secondaryHref === '/events') {
       updated.secondaryLabel = siteContentDefaults.home.secondaryLabel;
       updated.secondaryHref = siteContentDefaults.home.secondaryHref;
     }
-    if (updated.secondaryLabel === 'Write the stories' && updated.secondaryHref === '/write') updated.secondaryLabel = siteContentDefaults.home.secondaryLabel;
+    if (['Write the stories', 'Publish with us', 'Publish With Us'].includes(String(updated.secondaryLabel)) && updated.secondaryHref === '/write') updated.secondaryLabel = siteContentDefaults.home.secondaryLabel;
+    if (updated.primaryLabel === 'Read the stories' && updated.primaryHref === '/latest') updated.primaryLabel = siteContentDefaults.home.primaryLabel;
     if (updated.eventLabel === 'Next campus event') updated.eventLabel = siteContentDefaults.home.eventLabel;
   }
-  if (section === 'navigation' && updated.writeLabel === 'Write for us' && updated.writeHref === '/write') updated.writeLabel = siteContentDefaults.navigation.writeLabel;
-  if (section === 'branding' && updated.shareTitle === 'Champaign Urbana. With room for more.') updated.shareTitle = siteContentDefaults.branding.shareTitle;
+  if (section === 'navigation' && ['Write for us', 'Publish with us', 'Publish With Us'].includes(String(updated.writeLabel)) && updated.writeHref === '/write') updated.writeLabel = siteContentDefaults.navigation.writeLabel;
+  if (section === 'branding' && ['Champaign Urbana. With room for more.', 'Champaign Urbana. Cultivating our Garden'].includes(String(updated.shareTitle))) updated.shareTitle = siteContentDefaults.branding.shareTitle;
   const previousGardenCopy: Partial<Record<SiteSection, Record<string, string>>> = {
     home: { recentTitle: 'Recent writing' },
     about: { writeTitle: 'Write for us' },

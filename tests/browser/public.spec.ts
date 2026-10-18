@@ -72,7 +72,7 @@ test('reduced motion and small screens preserve usable content', async ({ page }
   await page.goto('/');
   expect(await page.locator('main').evaluate(main => main.getAnimations({ subtree: true }).length)).toBe(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
-  await expect(page.locator('main').getByRole('link', { name: 'Publish with us', exact: false }).first()).toBeVisible();
+  await expect(page.locator('main').getByRole('link', { name: 'Write the Stories', exact: false }).first()).toBeVisible();
 });
 
 test('protected pages redirect and unknown content returns 404', async ({ request }) => {
