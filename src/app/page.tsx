@@ -77,7 +77,7 @@ export default async function Home() {
         <h2 id="recent-heading">{home.recentTitle}</h2>
         <Link href="/latest">{home.allStoriesLabel} <ArrowRight size={16}/></Link>
       </div>
-      <div className="story-grid">{stories.slice(1, 4).map(story => <StoryCard key={story.id} story={story}/>)}</div>
+      <div className="story-grid">{stories.slice(1, 4).map(story => <StoryCard key={story.id} story={story} headingLevel={3}/>)}</div>
     </Reveal>}
 
     {home.newsItems.length > 0 && <Reveal className={styles.news} aria-labelledby="news-heading">

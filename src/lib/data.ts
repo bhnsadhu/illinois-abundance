@@ -27,13 +27,13 @@ async function publicRows<T>(table: keyof typeof fields, samples: T[]): Promise<
   const rows: T[] = [];
   for (let offset = 0; ; offset += BATCH_SIZE) {
     const { data, error } = await db.from(`public_${table}`).select(fields[table]).order('id').range(offset, offset + BATCH_SIZE - 1);
-    if (error) { console.error(`Public content unavailable: ${table} (${error.code})`); return []; }
+    if (error) throw new Error('Public content is temporarily unavailable.');
     rows.push(...data as unknown as T[]);
     if (!data || data.length < BATCH_SIZE) return rows;
   }
 }
 export const getTopics = publicCache(async () => (await publicRows<Topic>('topics', sampleTopics)).filter(t=>t.is_active).sort((a,b)=>a.sort_order-b.sort_order));
-export const getStoryTopics = publicCache(async ():Promise<Topic[]> => { const db=publicDatabase(); if(!db)return sampleTopics; const {data,error}=await db.from('public_story_topics').select(fields.topics); if(error)return getTopics();return data as Topic[]; });
+export const getStoryTopics = publicCache(async ():Promise<Topic[]> => { const db=publicDatabase(); if(!db)return sampleTopics; const {data,error}=await db.from('public_story_topics').select(fields.topics); if(error)throw new Error('Public content is temporarily unavailable.');return data as Topic[]; });
 export const getWriters = publicCache(async () => publicRows<Writer>('writers', sampleWriters));
 async function attachStories(posts: PublicPost[]): Promise<Story[]> {
  const [topics,writers]=await Promise.all([getStoryTopics(),getWriters()]);
@@ -49,7 +49,7 @@ async function storyRows(limit?: number, offset = 0, filter?: { column: 'topic_i
     let query = db.from('public_posts').select(fields.posts).order('published_at',{ascending:false}).order('id',{ascending:false}).range(offset+rows.length,offset+rows.length+size-1);
     if (filter) query = query.eq(filter.column, filter.value);
     const { data, error } = await query;
-    if (error) return [];
+    if (error) throw new Error('Public content is temporarily unavailable.');
     rows.push(...data as PublicPost[]);
     if (!data || data.length < size) break;
   }
@@ -66,7 +66,7 @@ export const getRecapStories = publicCache(async (ids: string[]):Promise<Story[]
   const rows: PublicPost[] = [];
   for (let offset=0; offset<ids.length; offset+=BATCH_SIZE) {
     const { data,error }=await db.from('public_posts').select(fields.posts).in('id',ids.slice(offset,offset+BATCH_SIZE));
-    if (error) return [];
+    if (error) throw new Error('Public content is temporarily unavailable.');
     rows.push(...data as PublicPost[]);
   }
   return attachStories(rows);
@@ -77,11 +77,12 @@ export const searchStories = publicCache(async (query: string, limit:number=13, 
   const db=publicDatabase();
   if (!db) return attachStories(samplesEnabled() ? samplePosts.filter(post=>`${post.headline} ${post.short_version} ${post.final_body}`.toLowerCase().includes(text.toLowerCase())).slice(offset,offset+limit) : []);
   const { data,error }=await db.rpc<PublicPost[]>('search_public_posts',{p_query:text,p_limit:limit,p_offset:offset});
-  return error ? [] : attachStories(data || []);
+  if (error) throw new Error('Search is temporarily unavailable.');
+  return attachStories(data || []);
 });
 export const getStory = publicCache(async (slug:string):Promise<Story|undefined>=>{
  const db=publicDatabase();if(!db){const post=samplesEnabled()?samplePosts.find(p=>p.slug===slug):undefined;return post?(await attachStories([post]))[0]:undefined;}
- const {data,error}=await db.from('public_posts').select(fields.posts).eq('slug',slug).maybeSingle();return error||!data?undefined:(await attachStories([data as PublicPost]))[0];
+ const {data,error}=await db.from('public_posts').select(fields.posts).eq('slug',slug).maybeSingle();if(error)throw new Error('Stories are temporarily unavailable.');return !data?undefined:(await attachStories([data as PublicPost]))[0];
 });
 export const getEvents = publicCache(async () => (await publicRows<Event>('events',sampleEvents)).filter(e=>e.is_published).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)));
 export const getLearnPages = publicCache(async () => (await publicRows<LearnPage>('learn_pages',sampleLearnPages)).filter(p=>p.is_published));

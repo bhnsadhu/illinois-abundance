@@ -47,7 +47,7 @@ export function Header({branding=siteContentDefaults.branding,navigation=siteCon
     <div className="nav-wrap">
       <div className="masthead-brand">
         <Link className="wordmark" href="/" aria-label={`${branding.name} home`} onClick={() => setOpen(false)}>
-          {branding.logoUrl?<Image src={branding.logoUrl} alt={branding.logoAlt} width={1439} height={132} sizes="(max-width: 767px) 195px, 225px" priority unoptimized/>:branding.name}
+          {branding.logoUrl?<Image src={branding.logoUrl} alt={branding.logoAlt} width={1439} height={132} sizes="(max-width: 767px) 195px, 225px" priority/>:branding.name}
         </Link>
       </div>
       <nav className="desktop-nav" aria-label="Main navigation">{links.map(({label, href}) => <Link key={`${href}-${label}`} href={href} aria-current={current(href)}>{label}</Link>)}</nav>

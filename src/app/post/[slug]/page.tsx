@@ -52,6 +52,6 @@ export default async function PostPage({ params }: Props) {
         <a className="removal-link" href={`mailto:${branding.contactEmail}?subject=${removalSubject}`}>{reader.removalLabel}</a>
       </div>
     </article>
-    {related.length > 0 && <section className="container related-stories" aria-labelledby="related-heading"><div className="section-heading"><h2 id="related-heading">{reader.relatedTitle}</h2><Link href="/latest" className="text-link">{reader.allStoriesLabel} <ArrowUpRight size={16}/></Link></div><div className="story-grid">{related.map(item => <StoryCard key={item.id} story={item}/>)}</div></section>}
+    {related.length > 0 && <section className="container related-stories" aria-labelledby="related-heading"><div className="section-heading"><h2 id="related-heading">{reader.relatedTitle}</h2><Link href="/latest" className="text-link">{reader.allStoriesLabel} <ArrowUpRight size={16}/></Link></div><div className="story-grid">{related.map(item => <StoryCard key={item.id} story={item} headingLevel={3}/>)}</div></section>}
   </>;
 }
