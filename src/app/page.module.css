@@ -110,3 +110,36 @@
 }
 
 .intro { white-space: pre-line; }
+
+/* Garden details live around the content, on the same grid as the publication. */
+.hero { position: relative; isolation: isolate; }
+.hero::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 calc(-1 * min(var(--page-gutter), 48px)) -32px;
+  background: url('/illustrations/garden-margin.svg') no-repeat right top / 270px 324px,
+    radial-gradient(ellipse at center, rgb(226 239 234 / 55%), transparent 70%) no-repeat left center / 70% 100%;
+  pointer-events: none;
+}
+.growingHeading { display: flex; align-items: center; gap: 12px; }
+.growingHeading :global(.sprout) { width: 32px; height: 36px; opacity: .72; }
+.topics { position: relative; isolation: isolate; }
+.topics::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -28px -24px;
+  border-radius: 40px;
+  background: radial-gradient(ellipse at center, rgb(226 239 234 / 65%), transparent 75%);
+  pointer-events: none;
+}
+@media (max-width: 767px) {
+  .hero::before { background-position: right bottom, left top; background-size: 160px 192px, 100% 300px; }
+  .growingHeading { gap: 6px; }
+  .growingHeading :global(.sprout) { width: 24px; height: 28px; }
+  .topics::before { inset-inline: -16px; }
+}
+@media print {
+  .hero::before, .topics::before { display: none; }
+}

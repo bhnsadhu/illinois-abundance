@@ -1,0 +1,8 @@
+.border { height: 100px; overflow: hidden; pointer-events: none; }
+.border svg { display: block; width: 100%; height: 100%; }
+@media (max-width: 767px) {
+  .border { height: 76px; }
+}
+@media print {
+  .border { display: none; }
+}
