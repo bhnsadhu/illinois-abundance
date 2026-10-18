@@ -9,6 +9,7 @@ test('a writer can recover from a failed request, verify, and reach confirmation
   await page.route('**/api/submissions', route => route.fulfill({ status: 502, contentType: 'text/html', body: '<html>Bad gateway</html>' }));
   await page.locator('.submission-form button[type=submit], .submission-form button:not([type])').click();
   await expect(page.locator('main').getByRole('alert')).toContainText('Please try again in a moment.');
+  await expect(page.locator('main').getByRole('alert')).toBeFocused();
   await expect(page.locator('[name=body]')).toHaveValue(body);
   await page.unroute('**/api/submissions');
   await page.route('**/api/submissions', route => route.fulfill({ json: { ok: true } }));
@@ -18,9 +19,11 @@ test('a writer can recover from a failed request, verify, and reach confirmation
   await page.getByLabel('Your six digit code').fill('123456');
   await page.locator('.verify-card > button').click();
   await expect(page.locator('main').getByRole('alert')).toContainText('expired');
+  await expect(page.locator('main').getByRole('alert')).toBeFocused();
   await page.route('**/api/submissions/resend', route => route.fulfill({ json: { ok: true } }));
   await page.getByRole('button', { name: /Send a new code/ }).click();
   await expect(page.getByRole('status')).toContainText('A new code is on its way');
+  await expect(page.getByLabel('Your six digit code')).toBeFocused();
   await page.unroute('**/api/submissions/verify');
   await page.route('**/api/submissions/verify', route => route.fulfill({ json: { ok: true } }));
   await page.getByLabel('Your six digit code').fill('654321');
@@ -33,12 +36,43 @@ test('login errors remain actionable and retryable', async ({ page }) => {
   await page.goto('/login/admin');
   await page.getByLabel('Email').fill('admin@example.test');
   await page.getByLabel('Password', { exact: true }).fill('Not a real password');
+  await expect(page.locator('label').filter({ has: page.getByLabel('Email') })).toHaveText('Email address');
   await page.route('**/api/login', route => route.fulfill({ status: 401, json: { error: 'Email or password is incorrect for this sign in.' } }));
   await page.locator('.login-form button').click();
   await expect(page.locator('main').getByRole('alert')).toContainText('Email or password is incorrect');
+  await expect(page.locator('main').getByRole('alert')).toBeFocused();
   await expect(page.locator('.login-form button')).toBeEnabled();
   await page.unroute('**/api/login');
   await page.route('**/api/login', route => route.fulfill({ status: 502, body: 'Bad gateway' }));
   await page.locator('.login-form button').click();
   await expect(page.locator('main').getByRole('alert')).toContainText('Please try again in a moment.');
+});
+
+test('an unsent draft survives a cancelled reload and cannot change during submission', async ({ page }) => {
+  await page.goto('/write');
+  const body = 'A safer route to campus would help more students walk and bike to class.';
+  await page.getByLabel('Full name').click();
+  await page.getByLabel('Full name').fill('Test Writer');
+  await page.getByLabel('Illinois email').fill('student@illinois.edu');
+  await page.locator('[name=body]').fill(body);
+  await Promise.all([
+    page.waitForEvent('dialog').then(async dialog => {
+      expect(dialog.type()).toBe('beforeunload');
+      await dialog.dismiss();
+    }),
+    page.evaluate(() => window.location.reload()),
+  ]);
+  await expect(page.locator('[name=body]')).toHaveValue(body);
+
+  let finish!: () => void;
+  const gate = new Promise<void>(resolve => { finish = resolve; });
+  await page.route('**/api/submissions', async route => {
+    await gate;
+    await route.fulfill({ json: { ok: true } });
+  });
+  await page.getByRole('button', { name: 'Send my code' }).click();
+  await expect(page.locator('[name=body]')).toBeDisabled();
+  await expect(page.getByLabel('Full name')).toBeDisabled();
+  finish();
+  await expect(page).toHaveURL('/write/verify');
 });

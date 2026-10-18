@@ -18,4 +18,4 @@ Use `.agents/skills/apple-design/SKILL.md` for UI work across this project. Buil
 
 Keep the interface minimal and premium: lead with a title and a short, useful description. Omit decorative labels above headings, filler taglines, ornamental numbering, and repeated explanations. Keep navigation, meaningful status, form guidance, privacy notices, and sample-content labels clear.
 
-Apply relevant installed skills proactively as the work calls for them. For UI and motion work, use the applicable design, animation, performance, and mobile skills without waiting for the user to name each one.
+Apply relevant installed skills proactively throughout the project, without waiting for the user to name each one. Match the skill to the actual task across design, animation, accessibility, mobile behavior, performance, data, backend work, documents, and other supported areas. When reviewing existing work, use the applicable skills to find and implement concrete improvements while preserving the site's established design and unrelated work.

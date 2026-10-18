@@ -382,6 +382,9 @@
   box-shadow: 0 2px 8px #1d1d1f07;
 }
 
+/* Keep the complete keyboard outline inside horizontally clipped navigation. */
+.admin-nav a:focus-visible, .site-content-nav button:focus-visible { outline-offset: -3px; }
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

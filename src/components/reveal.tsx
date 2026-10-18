@@ -19,7 +19,7 @@ export function Reveal({ children, className = '', ...props }: HTMLAttributes<HT
     };
     const observer = new IntersectionObserver(entries => {
       if (entries.some(entry => entry.isIntersecting)) reveal();
-    }, { threshold: 0 });
+    }, { threshold: 0, rootMargin: '0px 0px 64px 0px' });
     const onFocus = () => reveal(true);
     const onMotionChange = () => { if (motion.matches) reveal(true); };
     element.dataset.reveal = 'pending';

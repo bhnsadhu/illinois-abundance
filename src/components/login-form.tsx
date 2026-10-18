@@ -1,6 +1,6 @@
 'use client';
 import { readApiResponse } from '@/lib/client-response';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {siteContentDefaults,type SiteContent} from '@/lib/site-content-model';
@@ -10,6 +10,8 @@ export function LoginForm({ role = 'reviewer',copy=siteContentDefaults.access }:
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const feedback = useRef<HTMLParagraphElement>(null);
+  useEffect(() => { if (error) feedback.current?.focus(); }, [error]);
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError('');
     const data = new FormData(event.currentTarget);
@@ -23,10 +25,10 @@ export function LoginForm({ role = 'reviewer',copy=siteContentDefaults.access }:
     } catch (error) { setError(error instanceof Error ? error.message : 'Please try again.'); setBusy(false); }
   }
   return <form className="form-card login-form" onSubmit={submit}>
-    <label><span className="sr-only">{copy.emailLabel}</span><input name="email" type="email" autoComplete="username" autoCapitalize="none" maxLength={254} placeholder={copy.emailLabel} required/></label>
-    <label><span className="sr-only">{copy.passwordLabel}</span><input name="password" type="password" autoComplete="current-password" maxLength={128} placeholder={copy.passwordLabel} required/></label>
+    <label>{copy.emailLabel}<input name="email" type="email" autoComplete="username" autoCapitalize="none" maxLength={254} required/></label>
+    <label>{copy.passwordLabel}<input name="password" type="password" autoComplete="current-password" maxLength={128} required/></label>
     <div className="honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off"/></label></div>
-    {error && <p className="alert alert-error" role="alert">{error}</p>}
+    {error && <p ref={feedback} tabIndex={-1} className="alert alert-error" role="alert">{error}</p>}
     <button className="button full-width" disabled={busy} aria-busy={busy}>{busy ? 'Signing in…' : role === 'admin' ? copy.adminButton : copy.reviewerButton}<ArrowRight size={17}/></button>
     {role === 'reviewer' && <p className="consent-copy login-note">{copy.resetHint}</p>}
     <p className="login-note"><Link className="text-link" href={role === 'admin' ? '/login' : '/login/admin'}>{role === 'admin' ? copy.reviewerTitle : copy.adminTitle}</Link></p>

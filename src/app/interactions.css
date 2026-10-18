@@ -6,10 +6,10 @@
   --duration-press: 100ms;
   --duration-fast: 160ms;
   --duration-ui: 220ms;
-  --duration-reveal: 600ms;
+  --duration-reveal: 220ms;
 }
 
-.reveal[data-reveal=pending] { opacity: 0; transform: translateY(16px); }
+.reveal[data-reveal=pending] { opacity: 0; transform: translateY(8px); }
 .reveal[data-reveal=visible] {
   opacity: 1;
   transform: none;

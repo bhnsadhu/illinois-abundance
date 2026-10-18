@@ -1,10 +1,12 @@
 'use client';
 import { readApiResponse } from '@/lib/client-response';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 export function PasswordForm({ email }: { email: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
+  const feedback = useRef<HTMLParagraphElement>(null);
+  useEffect(() => { if (error) feedback.current?.focus(); }, [error]);
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(''); setSaved(false);
     const form = event.currentTarget;
@@ -25,7 +27,7 @@ export function PasswordForm({ email }: { email: string }) {
     <label>Current password<input name="currentPassword" type="password" autoComplete="current-password" maxLength={128} required/></label>
     <label>New password<input name="newPassword" type="password" autoComplete="new-password" minLength={12} maxLength={128} aria-describedby="password-hint" required/><span id="password-hint" className="field-hint">Use at least 12 characters.</span></label>
     <label>Confirm new password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={12} maxLength={128} required/></label>
-    {error && <p className="alert alert-error" role="alert">{error}</p>}
+    {error && <p ref={feedback} tabIndex={-1} className="alert alert-error" role="alert">{error}</p>}
     {saved && <p className="alert" role="status">Your password has changed. Your other sessions have been signed out.</p>}
     <button className="button" disabled={busy} aria-busy={busy}>{busy ? 'Changing password…' : 'Change password'}</button>
   </form>;

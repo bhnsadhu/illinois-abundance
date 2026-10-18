@@ -1,5 +1,6 @@
 'use client';
 import { readApiResponse } from '@/lib/client-response';
+import { useUnsavedChanges } from '@/lib/use-unsaved-changes';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -15,6 +16,7 @@ export function ReviewEditor({ post, topics, writers }: { post: ReviewPost; topi
   const router = useRouter();
   const [version, setVersion] = useState(post.version);
   const [dirty, setDirty] = useState(false);
+  useUnsavedChanges(dirty);
   const [status, setStatus] = useState(post.status);
   const [slug, setSlug] = useState(post.slug);
   const [busy, setBusy] = useState('');

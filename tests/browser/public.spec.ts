@@ -49,6 +49,17 @@ test('keyboard skip link bypasses navigation', async ({ page }) => {
   expect(await page.evaluate(() => document.activeElement?.id)).toBe('main');
 });
 
+test('keyboard focus reveals offscreen editorial content immediately', async ({ page }) => {
+  await page.goto('/');
+  const section = page.locator('.reveal[data-reveal=pending]').last();
+  const heading = await section.getByRole('heading').first().textContent();
+  await section.getByRole('link').first().focus();
+  const revealed = page.locator('.reveal').filter({ has: page.getByRole('heading', { name: heading!, exact: true }) });
+  await expect(revealed).toHaveAttribute('data-reveal', 'instant');
+  await expect(revealed).toHaveCSS('opacity', '1');
+  await expect(revealed).toHaveCSS('transform', 'none');
+});
+
 test('search, story, writer, and share links work', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/search');
