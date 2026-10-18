@@ -112,7 +112,6 @@ svg { flex-shrink: 0; }
 .write-heading > div { min-width: 0; }
 .sprout { width: 80px; height: 88px; flex-shrink: 0; }
 .write-heading > .sprout { width: 120px; height: 132px; }
-.footer-brand > .sprout { width: 32px; height: 36px; }
 .write-heading h1 { font-size: clamp(42px, 5vw, 64px); max-width: 640px; }
 .write-heading p { max-width: 55ch; margin-bottom: 0; color: var(--muted); font-size: 17px; }
 .form-card { background: var(--paper); border-radius: 24px; padding: 40px; max-width: 100%; }
