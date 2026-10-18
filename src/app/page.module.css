@@ -1,6 +1,6 @@
 .home { position: relative; isolation: isolate; padding-bottom: 0; }
 .hero { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 48px; padding: 28px 0 36px; }
-.heading { min-width: 0; text-align: left; }
+.heading { min-width: 0; padding-top: 12px; text-align: left; }
 .heading h1 { font-size: clamp(36px, 3.6vw, 48px); line-height: 1.12; margin: 0 0 16px; }
 .heading > p { margin: 18px 0 0; font-size: 16px; line-height: 1.65; color: var(--muted); max-width: 48ch; }
 .introActions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 0; }
