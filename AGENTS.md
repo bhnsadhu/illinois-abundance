@@ -17,3 +17,5 @@ After every meaningful, verified chunk of work, commit it with a clear message a
 Use `.agents/skills/apple-design/SKILL.md` for UI work across this project. Build on the existing Illinois Abundance design: preserve its palette, handwritten headings, and layouts unless a redesign is requested. Favor clear hierarchy, immediate feedback, consistent controls, comfortable touch targets, and accessible motion. Make focused improvements when needed; do not restyle working pages solely to resemble Apple's branding.
 
 Keep the interface minimal and premium: lead with a title and a short, useful description. Omit decorative labels above headings, filler taglines, ornamental numbering, and repeated explanations. Keep navigation, meaningful status, form guidance, privacy notices, and sample-content labels clear.
+
+Apply relevant installed skills proactively as the work calls for them. For UI and motion work, use the applicable design, animation, performance, and mobile skills without waiting for the user to name each one.

@@ -9,6 +9,7 @@ import { Author } from '@/components/author';
 import { EventJoinLink } from '@/components/event-join-link';
 import { EventRecurrence } from '@/components/event-recurrence';
 import { HomeTitle } from '@/components/home-title';
+import { ScrollGarden } from '@/components/scroll-garden';
 import { getStories, getTopics, getNextEvent, coverFor, coverAlt } from '@/lib/data';
 import { eventLocation } from '@/lib/event-links';
 import { eventDate } from '@/lib/syndication';
@@ -25,6 +26,7 @@ export default async function Home() {
   const location = nextEvent ? eventLocation(nextEvent) : '';
 
   return <div className={`container ${styles.home}`}>
+    <ScrollGarden/>
     <div className={styles.hero}>
       <header className={styles.heading}>
         <HomeTitle firstLine={home.firstLine} secondLine={home.secondLine}/>

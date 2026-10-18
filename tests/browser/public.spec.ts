@@ -75,6 +75,26 @@ test('reduced motion and small screens preserve usable content', async ({ page }
   await expect(page.locator('main').getByRole('link', { name: 'Write the Stories', exact: false }).first()).toBeVisible();
 });
 
+test('background foliage renders accessibly and follows scroll preferences', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  const foliage = page.getByTestId('scroll-garden');
+  const sprig = foliage.locator(':scope > div').nth(1);
+  await expect(foliage).toHaveCount(1);
+  await expect(foliage).toHaveAttribute('aria-hidden', 'true');
+  await sprig.scrollIntoViewIfNeeded();
+  const transform = () => sprig.evaluate(element => getComputedStyle(element).transform);
+  await expect.poll(transform).not.toBe('none');
+  const initial = await transform();
+  await page.evaluate(() => window.scrollBy({ top: 200, behavior: 'instant' }));
+  await expect.poll(transform).not.toBe(initial);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
+  await page.screenshot({ path: test.info().outputPath('scroll-foliage.png') });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect.poll(transform).toBe('none');
+  expect(await foliage.evaluate(element => element.getAnimations({ subtree: true }).length)).toBe(0);
+});
+
 test('protected pages redirect and unknown content returns 404', async ({ request }) => {
   for (const [path, target] of [['/admin', '/login/admin'], ['/review', '/login'], ['/account', '/login']]) {
     const response = await request.get(path, { maxRedirects: 0 });
