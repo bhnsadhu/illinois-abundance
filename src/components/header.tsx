@@ -16,6 +16,12 @@ export function Header({branding=siteContentDefaults.branding,navigation=siteCon
   const menuButton = useRef<HTMLButtonElement>(null);
   const header = useRef<HTMLElement>(null);
   const pathname = usePathname();
+  const current = (href: string) => {
+    if (pathname === href) return 'page' as const;
+    const storyPage = /^\/(post|topic|writer)\//.test(pathname);
+    if ((href === '/latest' && storyPage) || (href !== '/' && pathname.startsWith(`${href}/`))) return 'location' as const;
+    return undefined;
+  };
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent) => {
@@ -44,7 +50,7 @@ export function Header({branding=siteContentDefaults.branding,navigation=siteCon
           {branding.logoUrl?<Image src={branding.logoUrl} alt={branding.logoAlt} width={1439} height={132} sizes="(max-width: 767px) 195px, 225px" priority unoptimized/>:branding.name}
         </Link>
       </div>
-      <nav className="desktop-nav" aria-label="Main navigation">{links.map(({label, href}) => <Link key={`${href}-${label}`} href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</Link>)}</nav>
+      <nav className="desktop-nav" aria-label="Main navigation">{links.map(({label, href}) => <Link key={`${href}-${label}`} href={href} aria-current={current(href)}>{label}</Link>)}</nav>
       <div className="nav-actions">
         <Link href="/search" className="icon-button" aria-label="Search stories" onClick={() => setOpen(false)}><Search size={19}/></Link>
         <Link className="nav-write" href={navigation.writeHref}>{navigation.writeLabel}</Link>
@@ -52,7 +58,7 @@ export function Header({branding=siteContentDefaults.branding,navigation=siteCon
       </div>
     </div>
     <nav id="mobile-nav" className="mobile-nav" data-open={open} inert={!open} aria-label="Mobile navigation">
-      {links.map(({label, href}) => <Link key={`${href}-${label}`} href={href} aria-current={pathname === href ? 'page' : undefined} onClick={() => setOpen(false)}>{label}<ArrowRight size={16}/></Link>)}
+      {links.map(({label, href}) => <Link key={`${href}-${label}`} href={href} aria-current={current(href)} onClick={() => setOpen(false)}>{label}<ArrowRight size={16}/></Link>)}
       <Link href={navigation.writeHref} onClick={() => setOpen(false)}>{navigation.writeLabel} <ArrowRight size={16}/></Link>
     </nav>
   </header>;

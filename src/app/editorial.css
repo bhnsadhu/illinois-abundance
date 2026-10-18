@@ -583,7 +583,6 @@
 @media (hover: hover) and (pointer: fine) {
   .story-card-link:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 28px rgb(29 29 31 / 7%);
   }
 
   .topic-filters a:not([aria-current=page]):hover {

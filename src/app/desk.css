@@ -270,6 +270,8 @@
 }
 
 .internal-note summary {
+  min-height: 44px;
+  padding-block: 10px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 550;
@@ -704,5 +706,3 @@
 .site-image-field input[hidden] { display: none; }
 .site-toggle { min-height: 44px; }
 @media (max-width: 900px) { .site-content-layout { grid-template-columns: 1fr; gap: 20px; }.site-content-nav { position: static; max-height: none; display: flex; overflow-x: auto; padding-bottom: 8px; }.site-content-nav button { white-space: nowrap; }.site-content-panel { padding: 24px 20px; }.site-content-panel .section-heading { flex-wrap: wrap; }.site-list-item { padding: 20px 16px; } }
-
-.internal-note summary { min-height: 44px; padding-block: 10px; }

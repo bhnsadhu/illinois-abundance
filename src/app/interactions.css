@@ -48,7 +48,7 @@
   transform: scaleX(.8);
   transition: opacity var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out);
 }
-.desktop-nav a[aria-current=page]::after { opacity: 1; transform: none; }
+.desktop-nav a[aria-current]::after { opacity: 1; transform: none; }
 
 :is(a, button) :is(.lucide-arrow-right, .lucide-arrow-up-right, .lucide-arrow-left) {
   transition: transform var(--duration-fast) var(--ease-out);

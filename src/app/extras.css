@@ -479,7 +479,6 @@
 @media (hover: hover) and (pointer: fine) {
   .learn-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 28px rgb(29 29 31 / 7%);
   }
 }
 

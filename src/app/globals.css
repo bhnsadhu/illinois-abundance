@@ -72,7 +72,7 @@ svg { flex-shrink: 0; }
 .wordmark img { width: 100%; height: auto; }
 .desktop-nav { display: flex; align-items: center; gap: 24px; margin-left: auto; font-size: 12px; font-weight: 500; }
 .desktop-nav a { display: flex; align-items: center; min-height: 44px; color: var(--muted); transition: color var(--duration-fast) ease; }
-.desktop-nav a[aria-current=page] { color: var(--ink); font-weight: 650; }
+.desktop-nav a[aria-current] { color: var(--ink); font-weight: 650; }
 .nav-actions { display: flex; align-items: center; gap: 10px; }
 .nav-write { font-size: 12px; font-weight: 550; min-height: 44px; padding: 9px 17px; display: inline-flex; align-items: center; border-radius: 999px; background: var(--deep-teal); color: var(--paper); white-space: nowrap; transition: transform var(--duration-fast) var(--ease-out), background var(--duration-fast) ease; }
 .icon-button { display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; width: 44px; height: 44px; border-radius: 50%; color: var(--ink); transition: transform var(--duration-fast) var(--ease-out), background var(--duration-fast) ease; }
@@ -177,7 +177,7 @@ label:has(input[type=checkbox]) { display: flex; gap: 10px; align-items: center;
   .mobile-nav { display: block; position: absolute; inset: 100% 0 auto; background: var(--cream); padding: 20px var(--page-gutter) 32px; visibility: hidden; opacity: 0; transform: translateY(-8px); pointer-events: none; transition: opacity var(--duration-ui) ease, transform var(--duration-ui) var(--ease-drawer), visibility var(--duration-ui); box-shadow: 0 24px 24px -24px rgba(0,0,0,.18); max-height: calc(100dvh - 76px); overflow-y: auto; }
   .mobile-nav[data-open=true] { visibility: visible; opacity: 1; transform: translateY(0); pointer-events: auto; }
   .mobile-nav a { min-height: 54px; display: flex; align-items: center; justify-content: space-between; font-size: 24px; font-weight: 600; letter-spacing: -.025em; }
-  .mobile-nav a[aria-current=page] { color: var(--deep-teal); }
+  .mobile-nav a[aria-current] { color: var(--deep-teal); }
 }
 @media (max-width: 767px) {
   :root { --page-gutter: 20px; --column-gap: 20px; }

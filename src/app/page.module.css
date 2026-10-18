@@ -58,7 +58,7 @@
   .newsItem h3 a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .feature h2 a:hover { color: var(--deep-teal); }
   .readLink:hover, .sectionHeading > a:hover { text-decoration: underline; text-underline-offset: 4px; }
-  .topic:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(29,29,31,.055); }
+  .topic:hover { transform: translateY(-3px); }
 }
 .topic:active { transform: scale(.985); }
 @media (max-width: 1023px) {
