@@ -1,7 +1,7 @@
 import 'server-only';
 import { createHash } from 'node:crypto';
 import { Temporal } from 'temporal-polyfill';
-import ical, { type ParameterValue } from 'node-ical';
+import ical, { type ParameterValue, type RRule } from 'node-ical';
 import { googleMeetUrl } from './event-links';
 import type { Event } from './types';
 
@@ -14,6 +14,19 @@ const day = 86_400_000;
 // Champaign Urbana so all-day events end at local midnight on every server.
 const localDay = (date: Date) => new Date(Temporal.PlainDate.from({ year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() }).toZonedDateTime('America/Chicago').epochMilliseconds).toISOString();
 const plainText = (value?: ParameterValue) => typeof value === 'string' ? value : value?.val || '';
+
+function recurrenceLabel(rule?: RRule): string {
+  // Keep the series cadence separate from the actual occurrence date/time,
+  // which accounts for moved meetings, skipped dates and daylight saving.
+  const { freq, interval = 1 } = rule?.options ?? {};
+  const frequencies: Record<string, [string, string]> = {
+    DAILY: ['daily', 'days'], WEEKLY: ['weekly', 'weeks'],
+    MONTHLY: ['monthly', 'months'], YEARLY: ['yearly', 'years'],
+  };
+  const frequency = typeof freq === 'string' ? frequencies[freq] : undefined;
+  if (!frequency || typeof interval !== 'number' || !Number.isInteger(interval) || interval < 1) return 'Repeating event';
+  return interval === 1 ? `Repeats ${frequency[0]}` : `Repeats every ${interval} ${frequency[1]}`;
+}
 
 export async function parseCalendarEvents(source: string, now = new Date()): Promise<Event[]> {
   if (!source.trimStart().startsWith('BEGIN:VCALENDAR')) throw new Error('Invalid public calendar.');
@@ -41,6 +54,7 @@ export async function parseCalendarEvents(source: string, now = new Date()): Pro
         rsvp_url: null, recap_post_id: null, is_published: true, is_sample: false,
         all_day: instance.isFullDay, calendar_url: googleCalendarHref,
         join_url: googleMeetUrl(event['GOOGLE-CONFERENCE'], event.url, event.location, event.description),
+        ...(instance.isRecurring && { recurrence: `${recurrenceLabel(item.rrule)}${instance.isOverride ? ' · Updated for this date' : ''}` }),
       });
     }
   }
@@ -66,7 +80,11 @@ export function mergeCalendarEvents(local: Event[], calendar: Event[]): Event[] 
   const calendarByKey = new Map(calendar.map(event => [key(event), event]));
   const localEvents = local.filter(event => !calendar.length || !event.is_sample).map(event => {
     const remote = calendarByKey.get(key(event));
-    return remote?.join_url && !event.join_url ? {...event, join_url: remote.join_url} : event;
+    return {
+      ...event,
+      ...(remote?.join_url && !event.join_url && { join_url: remote.join_url }),
+      ...(remote?.recurrence && { recurrence: remote.recurrence }),
+    };
   });
   return [...localEvents, ...calendar.filter(event => !localKeys.has(key(event)))]
     .sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at));

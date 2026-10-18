@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, Download, MapPin, CalendarDays, ArrowRight } from '@/components/icons';
 import { EventJoinLink } from '@/components/event-join-link';
+import { EventRecurrence } from '@/components/event-recurrence';
 import { getEventGroups, getRecapStories } from '@/lib/data';
 import { getSiteContent } from '@/lib/site-content';
 import type {SiteContent} from '@/lib/site-content-schema';
@@ -16,7 +17,7 @@ export async function generateMetadata():Promise<Metadata>{const content=await g
 function EventDetails({event,recap,past=false,copy}:{event:Event;recap?:Story;past?:boolean;copy:SiteContent['events']}) {
   const location=eventLocation(event);
   const rsvp=event.rsvp_url?safeUrl(event.rsvp_url):null;
-  return <>{event.description&&<p className="event-description">{event.description}</p>}<div className="event-facts"><p><CalendarDays size={17}/><time dateTime={event.starts_at}>{eventDate(event.starts_at,event.all_day)}</time></p>{location&&<p><MapPin size={17}/><span>{location}</span></p>}</div>{event.is_sample&&<p className="sample-caption">{copy.sample}</p>}<div className="event-actions">{!past&&<EventJoinLink href={event.join_url} label={copy.joinLabel}/>}{rsvp&&!past&&<a href={rsvp} className="button button-small" target="_blank" rel="noopener noreferrer">{copy.rsvpLabel} <ArrowUpRight size={15}/></a>}{event.calendar_url?<a className="text-link" href={event.calendar_url} target="_blank" rel="noopener noreferrer">View in Google Calendar <ArrowUpRight size={15}/></a>:!past&&<a className="text-link" href={`/events/${event.id}/calendar.ics`}>{copy.calendarLabel} <Download size={15}/></a>}{recap&&<Link className="text-link" href={`/post/${recap.slug}`}>{copy.recapLabel} <ArrowRight size={15}/></Link>}</div></>;
+  return <>{event.description&&<p className="event-description">{event.description}</p>}<div className="event-facts"><p><CalendarDays size={17}/><time dateTime={event.starts_at}>{eventDate(event.starts_at,event.all_day)}</time></p><EventRecurrence event={event}/>{location&&<p><MapPin size={17}/><span>{location}</span></p>}</div>{event.is_sample&&<p className="sample-caption">{copy.sample}</p>}<div className="event-actions">{!past&&<EventJoinLink href={event.join_url} label={copy.joinLabel}/>}{rsvp&&!past&&<a href={rsvp} className="button button-small" target="_blank" rel="noopener noreferrer">{copy.rsvpLabel} <ArrowUpRight size={15}/></a>}{event.calendar_url?<a className="text-link" href={event.calendar_url} target="_blank" rel="noopener noreferrer">View in Google Calendar <ArrowUpRight size={15}/></a>:!past&&<a className="text-link" href={`/events/${event.id}/calendar.ics`}>{copy.calendarLabel} <Download size={15}/></a>}{recap&&<Link className="text-link" href={`/post/${recap.slug}`}>{copy.recapLabel} <ArrowRight size={15}/></Link>}</div></>;
 }
 export default async function EventsPage() {
   const content=await getSiteContent();

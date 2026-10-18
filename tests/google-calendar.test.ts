@@ -14,6 +14,7 @@ describe('public Google Calendar', () => {
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({title:'Community gathering', location:'Cloud Mountain, Urbana', description:'First line\nSecond line', starts_at:'2026-10-18T23:00:00.000Z', ends_at:'2026-10-19T00:00:00.000Z', is_sample:false, all_day:false});
     expect((await parseCalendarEvents(source, now))[0].id).toBe(events[0].id);
+    expect(events[0].recurrence).toBeUndefined();
   });
 
   it('extracts join links from conference metadata, locations and descriptions', async () => {
@@ -37,7 +38,26 @@ describe('public Google Calendar', () => {
     const events = await parseCalendarEvents(source, now);
     expect(events.map(event => event.starts_at)).toEqual(['2026-10-22T21:30:00.000Z','2026-11-05T22:30:00.000Z','2026-11-13T00:00:00.000Z']);
     expect(events[2].title).toBe('Moved meeting');
+    expect(events.map(event => event.recurrence)).toEqual(['Repeats weekly', 'Repeats weekly', 'Repeats weekly · Updated for this date']);
     expect(new Set(events.map(event => event.id)).size).toBe(3);
+  });
+
+  it.each([
+    ['DAILY', 1, 'Repeats daily'],
+    ['WEEKLY', 2, 'Repeats every 2 weeks'],
+    ['MONTHLY', 1, 'Repeats monthly'],
+    ['MONTHLY', 3, 'Repeats every 3 months'],
+    ['YEARLY', 1, 'Repeats yearly'],
+  ])('labels %s series with interval %i', async (frequency, interval, label) => {
+    const events = await parseCalendarEvents(feed(event(`RRULE:FREQ=${frequency};INTERVAL=${interval};COUNT=2`)), now);
+    expect(events.length).toBeGreaterThan(0);
+    expect(events.every(event => event.recurrence === label)).toBe(true);
+  });
+
+  it('keeps recurrence on matching local listings even without a meeting link', async () => {
+    const [remote] = await parseCalendarEvents(feed(event('RRULE:FREQ=WEEKLY;COUNT=2')), now);
+    const local = {...remote, id:'local', recurrence:undefined, location:'Local details'};
+    expect(mergeCalendarEvents([local], [remote])).toEqual([{...local, recurrence:'Repeats weekly'}]);
   });
 
   it('keeps all-day events on their Chicago date and ends them at local midnight across DST', async () => {

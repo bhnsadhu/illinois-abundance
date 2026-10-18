@@ -6,6 +6,7 @@ import { SubscriptionForm } from '@/components/subscription-form';
 import { StoryCard } from '@/components/story-card';
 import { Author } from '@/components/author';
 import { EventJoinLink } from '@/components/event-join-link';
+import { EventRecurrence } from '@/components/event-recurrence';
 import { HomeTitle } from '@/components/home-title';
 import { getStories, getTopics, getNextEvent, coverFor, coverAlt } from '@/lib/data';
 import { eventLocation } from '@/lib/event-links';
@@ -38,6 +39,7 @@ export default async function Home() {
           <h3>{nextEvent.title}</h3>
           <div className={styles.eventDetails}>
             <p><CalendarDays size={18}/><time dateTime={nextEvent.starts_at}>{eventDate(nextEvent.starts_at, nextEvent.all_day)}</time></p>
+            <EventRecurrence event={nextEvent}/>
             {location && <p><MapPin size={18}/><span>{location}</span></p>}
           </div>
           {nextEvent.is_sample && <p className={styles.sampleNote}>Sample event. Details are for demonstration.</p>}
