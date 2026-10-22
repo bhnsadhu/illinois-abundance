@@ -26,6 +26,7 @@ export const siteContentMutationSchema=z.object({section:siteSectionSchema,versi
 export function upgradeLegacySiteSection(section: SiteSection, values: Record<string, unknown>) {
   const updated = {...values};
   if (section === 'home') {
+    if (updated.imageUrl === '/illustrations/housing.svg') updated.imageUrl = siteContentDefaults.home.imageUrl;
     if (updated.secondLine === 'With room for more.' || updated.secondLine === 'Cultivating our Garden') updated.secondLine = siteContentDefaults.home.secondLine;
     if (updated.secondaryLabel === 'Come to a campus event' && updated.secondaryHref === '/events') {
       updated.secondaryLabel = siteContentDefaults.home.secondaryLabel;

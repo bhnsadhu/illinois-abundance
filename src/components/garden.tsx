@@ -1,27 +1,22 @@
 import styles from './garden.module.css';
 
-/** A single, quiet watering gesture on arrival. The text remains still. */
+/** One large plant, drawn as a brand mark. Its brief growth sequence settles. */
 export function Garden() {
-  return <svg className={styles.garden} viewBox="0 0 112 100" fill="none" aria-hidden="true" focusable="false">
-    <path d="M13 90c16-3 39-3 57 0" stroke="var(--line)" strokeWidth="2" strokeLinecap="round"/>
-    <path d="M28 66h32l-5 22H34z" fill="var(--orange)"/>
-    <path d="M25 64c10-2 27-2 38 0v7H25z" fill="var(--accent)"/>
+  return <svg className={styles.garden} viewBox="0 0 480 600" fill="none" aria-hidden="true" focusable="false" data-testid="hero-garden">
     <g className={styles.plant}>
-      <path d="M44 64V37" stroke="var(--deep-teal)" strokeWidth="3" strokeLinecap="round"/>
-      <path d="M44 51C28 52 22 43 24 33c13-1 21 6 20 18Z" fill="var(--teal)" stroke="var(--deep-teal)" strokeWidth="2" strokeLinejoin="round"/>
-      <path d="M44 43c-1-15 7-23 20-23 1 14-6 24-20 23Z" fill="var(--soft-teal)" stroke="var(--deep-teal)" strokeWidth="2" strokeLinejoin="round"/>
-      <path d="m31 40 13 11m0-8 12-14" stroke="var(--deep-teal)" strokeWidth="1.5" strokeLinecap="round"/>
+      <path className={styles.stem} d="M241 501C221 399 254 326 250 274" stroke="var(--deep-teal)" strokeWidth="14" strokeLinecap="round"/>
+      <g className={styles.left}>
+        <path d="M239 371C127 390 54 318 64 218C167 204 247 266 239 371Z" fill="var(--teal)"/>
+        <path d="M106 259C153 284 204 327 239 371" stroke="var(--deep-teal)" strokeWidth="5" strokeLinecap="round"/>
+      </g>
+      <g className={styles.right}>
+        <path d="M250 274C239 168 306 103 404 114C418 214 357 280 250 274Z" fill="var(--deep-teal)"/>
+        <path d="M250 274C284 233 322 191 363 153" stroke="var(--teal)" strokeWidth="5" strokeLinecap="round"/>
+      </g>
     </g>
-    <g className={styles.can}>
-      <path d="M89 20c15-9 23 10 9 14" stroke="var(--deep-teal)" strokeWidth="3"/>
-      <path d="m76 24-17 3-5-6-4 3 8 12 21-4" fill="var(--teal)" stroke="var(--deep-teal)" strokeWidth="2" strokeLinejoin="round"/>
-      <path d="m73 17 22-4 5 25c-6 5-14 7-22 4Z" fill="var(--teal)" stroke="var(--deep-teal)" strokeWidth="2" strokeLinejoin="round"/>
-      <path d="m72 17 24-5" stroke="var(--deep-teal)" strokeWidth="3" strokeLinecap="round"/>
-    </g>
-    <g stroke="var(--deep-teal)" strokeWidth="2" strokeLinecap="round">
-      <path className={styles.drop} d="m51 31-2 4"/>
-      <path className={`${styles.drop} ${styles.dropTwo}`} d="m57 35-2 4"/>
-      <path className={`${styles.drop} ${styles.dropThree}`} d="m63 34-2 4"/>
+    <g className={styles.pot}>
+      <path d="M151 482H329L311 563C305 589 176 589 170 563Z" fill="var(--orange)"/>
+      <path d="M143 468C198 456 282 456 337 468L333 496C278 508 202 508 147 496Z" fill="var(--accent)"/>
     </g>
   </svg>;
 }

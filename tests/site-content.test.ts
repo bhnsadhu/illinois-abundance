@@ -35,7 +35,8 @@ describe('site content editing',()=>{
   expect(upgradeLegacySiteSection('navigation',{writeLabel:'Write for us',writeHref:'/write'})).toEqual({writeLabel:'Write the Stories',writeHref:'/write'});
   expect(upgradeLegacySiteSection('home',{secondLine:'Cultivating our Garden',secondaryLabel:'Publish with us',secondaryHref:'/write',primaryLabel:'Read the stories',primaryHref:'/latest'})).toEqual({secondLine:'Cultivating Our Garden',secondaryLabel:'Write the Stories',secondaryHref:'/write',primaryLabel:'Read the Stories',primaryHref:'/latest'});
   expect(upgradeLegacySiteSection('navigation',{writeLabel:'Publish with us',writeHref:'/write'})).toEqual({writeLabel:'Write the Stories',writeHref:'/write'});
-  const custom={secondLine:'A custom headline',secondaryLabel:'Pitch a story',secondaryHref:'/about',newsItems:[]};
+  expect(upgradeLegacySiteSection('home',{imageUrl:'/illustrations/housing.svg'})).toEqual({imageUrl:''});
+  const custom={secondLine:'A custom headline',secondaryLabel:'Pitch a story',secondaryHref:'/about',newsItems:[],imageUrl:'/media/our-garden.webp'};
   expect(upgradeLegacySiteSection('home',custom)).toEqual(custom);
   expect(parseSiteSection('home',{...siteContentDefaults.home,newsItems:[]})).toMatchObject({newsItems:[]});
   expect(()=>parseSiteSection('home',{...siteContentDefaults.home,newsItems:[{...siteContentDefaults.home.newsItems[0],href:'javascript:alert(1)'}]})).toThrow();

@@ -1,0 +1,20 @@
+.intro { display: none; position: fixed; inset: 0; z-index: 100; background: var(--deep-teal); color: var(--cream); }
+.identity { display: grid; justify-items: center; gap: 20px; }
+.identity svg { width: 112px; height: 126px; overflow: visible; }
+.identity p { margin: 0; font-family: var(--hand); font-size: 32px; line-height: 1.2; }
+.stem { transform-origin: 80px 151px; }
+.left { transform-origin: 80px 105px; }
+.right { transform-origin: 80px 77px; }
+@media (prefers-reduced-motion: no-preference) {
+  :global(html[data-intro=play]) .intro { display: grid; place-items: center; animation: curtain 420ms var(--ease-drawer) 700ms both; }
+  :global(html[data-intro=play]) .identity { animation: arrive 400ms var(--ease-out) both; }
+  :global(html[data-intro=play]) .stem { animation: stem 500ms var(--ease-out) both; }
+  :global(html[data-intro=play]) .left { animation: left 500ms var(--ease-out) 80ms both; }
+  :global(html[data-intro=play]) .right { animation: right 500ms var(--ease-out) 160ms both; }
+}
+@keyframes curtain { to { transform: translateY(-100%); } }
+@keyframes arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes stem { from { transform: scaleY(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes left { from { transform: rotate(20deg) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes right { from { transform: rotate(-20deg) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+@media print { .intro { display: none !important; } }

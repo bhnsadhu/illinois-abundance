@@ -1,15 +1,15 @@
 .home { position: relative; isolation: isolate; padding-bottom: 0; }
-/* A generous campus invitation, followed by the work of the publication. */
-.hero { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: center; gap: 12px; min-height: 570px; padding: 64px 0 72px; }
-.hero:not(:has(.heroVisual)) { grid-template-columns: 1fr; }
+/* The sprout mark carries the opening, pattern, and large hero animation. */
+.hero { position: relative; isolation: isolate; min-height: 760px; padding: 56px 0 80px; }
+.seedField { position: absolute; z-index: -1; inset: 0 calc(-1 * var(--page-gutter)); overflow: clip; pointer-events: none; }
+.seedField::before { content: ''; position: absolute; inset: 0; background: url('/illustrations/sprout-mark.svg') 24px 18px / 116px 130px repeat; opacity: .045; mask-image: linear-gradient(to bottom, #000, #000 60%, transparent); }
 .heading { min-width: 0; position: relative; z-index: 1; }
-.heading h1 { font-size: clamp(48px, 4.85vw, 70px); line-height: 1.08; margin: 0 0 28px; }
-.heading h1 svg { width: 72px; height: 65px; }
-.heading > p { margin: 0 0 28px; font-size: 18px; line-height: 1.65; max-width: 44ch; }
+.heading h1 { font-size: clamp(64px, 7.6vw, 104px); line-height: 1.04; margin: 0 0 52px; max-width: 100%; }
+.heading > p { margin: 0 0 28px; font-size: 19px; line-height: 1.65; max-width: 440px; }
 .introActions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
 .explore { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 24px; font-size: 14px; color: var(--deep-teal); }
-.heroVisual { min-width: 0; }
-.heroVisual img { width: 112%; max-width: none; margin-left: -7%; }
+.heroVisual { position: absolute; z-index: -1; right: -24px; bottom: 14px; width: 540px; height: 620px; pointer-events: none; }
+.heroVisual > img { width: 100%; height: 100%; object-fit: contain; }
 .mission { display: grid; grid-template-columns: 1fr 1.25fr; align-items: start; gap: 80px; padding: 52px 56px; background: var(--soft-teal); border-radius: 28px; }
 .mission h2 { font-size: clamp(36px, 3.4vw, 48px); margin-bottom: 20px; max-width: 12ch; }
 .missionCopy p { font-size: 18px; line-height: 1.65; margin-bottom: 20px; }
@@ -99,15 +99,16 @@
 }
 .topic:active { transform: scale(.985); }
 @media (max-width: 1023px) {
-  .hero { gap: 8px; min-height: 500px; padding-block: 48px; }
-  .heading h1 svg { width: 56px; height: 50px; }
+  .hero { min-height: 700px; padding-block: 48px 64px; }
+  .heroVisual { width: 420px; height: 500px; right: -28px; bottom: 8px; }
+  .heading > p { max-width: 360px; font-size: 18px; }
   .mission { padding: 40px; gap: 40px; }
   .involvementGrid { grid-template-columns: 1fr 1fr; }
   .readInvitation img { display: none; }
   .community { padding: 40px; gap: 28px; }
   .newsList { grid-template-columns: 1fr; gap: 28px; }
   .newsItem { max-width: 65ch; }
-  .heading h1 { font-size: clamp(40px, 4.9vw, 50px); }
+  .heading h1 { font-size: clamp(58px, 7.5vw, 76px); }
   .featureCopy { padding: 32px; }
   .feature h2 { font-size: 36px; }
   .featureCopy > p { font-size: var(--text-body); }
@@ -115,18 +116,13 @@
   .event { padding: 28px; }
   .subscribe { padding: 40px; gap: 32px; }
 }
-@media (min-width: 768px) and (max-width: 900px) {
-  .hero { grid-template-columns: 1.25fr 1fr; }
-  .heading h1 svg { display: none; }
-}
 @media (max-width: 767px) {
-  .hero { grid-template-columns: 1fr; gap: 8px; min-height: 0; padding: 40px 0 28px; }
-  .heading h1 { font-size: clamp(29px, 8.4vw, 58px); margin-bottom: 24px; }
-  .heading h1 svg { display: none; }
+  .hero { min-height: 800px; padding: 40px 0 380px; }
+  .heading h1 { font-size: clamp(30px, 9.6vw, 58px); margin-bottom: 28px; }
+  .seedField::before { background-size: 88px 100px; opacity: .035; }
   .heading > p { font-size: 17px; margin-bottom: 24px; }
   .explore { margin-top: 16px; }
-  .heroVisual { width: 85%; max-width: 420px; justify-self: center; }
-  .heroVisual img { width: 100%; margin: 0; }
+  .heroVisual { width: 320px; height: 390px; right: calc(50% - 160px); bottom: 10px; }
   .mission { grid-template-columns: 1fr; gap: 24px; padding: 32px 24px; border-radius: 24px; }
   .mission h2 { font-size: 36px; max-width: none; margin-bottom: 8px; }
   .missionCopy p { font-size: 17px; }
@@ -173,3 +169,17 @@
 @media (hover: hover) and (pointer: fine) {
   .explore:hover { text-decoration: underline; text-underline-offset: 4px; }
 }
+
+/* The page reveals in small groups; controls retain their existing press feedback. */
+@media (prefers-reduced-motion: no-preference) {
+  .seedField { animation: fieldIn 1200ms var(--ease-out) both; }
+  :global(html[data-arrival=intro]) .seedField { animation-delay: 800ms; }
+  .mission:global([data-reveal=visible]) > div:last-child,
+  .community:global([data-reveal=visible]) .communityActions { animation: sectionIn 420ms var(--ease-out) 80ms both; }
+  .recent:global([data-reveal=visible]) :global(.story-card):nth-child(2),
+  .news:global([data-reveal=visible]) .newsItem:nth-child(2) { animation: sectionIn 420ms var(--ease-out) 80ms both; }
+  .recent:global([data-reveal=visible]) :global(.story-card):nth-child(3),
+  .news:global([data-reveal=visible]) .newsItem:nth-child(3) { animation: sectionIn 420ms var(--ease-out) 160ms both; }
+}
+@keyframes fieldIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes sectionIn { from { transform: translateY(12px); } to { transform: none; } }

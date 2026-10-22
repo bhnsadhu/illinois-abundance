@@ -10,7 +10,7 @@ import { Author } from '@/components/author';
 import { EventJoinLink } from '@/components/event-join-link';
 import { EventRecurrence } from '@/components/event-recurrence';
 import { HomeTitle } from '@/components/home-title';
-import { ScrollGarden } from '@/components/scroll-garden';
+import { Garden } from '@/components/garden';
 import { getStories, getTopics, getNextEvent, coverFor, coverAlt } from '@/lib/data';
 import { eventLocation } from '@/lib/event-links';
 import { eventDate } from '@/lib/syndication';
@@ -27,8 +27,8 @@ export default async function Home() {
   const location = nextEvent ? eventLocation(nextEvent) : '';
 
   return <div className={`container ${styles.home}`}>
-    <ScrollGarden/>
     <div className={styles.hero}>
+      <div className={styles.seedField} aria-hidden="true"/>
       <header className={styles.heading}>
         <HomeTitle firstLine={home.firstLine} secondLine={home.secondLine}/>
         <p className={styles.intro}>{home.intro}</p>
@@ -38,9 +38,9 @@ export default async function Home() {
         </div>
         <a className={styles.explore} href="#get-involved">{home.exploreLabel} <ArrowDown size={18}/></a>
       </header>
-      {home.imageUrl && <div className={styles.heroVisual}>
-        <Image src={home.imageUrl} alt={home.imageAlt} width={800} height={560} loading="eager" unoptimized/>
-      </div>}
+      <div className={styles.heroVisual}>
+        {home.imageUrl ? <Image src={home.imageUrl} alt={home.imageAlt} width={800} height={560} loading="eager" unoptimized/> : <Garden/>}
+      </div>
     </div>
 
     <Reveal className={styles.mission} aria-labelledby="mission-title">

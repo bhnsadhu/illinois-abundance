@@ -7,6 +7,8 @@ const pages = ['/', '/latest', '/events', '/about', '/write', '/write/verify', '
 
 for (const path of pages) {
   test(`${path} renders accessibly without broken content`, async ({ page }) => {
+    // Audit settled contrast; the motion-specific tests cover animated entry and dismissal.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     const response = await page.goto(path);
@@ -86,24 +88,76 @@ test('reduced motion and small screens preserve usable content', async ({ page }
   await expect(page.locator('main').getByRole('link', { name: 'Write the Stories', exact: false }).first()).toBeVisible();
 });
 
-test('background foliage renders accessibly and follows scroll preferences', async ({ page }) => {
+test('the welcome plays once per session and exits without blocking the page', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.clock.install({ time: new Date('2026-10-22T12:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-10-22T12:00:01Z'));
   await page.goto('/');
-  const foliage = page.getByTestId('scroll-garden');
-  const sprig = foliage.locator(':scope > div').nth(1);
-  await expect(foliage).toHaveCount(1);
-  await expect(foliage).toHaveAttribute('aria-hidden', 'true');
-  await sprig.scrollIntoViewIfNeeded();
-  const transform = () => sprig.evaluate(element => getComputedStyle(element).transform);
-  await expect.poll(transform).not.toBe('none');
-  const initial = await transform();
-  await page.evaluate(() => window.scrollBy({ top: 200, behavior: 'instant' }));
-  await expect.poll(transform).not.toBe(initial);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
-  await page.screenshot({ path: test.info().outputPath('scroll-foliage.png') });
+  await expect(page.locator('html')).toHaveAttribute('data-intro', 'play');
+  await expect(page.getByTestId('site-intro')).toHaveAttribute('aria-hidden', 'true');
+  await expect(page.getByTestId('site-intro')).toHaveCSS('pointer-events', 'auto');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName('Champaign Urbana. Cultivating Our Garden');
+  await page.clock.fastForward(3500);
+  await expect(page.locator('html')).not.toHaveAttribute('data-intro');
+  await expect(page.locator('html')).not.toHaveAttribute('data-arrival');
+  await page.reload();
+  await expect(page.locator('html')).not.toHaveAttribute('data-intro');
+  await expect(page.getByTestId('site-intro')).toBeHidden();
+});
+
+test('the first tap dismisses the welcome without following a hidden link', async ({ page, hasTouch }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.clock.install({ time: new Date('2026-10-22T12:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-10-22T12:00:01Z'));
+  await page.goto('/');
+  const stories = page.locator('main').getByRole('link', { name: 'Read the Stories', exact: true });
+  const bounds = (await stories.boundingBox())!;
+  const x = bounds.x + bounds.width / 2, y = bounds.y + bounds.height / 2;
+  if (hasTouch) await page.touchscreen.tap(x, y);
+  else await page.mouse.click(x, y);
+  await expect(page.getByTestId('site-intro')).toBeHidden();
+  await expect(page).toHaveURL('/');
+  await stories.click();
+  await expect(page).toHaveURL('/latest');
+});
+
+test('keyboard input skips the welcome and reduced motion keeps the garden still', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.clock.install({ time: new Date('2026-10-22T12:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-10-22T12:00:01Z'));
+  await page.goto('/');
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+  await expect(page.locator('html')).not.toHaveAttribute('data-intro');
+  await expect(page.locator('html')).not.toHaveAttribute('data-arrival');
+  const garden = page.getByTestId('hero-garden');
+  await expect(garden).toHaveAttribute('aria-hidden', 'true');
+  await expect(page.getByTestId('scroll-garden')).toHaveCount(0);
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await expect.poll(transform).toBe('none');
-  expect(await foliage.evaluate(element => element.getAnimations({ subtree: true }).length)).toBe(0);
+  expect(await garden.evaluate(element => element.getAnimations({ subtree: true }).length)).toBe(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
+});
+
+test('blocked session storage cannot strand the welcome', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(window, 'sessionStorage', { get() { throw new Error('Storage is disabled'); } }));
+  await page.goto('/');
+  await expect(page.getByTestId('site-intro')).toBeHidden({ timeout: 5000 });
+  await page.locator('main').getByRole('link', { name: 'Read the Stories', exact: true }).click();
+  await expect(page).toHaveURL('/latest');
+});
+
+test('deep links and JavaScript-free visits show usable content immediately', async ({ page, browser }) => {
+  await page.goto('/#get-involved');
+  await expect(page.getByTestId('site-intro')).toBeHidden();
+  await expect(page.locator('#involvement-title')).toBeInViewport();
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const plain = await context.newPage();
+  await plain.goto('http://localhost:3100/');
+  await expect(plain.getByTestId('site-intro')).toBeHidden();
+  await expect(plain.getByRole('heading', { level: 1 })).toHaveAccessibleName('Champaign Urbana. Cultivating Our Garden');
+  await plain.locator('main').getByRole('link', { name: 'Read the Stories', exact: true }).click();
+  await expect(plain).toHaveURL('http://localhost:3100/latest');
+  await context.close();
 });
 
 test('protected pages redirect and unknown content returns 404', async ({ request }) => {
