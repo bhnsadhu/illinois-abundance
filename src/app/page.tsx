@@ -1,8 +1,9 @@
+import { LocationLink } from '@/components/location-link';
 import { PublicationLabel } from '@/components/publication-label';
 import Image from 'next/image';
 import { Reveal } from '@/components/reveal';
 import Link from 'next/link';
-import { ArrowRight, ArrowUpRight, CalendarDays, MapPin } from '@/components/icons';
+import { ArrowRight, ArrowUpRight, CalendarDays } from '@/components/icons';
 import { SubscriptionForm } from '@/components/subscription-form';
 import { StoryCard } from '@/components/story-card';
 import { Author } from '@/components/author';
@@ -30,11 +31,11 @@ export default async function Home() {
     <div className={styles.hero}>
       <header className={styles.heading}>
         <HomeTitle firstLine={home.firstLine} secondLine={home.secondLine}/>
+        <p className={styles.intro}>{home.intro}</p>
         <div className={styles.introActions}>
           <Link className="button" href={home.primaryHref}>{home.primaryLabel}</Link>
           {visibility.homeWrite && <Link className="button button-outline" href={home.secondaryHref}>{home.secondaryLabel} <ArrowRight size={17}/></Link>}
         </div>
-        <p className={styles.intro}>{home.intro}</p>
       </header>
       {visibility.homeEvent && <section className={styles.event} aria-labelledby="next-event-title">
         <h2 id="next-event-title">{home.eventLabel}</h2>
@@ -43,7 +44,7 @@ export default async function Home() {
           <div className={styles.eventDetails}>
             <p><CalendarDays size={18}/><time dateTime={nextEvent.starts_at}>{eventDate(nextEvent.starts_at, nextEvent.all_day)}</time></p>
             <EventRecurrence event={nextEvent}/>
-            {location && <p><MapPin size={18}/><span>{location}</span></p>}
+            <LocationLink location={location}/>
           </div>
           {nextEvent.is_sample && <p className={styles.sampleNote}>Sample event. Details are for demonstration.</p>}
         </> : <p>{home.eventEmptyBody}</p>}

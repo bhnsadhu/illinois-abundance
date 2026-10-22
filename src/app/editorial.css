@@ -13,7 +13,7 @@
 
 .topic-label {
   color: var(--deep-teal);
-  font-size: 12px;
+  font-size: var(--text-small);
   font-weight: 650;
   letter-spacing: .01em;
 }
@@ -21,7 +21,7 @@
 .sample-label {
   display: inline-block;
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-small);
   font-weight: 450;
   letter-spacing: .01em;
   white-space: nowrap;
@@ -29,7 +29,7 @@
 
 .publication-label {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-small);
   font-weight: 450;
 }
 
@@ -50,7 +50,6 @@
   overflow: hidden;
   border-radius: 24px;
   background: var(--paper);
-  box-shadow: 0 3px 14px rgb(29 29 31 / 3%);
   transition: transform var(--duration-ui) var(--ease-out);
 }
 
@@ -97,8 +96,8 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   margin: 0 0 28px;
-  color: var(--muted);
-  font-size: 14px;
+  color: var(--ink);
+  font-size: var(--text-body);
   line-height: 1.6;
 }
 
@@ -109,7 +108,7 @@
 .story-card .author {
   flex-wrap: wrap;
   gap: 9px 12px;
-  font-size: 11px;
+  font-size: var(--text-small);
 }
 
 .story-card .author-avatar {
@@ -183,7 +182,7 @@
   border-radius: 50%;
   background: var(--soft-teal);
   color: var(--deep-teal);
-  font-size: 11px;
+  font-size: var(--text-small);
   font-weight: 650;
 }
 
@@ -400,7 +399,7 @@
 .article-updated {
   margin-top: 24px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-small);
 }
 
 .writer-box {
@@ -424,7 +423,7 @@
 
 .writer-box .eyebrow {
   margin: 0 0 8px;
-  font-size: 11px;
+  font-size: var(--text-small);
 }
 
 .writer-box h2 {
@@ -435,8 +434,8 @@
 
 .writer-box p:not(.eyebrow) {
   margin-bottom: 12px;
-  color: var(--muted);
-  font-size: 14px;
+  color: var(--ink);
+  font-size: var(--text-body);
   line-height: 1.6;
 }
 
@@ -476,7 +475,7 @@
   min-height: 28px;
   padding-top: 8px;
   color: var(--deep-teal);
-  font-size: 12px;
+  font-size: var(--text-small);
 }
 
 .removal-link {
@@ -485,7 +484,7 @@
   margin-top: 16px;
   padding-block: 12px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-small);
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -608,7 +607,7 @@
   border-radius: 50%;
   background: var(--paper);
   color: var(--deep-teal);
-  font-size: 12px;
+  font-size: var(--text-small);
   font-weight: 650;
   content: counter(steps);
 }
@@ -653,7 +652,7 @@
   .about-hero-art { min-height: 340px; padding: 16px; }
   .about-section { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; padding: 32px; }
   .about-section h2 { font-size: 27px; }
-  .about-section > p { font-size: 15px; }
+  .about-section > p { font-size: var(--text-body); }
   .about-write h2 { font-size: 42px; }
 }
 
@@ -663,14 +662,14 @@
   .topic-heading p { margin-inline: 0; font-size: 18px; }
   .topic-heading img { max-width: 400px; max-height: 260px; justify-self: center; }
   .topic-filters { gap: 8px; margin-bottom: 32px; }
-  .topic-filters a { padding: 10px 16px; font-size: 12px; }
+  .topic-filters a { padding: 10px 16px; font-size: var(--text-small); }
   .article-heading { padding-top: 28px; padding-bottom: 32px; }
-  .article-back { margin-bottom: 32px; font-size: 12px; }
-  .article-kicker { gap: 8px; margin-bottom: 18px; font-size: 12px; }
+  .article-back { margin-bottom: 32px; font-size: var(--text-small); }
+  .article-kicker { gap: 8px; margin-bottom: 18px; font-size: var(--text-small); }
   .article-kicker .sample-label { margin-left: 0; }
   .article-heading h1 { margin-bottom: 24px; font-size: clamp(38px, 10vw, 56px); }
   .article-deck { margin-bottom: 26px; font-size: 18px; line-height: 1.6; }
-  .article-heading .author { gap: 12px; font-size: 12px; }
+  .article-heading .author { gap: 12px; font-size: var(--text-small); }
   .article-cover { height: 300px; margin-bottom: 40px; border-radius: 20px; }
   .prose { font-size: 18px; line-height: 1.75; }
   .prose h2 { font-size: 28px; }
@@ -678,11 +677,11 @@
   .writer-box { gap: 16px; margin: 36px 0; padding: 24px; border-radius: 20px; }
   .writer-avatar { width: 40px; height: 40px; font-size: 13px; }
   .writer-box h2 { font-size: 24px; }
-  .writer-box p:not(.eyebrow) { font-size: 13px; }
+  .writer-box p:not(.eyebrow) { font-size: var(--text-body); }
   .article-share h2 { font-size: 28px; }
   .article-share > p { font-size: 14px; }
   .share-buttons { gap: 12px 20px; }
-  .share-buttons .text-link { font-size: 12px; }
+  .share-buttons .text-link { font-size: var(--text-small); }
   .related-stories { margin-top: 56px; }
   .related-stories .section-heading { flex-wrap: wrap; row-gap: 12px; }
   .related-stories .section-heading h2 { font-size: 32px; }
@@ -693,7 +692,7 @@
   .about-hero-art img { max-height: 320px; object-fit: contain; }
   .about-section { grid-template-columns: 1fr; gap: 16px; padding: 28px 24px; border-radius: 24px; }
   .about-section h2 { max-width: 20ch; font-size: 27px; }
-  .about-section > p { font-size: 15px; }
+  .about-section > p { font-size: var(--text-body); }
   .about-write { grid-template-columns: 1fr; gap: 32px; margin-top: 48px; padding-block: 16px; }
   .about-write h2 { max-width: 14ch; font-size: 40px; }
   .about-write li { font-size: 14px; }
@@ -705,8 +704,8 @@
   .story-card-cover { aspect-ratio: 1.7; }
   .story-card-copy { padding: 24px; }
   .story-card .story-card-title { max-width: 26ch; font-size: 26px; }
-  .story-card-deck { font-size: 14px; }
-  .story-card .author { font-size: 11px; }
+  .story-card-deck { font-size: var(--text-body); }
+  .story-card .author { font-size: var(--text-small); }
   .article-cover { height: 250px; }
 }
 

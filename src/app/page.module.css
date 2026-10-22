@@ -2,13 +2,13 @@
 .hero { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 48px; padding: 28px 0 36px; }
 .heading { min-width: 0; padding-top: 12px; text-align: left; }
 .heading h1 { font-size: clamp(36px, 3.6vw, 48px); line-height: 1.12; margin: 0 0 16px; }
-.heading > p { margin: 18px 0 0; font-size: 16px; line-height: 1.65; color: var(--muted); max-width: 48ch; }
+.heading > p { margin: 18px 0 24px; font-size: 16px; line-height: 1.65; color: var(--muted); max-width: 48ch; }
 .introActions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 0; }
 .feature { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--paper); border-radius: 28px; overflow: hidden; }
 .featureCopy { min-width: 0; padding: 48px; align-self: center; }
-.kicker { display: flex; flex-wrap: wrap; align-items: baseline; gap: 14px; margin-bottom: 24px; font-size: 12px; }
+.kicker { display: flex; flex-wrap: wrap; align-items: baseline; gap: 14px; margin-bottom: 24px; font-size: var(--text-small); }
 .kicker a { color: var(--deep-teal); font-weight: 650; }
-.kicker span { font-size: 11px; color: var(--muted); }
+.kicker span { font-size: var(--text-small); color: var(--muted); }
 .feature h2 { font-size: clamp(32px, 3.3vw, 46px); line-height: 1.08; margin: 0 0 20px; max-width: 20ch; }
 .featureCopy > p { max-width: 44ch; font-size: 16px; line-height: 1.7; color: var(--muted); margin-bottom: 24px; }
 .readLink { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 22px; font-size: 14px; font-weight: 550; color: var(--deep-teal); }
@@ -22,14 +22,14 @@
 .recent :global(.story-grid) { column-gap: var(--column-gap); }
 .news { margin-top: 80px; }
 .news .sectionHeading { margin-bottom: 14px; }
-.newsIntro { color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+.newsIntro { color: var(--muted); font-size: var(--text-body); margin-bottom: 24px; }
 .newsList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
-.newsItem { border-top: 1px solid var(--line); padding-top: 22px; min-width: 0; }
+.newsItem { min-width: 0; }
 .newsItem h3 { font-size: 26px; margin-bottom: 12px; }
 .newsItem h3 a { display: inline-block; min-height: 44px; }
 .newsItem h3 svg { display: inline; vertical-align: middle; color: var(--deep-teal); }
-.newsItem p { color: var(--muted); font-size: 15px; margin-bottom: 12px; }
-.newsSource { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; }
+.newsItem p { color: var(--muted); font-size: var(--text-body); margin-bottom: 12px; }
+.newsSource { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: var(--text-small); }
 .newsSource span:first-child { color: var(--deep-teal); font-weight: 600; }
 .newsSource span:last-child { color: var(--muted); }
 @supports (grid-template-rows: subgrid) {
@@ -44,24 +44,24 @@
 .topicList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--column-gap); }
 .topic { display: grid; grid-template-columns: minmax(0, 1fr) 20px; align-items: start; gap: 20px 16px; padding: 30px; background: var(--paper); border-radius: 24px; transition: transform var(--duration-ui) var(--ease-out); }
 .topic h3 { font-size: 22px; line-height: 1.2; margin: 0 0 12px; }
-.topic p { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.6; }
+.topic p { margin: 0; font-size: var(--text-body); color: var(--muted); line-height: 1.6; }
 .topic > svg { margin-top: 4px; color: var(--deep-teal); }
 .event { min-width: 0; padding: 30px 32px; border-radius: 24px; background: var(--soft-teal); }
 .event h2 { font-size: 28px; margin-bottom: 12px; }
 .event h3 { font-size: 24px; line-height: 1.2; margin-bottom: 16px; text-wrap: pretty; }
-.event > p { color: var(--muted); font-size: 15px; margin-bottom: 16px; }
+.event > p { color: var(--muted); font-size: var(--text-body); margin-bottom: 16px; }
 .eventDetails { display: grid; gap: 10px; font-size: 14px; }
 .eventDetails p { display: flex; align-items: flex-start; gap: 10px; margin: 0; }
 .eventDetails svg { margin-top: 2px; color: var(--deep-teal); }
 .eventDetails time { font-weight: 550; }
-.eventDetails span { color: var(--muted); overflow-wrap: anywhere; }
+.eventDetails span { overflow-wrap: anywhere; }
 .eventActions { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 18px; }
-.event .sampleNote { font-size: 12px; margin: 12px 0 0; }
+.event .sampleNote { font-size: var(--text-small); margin: 12px 0 0; }
 .subscribe { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px; align-items: center; padding: 64px; margin-top: 88px; background: var(--paper); border-radius: 28px; }
 .subscribe h2 { font-size: 44px; margin-bottom: 20px; }
-.subscribe p { color: var(--muted); font-size: 15px; line-height: 1.65; margin-bottom: 0; }
+.subscribe p { color: var(--muted); font-size: var(--text-body); line-height: 1.65; margin-bottom: 0; }
 .subscribe :global(.subscribe-form-compact) { width: 100%; max-width: none; }
-.subscribe :global(.consent-copy) { font-size: 12px; }
+.subscribe :global(.consent-copy) { font-size: var(--text-small); }
 
 @media (hover: hover) and (pointer: fine) {
   .newsItem h3 a:hover { text-decoration: underline; text-underline-offset: 4px; }
@@ -72,13 +72,19 @@
 .topic:active { transform: scale(.985); }
 @media (max-width: 1023px) {
   .hero { gap: 28px; }
+  .newsList { grid-template-columns: 1fr; gap: 28px; }
+  .newsItem { max-width: 65ch; }
   .heading h1 { font-size: 38px; }
   .featureCopy { padding: 32px; }
   .feature h2 { font-size: 36px; }
-  .featureCopy > p { font-size: 15px; }
+  .featureCopy > p { font-size: var(--text-body); }
   .topicList { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .event { padding: 28px; }
   .subscribe { padding: 40px; gap: 32px; }
+}
+@media (min-width: 768px) and (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; }
+  .heading { max-width: 620px; }
 }
 @media (max-width: 767px) {
   .hero { grid-template-columns: 1fr; gap: 28px; padding: 28px 0 32px; }
@@ -90,12 +96,12 @@
   .featureCopy { padding: 28px 24px; }
   .kicker { margin-bottom: 16px; }
   .feature h2 { font-size: 32px; }
-  .featureCopy > p { font-size: 15px; margin-bottom: 20px; }
+  .featureCopy > p { font-size: var(--text-body); margin-bottom: 20px; }
   .readLink { margin-top: 16px; }
   .recent, .news, .topics, .subscribe { margin-top: 56px; }
-  .sectionHeading { gap: 12px; margin-bottom: 22px; }
+  .sectionHeading { flex-wrap: wrap; gap: 8px 16px; margin-bottom: 22px; }
   .sectionHeading h2 { font-size: 28px; }
-  .sectionHeading > a { font-size: 12px; white-space: nowrap; gap: 6px; }
+  .sectionHeading > a { font-size: var(--text-small); gap: 6px; }
   .recent :global(.story-grid) { grid-template-columns: 1fr; gap: 20px; }
   .topicList { grid-template-columns: 1fr; gap: 12px; }
   .newsList { grid-template-columns: 1fr; gap: 24px; }
