@@ -3,7 +3,7 @@ import { PublicationLabel } from '@/components/publication-label';
 import Image from 'next/image';
 import { Reveal } from '@/components/reveal';
 import Link from 'next/link';
-import { ArrowRight, ArrowUpRight, CalendarDays } from '@/components/icons';
+import { ArrowDown, ArrowRight, ArrowUpRight, CalendarDays } from '@/components/icons';
 import { SubscriptionForm } from '@/components/subscription-form';
 import { StoryCard } from '@/components/story-card';
 import { Author } from '@/components/author';
@@ -36,33 +36,72 @@ export default async function Home() {
           <Link className="button" href={home.primaryHref}>{home.primaryLabel}</Link>
           {visibility.homeWrite && <Link className="button button-outline" href={home.secondaryHref}>{home.secondaryLabel} <ArrowRight size={17}/></Link>}
         </div>
+        <a className={styles.explore} href="#get-involved">{home.exploreLabel} <ArrowDown size={18}/></a>
       </header>
-      {visibility.homeEvent && <section className={styles.event} aria-labelledby="next-event-title">
-        <h2 id="next-event-title">{home.eventLabel}</h2>
-        {nextEvent ? <>
-          <h3>{nextEvent.title}</h3>
-          <div className={styles.eventDetails}>
-            <p><CalendarDays size={18}/><time dateTime={nextEvent.starts_at}>{eventDate(nextEvent.starts_at, nextEvent.all_day)}</time></p>
-            <EventRecurrence event={nextEvent}/>
-            <LocationLink location={location}/>
-          </div>
-          {nextEvent.is_sample && <p className={styles.sampleNote}>Sample event. Details are for demonstration.</p>}
-        </> : <p>{home.eventEmptyBody}</p>}
-        <div className={styles.eventActions}>
-          <EventJoinLink href={nextEvent?.join_url} label={content.events.joinLabel}/>
-          <Link href={nextEvent && home.eventLinkHref === '/events' ? `/events#event-${nextEvent.id}` : home.eventLinkHref} className="text-link">{home.eventLinkLabel} <ArrowRight size={17}/></Link>
-          <a href={googleCalendarHref} className="text-link" target="_blank" rel="noopener noreferrer">Google Calendar <ArrowUpRight size={16}/></a>
-        </div>
-      </section>}
+      {home.imageUrl && <div className={styles.heroVisual}>
+        <Image src={home.imageUrl} alt={home.imageAlt} width={800} height={560} loading="eager" unoptimized/>
+      </div>}
     </div>
+
+    <Reveal className={styles.mission} aria-labelledby="mission-title">
+      <div>
+        <h2 id="mission-title">{home.missionTitle}</h2>
+        <Link className="text-link" href="/about">{home.missionLinkLabel} <ArrowRight size={18}/></Link>
+      </div>
+      <div className={styles.missionCopy}>
+        <p>{content.about.intro}</p>
+        <p>{home.missionBody}</p>
+      </div>
+    </Reveal>
+
+    <section className={styles.involvement} id="get-involved" aria-labelledby="involvement-title">
+      <div className={styles.sectionHeading}>
+        <h2 id="involvement-title">{home.involvementTitle}</h2>
+      </div>
+      <p className={styles.sectionIntro}>{home.involvementIntro}</p>
+      <div className={styles.involvementGrid}>
+        <div className={styles.participation}>
+          <article className={styles.readInvitation}>
+            <div>
+              <h3>{home.primaryLabel}</h3>
+              <p>{content.stories.intro}</p>
+              <Link className="text-link" href={home.primaryHref}>{reader.allStoriesLabel} <ArrowRight size={18}/></Link>
+            </div>
+            <Image src="/illustrations/education.svg" alt="" width={800} height={560} unoptimized/>
+          </article>
+          {visibility.homeWrite && <article className={styles.writeInvitation}>
+            <h3>{home.writeTitle}</h3>
+            <p>{home.writeDescription}</p>
+            <Link className="text-link" href={home.writeLinkHref}>{home.writeLinkLabel} <ArrowRight size={18}/></Link>
+          </article>}
+        </div>
+        {visibility.homeEvent && <section className={styles.event} aria-labelledby="next-event-title">
+          <h3 id="next-event-title">{home.eventLabel}</h3>
+          {nextEvent ? <>
+            <h4>{nextEvent.title}</h4>
+            <div className={styles.eventDetails}>
+              <p><CalendarDays size={18}/><time dateTime={nextEvent.starts_at}>{eventDate(nextEvent.starts_at, nextEvent.all_day)}</time></p>
+              <EventRecurrence event={nextEvent}/>
+              <LocationLink location={location}/>
+            </div>
+            {nextEvent.is_sample && <p className={styles.sampleNote}>Sample event. Details are for demonstration.</p>}
+          </> : <><h4>{home.eventEmptyTitle}</h4><p>{home.eventEmptyBody}</p></>}
+          <div className={styles.eventActions}>
+            <EventJoinLink href={nextEvent?.join_url} label={content.events.joinLabel}/>
+            <Link href={nextEvent && home.eventLinkHref === '/events' ? `/events#event-${nextEvent.id}` : home.eventLinkHref} className="text-link">{home.eventLinkLabel} <ArrowRight size={17}/></Link>
+            <a href={googleCalendarHref} className="text-link" target="_blank" rel="noopener noreferrer">Google Calendar <ArrowUpRight size={16}/></a>
+          </div>
+        </section>}
+      </div>
+    </section>
 
     {visibility.homeFeatured && (featured ? <section className={styles.feature} aria-labelledby="featured-title">
       <div className={styles.featureCopy}>
+        <h2 id="featured-title"><Link href={`/post/${featured.slug}`}>{featured.headline}</Link></h2>
         <div className={styles.kicker}>
           <Link href={`/topic/${featured.topic.slug}`}>{featured.topic.name}</Link>
           <PublicationLabel sample={featured.is_sample}/>
         </div>
-        <h2 id="featured-title"><Link href={`/post/${featured.slug}`}>{featured.headline}</Link></h2>
         <p>{featured.short_version}</p>
         <Author avatar={featured.writer?.avatar_url} name={featured.byline} date={featured.published_at} href={featured.writer ? `/writer/${featured.writer.slug}` : undefined}/>
         <Link className={styles.readLink} href={`/post/${featured.slug}`}>{reader.readStory} <ArrowRight size={18}/></Link>
@@ -70,7 +109,7 @@ export default async function Home() {
       <Link href={`/post/${featured.slug}`} className={`${styles.featureVisual} topic-color-${featured.topic.slug}`} tabIndex={-1} aria-hidden="true">
         <Image src={coverFor(featured)} alt={coverAlt(featured)} className={featured.cover_url ? undefined : styles.featureArtwork} width={800} height={560} loading="eager" unoptimized/>
       </Link>
-    </section> : <section className="empty-state">
+    </section> : <section className={`empty-state ${styles.featureEmpty}`}>
       <h2>{home.emptyTitle}</h2>
       <p>{home.emptyBody}</p>
       <Link className="button" href="/write">{home.emptyLinkLabel} <ArrowRight size={18}/></Link>
@@ -108,5 +147,13 @@ export default async function Home() {
       <div><h2 id="subscribe-heading">{newsletter.homeTitle}</h2><p>{newsletter.homeIntro}</p></div>
       <SubscriptionForm copy={content.newsletter} compact/>
     </Reveal>}
+
+    <Reveal className={styles.community} aria-labelledby="community-title">
+      <div><h2 id="community-title">{home.communityTitle}</h2><p>{home.communityBody}</p></div>
+      <div className={styles.communityActions}>
+        <a className="button button-light" href={content.about.socialHref} target="_blank" rel="noopener noreferrer">{content.about.socialLabel} <ArrowUpRight size={17}/><span className="sr-only"> (opens in a new tab)</span></a>
+        <a className="text-link" href={`mailto:${content.branding.contactEmail}`}>{content.navigation.contactLabel} <ArrowRight size={17}/></a>
+      </div>
+    </Reveal>
   </div>;
 }
