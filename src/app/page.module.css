@@ -5,7 +5,7 @@
 .seedField::before { content: ''; position: absolute; inset: 0; background: url('/illustrations/sprout-mark.svg') 24px 18px / 116px 130px repeat; opacity: .045; mask-image: linear-gradient(to bottom, #000, #000 60%, transparent); }
 .heading { min-width: 0; position: relative; z-index: 1; }
 .heading h1 { font-size: clamp(64px, 7.6vw, 104px); line-height: 1.04; margin: 0 0 52px; max-width: 100%; }
-.heading > p { margin: 0 0 28px; font-size: 19px; line-height: 1.65; max-width: 440px; }
+.heading > p { margin: 0 0 28px; font-size: 19px; line-height: 1.65; max-width: 520px; }
 .introActions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
 .explore { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 24px; font-size: 14px; color: var(--deep-teal); }
 .heroVisual { position: absolute; z-index: -1; right: -24px; bottom: 14px; width: 540px; height: 620px; pointer-events: none; }
@@ -164,7 +164,7 @@
   .topic:hover, .topic:active { transform: none; }
 }
 
-.intro { white-space: pre-line; }
+.intro > span { display: block; text-wrap: balance; }
 
 @media (hover: hover) and (pointer: fine) {
   .explore:hover { text-decoration: underline; text-underline-offset: 4px; }

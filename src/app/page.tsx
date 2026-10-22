@@ -31,7 +31,7 @@ export default async function Home() {
       <div className={styles.seedField} aria-hidden="true"/>
       <header className={styles.heading}>
         <HomeTitle firstLine={home.firstLine} secondLine={home.secondLine}/>
-        <p className={styles.intro}>{home.intro}</p>
+        <p className={styles.intro}>{home.intro.split('\n').map((line, index) => <span key={index}>{line || <br/>}</span>)}</p>
         <div className={styles.introActions}>
           <Link className="button" href={home.primaryHref}>{home.primaryLabel}</Link>
           {visibility.homeWrite && <Link className="button button-outline" href={home.secondaryHref}>{home.secondaryLabel} <ArrowRight size={17}/></Link>}

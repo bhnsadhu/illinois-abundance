@@ -1,6 +1,6 @@
 .title { text-wrap: pretty; }
 .line { display: block; }
-.accent { color: var(--accent); }
+.accent { color: var(--orange); }
 .word { display: inline-block; max-width: 100%; white-space: normal; }
 .ink { display: inline-block; }
 /* Each handwritten glyph inks from left to right; the accessible title stays intact. */
