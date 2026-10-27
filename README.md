@@ -2,7 +2,7 @@
 
 Student writing on local policy in Champaign Urbana. Readers need no account. Students verify an Illinois email before submitting; reviewers edit and publish; up to two configured admins manage publishing, reviewer accounts, and campus events.
 
-Current scope: stories and campus events on both the public site and the admin side. Learn, public meetings, newsletter tools, and exports are preserved behind switches in [`src/hidden/features.ts`](src/hidden/features.ts). See [`src/hidden/README.md`](src/hidden/README.md) for the retained code and restoration steps. No stored content or subscriber data is removed.
+Current scope: stories, curated local news, and campus events. News has its own `/news` page; admins edit its title, introduction, and source links in **Site content → Homepage & news**. Learn, public meetings, newsletter tools, and exports are preserved behind switches in [`src/hidden/features.ts`](src/hidden/features.ts). See [`src/hidden/README.md`](src/hidden/README.md) for the retained code and restoration steps. No stored content or subscriber data is removed.
 
 Live site: **https://abundance.bhanusadhu.com**. The initial deployment includes clearly labeled sample content. The configured admin signs in at `/login/admin` with `bhnsadhu@gmail.com`.
 

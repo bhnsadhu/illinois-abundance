@@ -38,9 +38,23 @@ export default async function Home() {
         </div>
         <a className={styles.explore} href="#get-involved">{home.exploreLabel} <ArrowDown size={18}/></a>
       </header>
-      <div className={styles.heroVisual}>
-        {home.imageUrl ? <Image src={home.imageUrl} alt={home.imageAlt} width={800} height={560} loading="eager" unoptimized/> : <Garden/>}
-      </div>
+      {visibility.homeEvent && <section className={styles.event} aria-labelledby="next-event-title">
+        <h2 id="next-event-title">{home.eventLabel}</h2>
+        {nextEvent ? <>
+          <h3>{nextEvent.title}</h3>
+          <div className={styles.eventDetails}>
+            <p><CalendarDays size={18}/><time dateTime={nextEvent.starts_at}>{eventDate(nextEvent.starts_at, nextEvent.all_day)}</time></p>
+            <EventRecurrence event={nextEvent}/>
+            <LocationLink location={location}/>
+          </div>
+          {nextEvent.is_sample && <p className={styles.sampleNote}>Sample event. Details are for demonstration.</p>}
+        </> : <><h3>{home.eventEmptyTitle}</h3><p>{home.eventEmptyBody}</p></>}
+        <div className={styles.eventActions}>
+          <EventJoinLink href={nextEvent?.join_url} label={content.events.joinLabel}/>
+          <Link href={nextEvent && home.eventLinkHref === '/events' ? `/events#event-${nextEvent.id}` : home.eventLinkHref} className="text-link">{home.eventLinkLabel} <ArrowRight size={17}/></Link>
+          <a href={googleCalendarHref} className="text-link" target="_blank" rel="noopener noreferrer">Google Calendar <ArrowUpRight size={16}/></a>
+        </div>
+      </section>}
     </div>
 
     <Reveal className={styles.mission} aria-labelledby="mission-title">
@@ -67,7 +81,7 @@ export default async function Home() {
               <p>{content.stories.intro}</p>
               <Link className="text-link" href={home.primaryHref}>{reader.allStoriesLabel} <ArrowRight size={18}/></Link>
             </div>
-            <Image src="/illustrations/education.svg" alt="" width={800} height={560} unoptimized/>
+            <div className={styles.gardenVisual}>{home.imageUrl ? <Image src={home.imageUrl} alt={home.imageAlt} width={800} height={560} unoptimized/> : <Garden/>}</div>
           </article>
           {visibility.homeWrite && <article className={styles.writeInvitation}>
             <h3>{home.writeTitle}</h3>
@@ -75,23 +89,6 @@ export default async function Home() {
             <Link className="text-link" href={home.writeLinkHref}>{home.writeLinkLabel} <ArrowRight size={18}/></Link>
           </article>}
         </div>
-        {visibility.homeEvent && <section className={styles.event} aria-labelledby="next-event-title">
-          <h3 id="next-event-title">{home.eventLabel}</h3>
-          {nextEvent ? <>
-            <h4>{nextEvent.title}</h4>
-            <div className={styles.eventDetails}>
-              <p><CalendarDays size={18}/><time dateTime={nextEvent.starts_at}>{eventDate(nextEvent.starts_at, nextEvent.all_day)}</time></p>
-              <EventRecurrence event={nextEvent}/>
-              <LocationLink location={location}/>
-            </div>
-            {nextEvent.is_sample && <p className={styles.sampleNote}>Sample event. Details are for demonstration.</p>}
-          </> : <><h4>{home.eventEmptyTitle}</h4><p>{home.eventEmptyBody}</p></>}
-          <div className={styles.eventActions}>
-            <EventJoinLink href={nextEvent?.join_url} label={content.events.joinLabel}/>
-            <Link href={nextEvent && home.eventLinkHref === '/events' ? `/events#event-${nextEvent.id}` : home.eventLinkHref} className="text-link">{home.eventLinkLabel} <ArrowRight size={17}/></Link>
-            <a href={googleCalendarHref} className="text-link" target="_blank" rel="noopener noreferrer">Google Calendar <ArrowUpRight size={16}/></a>
-          </div>
-        </section>}
       </div>
     </section>
 
@@ -123,15 +120,6 @@ export default async function Home() {
       <div className="story-grid">{stories.slice(1, 4).map(story => <StoryCard key={story.id} story={story} headingLevel={3}/>)}</div>
     </Reveal>}
 
-    {home.newsItems.length > 0 && <Reveal className={styles.news} aria-labelledby="news-heading">
-      <div className={styles.sectionHeading}><h2 id="news-heading">{home.newsTitle}</h2></div>
-      <p className={styles.newsIntro}>{home.newsIntro}</p>
-      <div className={styles.newsList}>{home.newsItems.map((item, index) => <article className={styles.newsItem} key={`${item.href}-${index}`}>
-        <h3><a href={item.href} target="_blank" rel="noopener noreferrer">{item.title} <ArrowUpRight size={17}/></a></h3>
-        <p>{item.description}</p>
-        <div className={styles.newsSource}><span>{item.publisher}</span><span>{item.dateLabel}</span></div>
-      </article>)}</div>
-    </Reveal>}
 
     {visibility.homeTopics && <Reveal className={styles.topics} aria-labelledby="topics-heading">
       <div className={styles.sectionHeading}><h2 id="topics-heading">{home.topicsTitle}</h2></div>

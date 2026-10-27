@@ -71,7 +71,9 @@ svg { flex-shrink: 0; }
 .site-header { position: sticky; top: 0; z-index: 30; padding-top: env(safe-area-inset-top); background: color-mix(in srgb, var(--cream) 90%, transparent); backdrop-filter: blur(20px) saturate(150%); -webkit-backdrop-filter: blur(20px) saturate(150%); }
 .nav-wrap { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .masthead-brand { flex-shrink: 0; }
-.wordmark { width: 225px; min-height: 44px; display: flex; align-items: center; }
+.wordmark { min-height: 44px; display: flex; align-items: center; gap: 12px; }
+.wordmark-name { display: block; width: 225px; }
+.brand-people { display: block; width: 64px; height: 40px; overflow: hidden; }
 .wordmark img { width: 100%; height: auto; }
 .desktop-nav { display: flex; align-items: center; gap: 24px; margin-left: auto; font-size: var(--text-label); font-weight: 500; }
 .desktop-nav a { display: flex; align-items: center; min-height: 44px; color: var(--muted); transition: color var(--duration-fast) ease; }
@@ -184,7 +186,7 @@ label:has(input[type=checkbox]) { display: flex; gap: 10px; align-items: center;
   :root { --page-gutter: 32px; }
   .desktop-nav { gap: 16px; }
   .nav-wrap { gap: 16px; }
-  .wordmark { width: 200px; }
+  .wordmark-name { width: 200px; }
   .nav-actions { gap: 4px; }
   .write-heading { gap: 40px; }
 }
@@ -199,7 +201,9 @@ label:has(input[type=checkbox]) { display: flex; gap: 10px; align-items: center;
 @media (max-width: 767px) {
   :root { --page-gutter: 20px; --column-gap: 20px; }
   .nav-wrap { min-height: 68px; gap: 12px; }
-  .wordmark { width: 195px; }
+  .wordmark { gap: 8px; }
+  .wordmark-name { width: clamp(128px, calc(100vw - 214px), 176px); }
+  .brand-people { width: 48px; height: 30px; }
   .mobile-nav { max-height: calc(100dvh - 68px - env(safe-area-inset-top)); }
   h1 { font-size: 44px; }
   h2 { font-size: 32px; }
@@ -232,7 +236,7 @@ label:has(input[type=checkbox]) { display: flex; gap: 10px; align-items: center;
   .subscribe-form-compact .button { width: 100%; margin-top: 12px; }
 }
 @media (max-width: 359px) {
-  .wordmark { width: 166px; }
+  .wordmark-name { width: 128px; }
   .nav-wrap { gap: 6px; }
   .nav-actions { gap: 0; }
 }

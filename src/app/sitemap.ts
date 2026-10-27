@@ -11,7 +11,7 @@ export default async function sitemap():Promise<MetadataRoute.Sitemap> {
   const url=(path:string)=>new URL(path,site.url).toString();
   const allTopics=[...new Map([...topics,...storyTopics].map(topic=>[topic.id,topic])).values()];
   return [
-    ...['/','/latest','/about','/write','/events','/learn','/show-up'].filter(path=>!isPathHidden(path,hiddenFeatures)).map(path=>({url:url(path)})),
+    ...['/','/latest','/news','/about','/write','/events','/learn','/show-up'].filter(path=>!isPathHidden(path,hiddenFeatures)).map(path=>({url:url(path)})),
     ...stories.map(story=>({url:url(`/post/${story.slug}`),lastModified:story.updated_at})),
     ...pages.map(page=>({url:url(`/learn/${page.slug}`),lastModified:page.updated_at})),
     ...allTopics.map(topic=>({url:url(`/topic/${topic.slug}`)})),

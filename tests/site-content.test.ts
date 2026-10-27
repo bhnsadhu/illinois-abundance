@@ -53,6 +53,20 @@ describe('site content editing',()=>{
   expect(upgradeLegacySiteSection('about',{sections:[]})).toEqual({sections:[]});
   expect(upgradeLegacySiteSection('write',{title:'A custom invitation',successBody:'We will reply by Friday.'})).toEqual({title:'A custom invitation',successBody:'We will reply by Friday.'});
  });
+ it('adds News to saved default navigation and upgrades the original icon without overwriting custom branding',()=>{
+  const previous=siteContentDefaults.navigation.links.filter(link=>link.href!=='/news');
+  const upgraded=upgradeLegacySiteSection('navigation',{links:previous});
+  expect(upgraded.links).toEqual(siteContentDefaults.navigation.links);
+  expect(upgradeLegacySiteSection('navigation',upgraded)).toEqual(upgraded);
+  expect(previous.some(link=>link.href==='/news')).toBe(false);
+  const visible=previous.filter(link=>!['/learn','/show-up'].includes(link.href));
+  expect(upgradeLegacySiteSection('navigation',{links:visible}).links).toEqual([visible[0],{label:'News',href:'/news'},...visible.slice(1)]);
+  const custom={links:[{label:'Our writing',href:'/latest'},{label:'About us',href:'/about'}]};
+  expect(upgradeLegacySiteSection('navigation',custom)).toEqual(custom);
+  expect(upgradeLegacySiteSection('navigation',{links:[]})).toEqual({links:[]});
+  expect(upgradeLegacySiteSection('branding',{faviconUrl:'/brand/favicon.png'})).toEqual({faviconUrl:'/brand/favicon.svg'});
+  expect(upgradeLegacySiteSection('branding',{faviconUrl:'/media/custom.webp'})).toEqual({faviconUrl:'/media/custom.webp'});
+ });
  it('requires an authenticated configured admin and same-origin request',async()=>{
   mocks.reviewer.mockResolvedValue(null);expect((await call(body())).status).toBe(401);
   mocks.reviewer.mockResolvedValue({id,email:'reviewer@example.test',isAdmin:false});expect((await call(body())).status).toBe(403);

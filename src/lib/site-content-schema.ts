@@ -37,6 +37,16 @@ export function upgradeLegacySiteSection(section: SiteSection, values: Record<st
     if (updated.eventLabel === 'Next campus event') updated.eventLabel = siteContentDefaults.home.eventLabel;
   }
   if (section === 'navigation' && ['Write for us', 'Publish with us', 'Publish With Us'].includes(String(updated.writeLabel)) && updated.writeHref === '/write') updated.writeLabel = siteContentDefaults.navigation.writeLabel;
+  if (section === 'navigation' && Array.isArray(updated.links)) {
+    // Add News to saved shipped menus, leaving editorially customized menus intact.
+    const previousLinks = siteContentDefaults.navigation.links.filter(link => link.href !== '/news');
+    const previousVisibleLinks = previousLinks.filter(link => !['/learn', '/show-up'].includes(link.href));
+    const matches = (links: typeof previousLinks) => updated.links instanceof Array && updated.links.length === links.length && updated.links.every((link, index) => link?.label === links[index].label && link?.href === links[index].href);
+    if (matches(previousLinks) || matches(previousVisibleLinks)) {
+      updated.links = [...updated.links.slice(0, 1), { label: 'News', href: '/news' }, ...updated.links.slice(1)];
+    }
+  }
+  if (section === 'branding' && updated.faviconUrl === '/brand/favicon.png') updated.faviconUrl = siteContentDefaults.branding.faviconUrl;
   if (section === 'branding' && ['Champaign Urbana. With room for more.', 'Champaign Urbana. Cultivating our Garden'].includes(String(updated.shareTitle))) updated.shareTitle = siteContentDefaults.branding.shareTitle;
   const previousGardenCopy: Partial<Record<SiteSection, Record<string, string>>> = {
     home: { recentTitle: 'Recent writing' },

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Search } from './icons';
+import { BrandPeople } from './brand-people';
 import { isPathHidden } from '@/hidden/features';
 import { siteContentDefaults, contentVisibility, type SiteContent } from '@/lib/site-content-model';
 
@@ -47,7 +48,8 @@ export function Header({branding=siteContentDefaults.branding,navigation=siteCon
     <div className="nav-wrap">
       <div className="masthead-brand">
         <Link className="wordmark" href="/" aria-label={`${branding.name} home`} onClick={() => setOpen(false)}>
-          {branding.logoUrl?<Image src={branding.logoUrl} alt={branding.logoAlt} width={1439} height={132} sizes="(max-width: 767px) 195px, 225px" loading="eager"/>:branding.name}
+          {branding.logoUrl === siteContentDefaults.branding.logoUrl && <BrandPeople/>}
+          <span className="wordmark-name">{branding.logoUrl?<Image src={branding.logoUrl} alt={branding.logoAlt} width={1439} height={132} sizes="(max-width: 359px) 132px, (max-width: 767px) 176px, 225px" loading="eager"/>:branding.name}</span>
         </Link>
       </div>
       <nav className="desktop-nav" aria-label="Main navigation">{links.map(({label, href}) => <Link key={`${href}-${label}`} href={href} aria-current={current(href)}>{label}</Link>)}</nav>

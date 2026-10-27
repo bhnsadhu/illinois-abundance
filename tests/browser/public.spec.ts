@@ -3,7 +3,7 @@ import { createRequire } from 'node:module';
 import type axe from 'axe-core';
 
 const require = createRequire(import.meta.url);
-const pages = ['/', '/latest', '/events', '/about', '/write', '/write/verify', '/search', '/search?q=homes', '/search?q=zzzzzzzzzz', '/login', '/login/admin', '/post/room-for-more-neighbors', '/topic/housing', '/writer/maya-patel'];
+const pages = ['/', '/latest', '/news', '/events', '/about', '/write', '/write/verify', '/search', '/search?q=homes', '/search?q=zzzzzzzzzz', '/login', '/login/admin', '/post/room-for-more-neighbors', '/topic/housing', '/writer/maya-patel'];
 
 for (const path of pages) {
   test(`${path} renders accessibly without broken content`, async ({ page }) => {
@@ -49,6 +49,37 @@ test('keyboard skip link bypasses navigation', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
   await page.keyboard.press('Enter');
   expect(await page.evaluate(() => document.activeElement?.id)).toBe('main');
+});
+
+test('the compact opening pairs the introduction with an event and links to a separate news page', async ({ page, isMobile }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const title = page.getByRole('heading', { level: 1 });
+  const event = page.getByRole('region', { name: 'Our next event' });
+  await expect(event).toBeInViewport();
+  const titleBox = (await title.boundingBox())!;
+  const eventBox = (await event.boundingBox())!;
+  if (isMobile) expect(eventBox.y).toBeGreaterThan(titleBox.y + titleBox.height);
+  else {
+    expect(eventBox.x).toBeGreaterThanOrEqual(titleBox.x + titleBox.width);
+    expect(eventBox.y + eventBox.height).toBeLessThan(700);
+  }
+  await expect(page.locator('.brand-people image')).toHaveAttribute('href', '/brand/logo-transparent.png');
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', '/brand/favicon.svg');
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+  const navigation = page.getByRole('navigation', { name: isMobile ? 'Mobile navigation' : 'Main navigation' });
+  await navigation.getByRole('link', { name: 'News', exact: true }).click();
+  await expect(page).toHaveURL('/news');
+  await expect(page).toHaveTitle('News · Illinois Abundance');
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+  await expect(navigation.getByRole('link', { name: 'News', exact: true })).toHaveAttribute('aria-current', 'page');
+  if (isMobile) await page.keyboard.press('Escape');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Around Champaign Urbana');
+  await expect(page.locator('main article')).toHaveCount(3);
+  for (const link of await page.locator('main article h2 a').all()) {
+    await expect(link).toHaveAttribute('href', /^https:\/\//);
+    await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  }
 });
 
 test('keyboard focus reveals offscreen editorial content immediately', async ({ page }) => {

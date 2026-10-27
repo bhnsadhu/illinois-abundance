@@ -1,29 +1,29 @@
 .home { position: relative; isolation: isolate; padding-bottom: 0; }
-/* The sprout mark carries the opening, pattern, and large hero animation. */
-.hero { position: relative; isolation: isolate; min-height: 760px; padding: 56px 0 80px; }
+/* A compact introduction shares the opening with the next campus event. */
+.hero { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; gap: 56px; padding: 48px 0 64px; }
+.hero:not(:has(.event)) { grid-template-columns: 1fr; }
 .seedField { position: absolute; z-index: -1; inset: 0 calc(-1 * var(--page-gutter)); overflow: clip; pointer-events: none; }
 .seedField::before { content: ''; position: absolute; inset: 0; background: url('/illustrations/sprout-mark.svg') 24px 18px / 116px 130px repeat; opacity: .045; mask-image: linear-gradient(to bottom, #000, #000 60%, transparent); }
 .heading { min-width: 0; position: relative; z-index: 1; }
-.heading h1 { font-size: clamp(64px, 7.6vw, 104px); line-height: 1.04; margin: 0 0 52px; max-width: 100%; }
-.heading > p { margin: 0 0 28px; font-size: 19px; line-height: 1.65; max-width: 520px; }
+.heading h1 { font-size: clamp(36px, 4vw, 52px); line-height: 1.1; margin: 0 0 24px; max-width: 100%; }
+.heading > p { margin: 0 0 28px; font-size: 17px; line-height: 1.65; max-width: 520px; }
 .introActions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
 .explore { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 24px; font-size: 14px; color: var(--deep-teal); }
-.heroVisual { position: absolute; z-index: -1; right: -24px; bottom: 14px; width: 540px; height: 620px; pointer-events: none; }
-.heroVisual > img { width: 100%; height: 100%; object-fit: contain; }
+.gardenVisual { flex: 0 0 28%; max-width: 160px; }
+.gardenVisual > svg, .gardenVisual > img { width: 100%; height: auto; }
 .mission { display: grid; grid-template-columns: 1fr 1.25fr; align-items: start; gap: 80px; padding: 52px 56px; background: var(--soft-teal); border-radius: 28px; }
 .mission h2 { font-size: clamp(36px, 3.4vw, 48px); margin-bottom: 20px; max-width: 12ch; }
 .missionCopy p { font-size: 18px; line-height: 1.65; margin-bottom: 20px; }
 .missionCopy p:last-child { font-size: 16px; margin-bottom: 0; }
 .involvement { margin-top: 96px; scroll-margin-top: 104px; }
 .sectionIntro { font-size: 18px; margin: -12px 0 36px; max-width: 56ch; }
-.involvementGrid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; }
-.involvementGrid:not(:has(.event)) { grid-template-columns: 1fr; }
-.participation { display: grid; gap: 24px; }
+.involvementGrid { display: grid; }
+.participation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; align-items: center; }
+.participation:not(:has(.writeInvitation)) { grid-template-columns: 1fr; }
 .participation h3 { font-size: 32px; margin: 0 0 12px; }
 .participation p { margin: 0 0 16px; max-width: 43ch; }
 .readInvitation { display: flex; align-items: center; gap: 12px; }
-.readInvitation > div { flex: 1; }
-.readInvitation img { width: 30%; }
+.readInvitation > div:first-child { flex: 1; min-width: 0; }
 .writeInvitation { background: var(--soft-cream); padding: 32px; border-radius: 24px; }
 .community { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 48px; margin-top: 96px; padding: 56px; background: var(--deep-teal); color: var(--cream); border-radius: 28px; }
 .community h2 { font-size: clamp(36px, 3.6vw, 52px); margin-bottom: 18px; }
@@ -48,26 +48,6 @@
 .sectionHeading h2 { font-size: 36px; margin: 0; line-height: 1.15; }
 .sectionHeading > a { display: inline-flex; align-items: center; min-height: 44px; gap: 10px; font-size: 14px; color: var(--deep-teal); font-weight: 500; }
 .recent :global(.story-grid) { column-gap: var(--column-gap); }
-.news { margin-top: 80px; }
-.news .sectionHeading { margin-bottom: 14px; }
-.newsIntro { color: var(--muted); font-size: var(--text-body); margin-bottom: 24px; }
-.newsList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
-.newsItem { min-width: 0; }
-.newsItem h3 { font-size: 26px; margin-bottom: 12px; }
-.newsItem h3 a { display: inline-block; min-height: 44px; }
-.newsItem h3 svg { display: inline; vertical-align: middle; color: var(--deep-teal); }
-.newsItem p { color: var(--muted); font-size: var(--text-body); margin-bottom: 12px; }
-.newsSource { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: var(--text-small); }
-.newsSource span:first-child { color: var(--deep-teal); font-weight: 600; }
-.newsSource span:last-child { color: var(--muted); }
-@supports (grid-template-rows: subgrid) {
-  @media (min-width: 768px) {
-    .newsList { row-gap: 12px; }
-    .newsItem { display: grid; grid-template-rows: subgrid; grid-row: span 3; }
-    .newsItem h3, .newsItem p { margin-bottom: 0; }
-    .newsSource { align-content: start; }
-  }
-}
 .topics { margin-top: 88px; }
 .topicList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 72px; }
 .topic { display: grid; grid-template-columns: minmax(0, 1fr) 20px; align-items: start; gap: 20px 16px; padding: 8px 0; transition: transform var(--duration-ui) var(--ease-out); }
@@ -75,8 +55,8 @@
 .topic p { margin: 0; font-size: var(--text-body); color: var(--muted); line-height: 1.6; }
 .topic > svg { margin-top: 4px; color: var(--deep-teal); }
 .event { min-width: 0; display: flex; flex-direction: column; padding: 36px; border-radius: 24px; background: var(--teal); }
-.event h3 { font-size: 36px; margin-bottom: 24px; }
-.event h4 { font-size: 30px; line-height: 1.2; margin-bottom: 16px; text-wrap: pretty; }
+.event h2 { font-size: 32px; margin-bottom: 20px; }
+.event h3 { font-size: 28px; line-height: 1.2; margin-bottom: 16px; text-wrap: pretty; }
 .event > p { color: var(--deep-teal); font-size: var(--text-body); margin-bottom: 16px; }
 .eventDetails { display: grid; gap: 10px; font-size: 14px; }
 .eventDetails p { display: flex; align-items: flex-start; gap: 10px; margin: 0; }
@@ -92,23 +72,18 @@
 .subscribe :global(.consent-copy) { font-size: var(--text-small); }
 
 @media (hover: hover) and (pointer: fine) {
-  .newsItem h3 a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .feature h2 a:hover { color: var(--deep-teal); }
   .readLink:hover, .sectionHeading > a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .topic:hover { transform: translateY(-3px); }
 }
 .topic:active { transform: scale(.985); }
 @media (max-width: 1023px) {
-  .hero { min-height: 700px; padding-block: 48px 64px; }
-  .heroVisual { width: 420px; height: 500px; right: -28px; bottom: 8px; }
-  .heading > p { max-width: 360px; font-size: 18px; }
+  .hero { gap: 32px; padding-block: 40px 56px; }
+  .heading > p { font-size: 16px; }
   .mission { padding: 40px; gap: 40px; }
-  .involvementGrid { grid-template-columns: 1fr 1fr; }
-  .readInvitation img { display: none; }
+  .participation { gap: 28px; }
   .community { padding: 40px; gap: 28px; }
-  .newsList { grid-template-columns: 1fr; gap: 28px; }
-  .newsItem { max-width: 65ch; }
-  .heading h1 { font-size: clamp(58px, 7.5vw, 76px); }
+  .heading h1 { font-size: clamp(32px, 4vw, 42px); }
   .featureCopy { padding: 32px; }
   .feature h2 { font-size: 36px; }
   .featureCopy > p { font-size: var(--text-body); }
@@ -117,20 +92,18 @@
   .subscribe { padding: 40px; gap: 32px; }
 }
 @media (max-width: 767px) {
-  .hero { min-height: 800px; padding: 40px 0 380px; }
-  .heading h1 { font-size: clamp(30px, 9.6vw, 58px); margin-bottom: 28px; }
+  .hero { grid-template-columns: 1fr; gap: 32px; padding: 32px 0 40px; }
+  .heading h1 { font-size: clamp(28px, 8.4vw, 40px); margin-bottom: 20px; }
   .seedField::before { background-size: 88px 100px; opacity: .035; }
   .heading > p { font-size: 17px; margin-bottom: 24px; }
   .explore { margin-top: 16px; }
-  .heroVisual { width: 320px; height: 390px; right: calc(50% - 160px); bottom: 10px; }
   .mission { grid-template-columns: 1fr; gap: 24px; padding: 32px 24px; border-radius: 24px; }
   .mission h2 { font-size: 36px; max-width: none; margin-bottom: 8px; }
   .missionCopy p { font-size: 17px; }
   .involvement { margin-top: 56px; }
   .sectionIntro { font-size: 16px; margin-top: -8px; margin-bottom: 28px; }
-  .involvementGrid { grid-template-columns: 1fr; gap: 24px; }
+  .participation { grid-template-columns: 1fr; gap: 24px; }
   .participation h3 { font-size: 30px; }
-  .readInvitation img { display: block; width: 28%; }
   .writeInvitation { padding: 24px; }
   .community { grid-template-columns: 1fr; gap: 28px; padding: 32px 24px; margin-top: 56px; border-radius: 24px; }
   .community h2 { font-size: 36px; }
@@ -145,18 +118,17 @@
   .feature h2 { font-size: 32px; }
   .featureCopy > p { font-size: var(--text-body); margin-bottom: 20px; }
   .readLink { margin-top: 16px; }
-  .recent, .news, .topics, .subscribe { margin-top: 56px; }
+  .recent, .topics, .subscribe { margin-top: 56px; }
   .sectionHeading { flex-wrap: wrap; gap: 8px 16px; margin-bottom: 22px; }
   .sectionHeading h2 { font-size: 28px; }
   .sectionHeading > a { font-size: var(--text-small); gap: 6px; }
   .recent :global(.story-grid) { grid-template-columns: 1fr; gap: 20px; }
   .topicList { grid-template-columns: 1fr; gap: 12px; }
-  .newsList { grid-template-columns: 1fr; gap: 24px; }
   .topic { padding: 12px 0; gap: 12px; }
   .topic h3 { font-size: 30px; margin-bottom: 8px; }
   .event { padding: 28px 24px; }
-  .event h3 { font-size: 32px; margin-bottom: 16px; }
-  .event h4 { font-size: 28px; }
+  .event h2 { font-size: 30px; margin-bottom: 16px; }
+  .event h3 { font-size: 26px; }
   .subscribe { grid-template-columns: 1fr; gap: 32px; padding: 32px 24px; border-radius: 24px; }
   .subscribe h2 { font-size: 36px; }
 }
@@ -176,10 +148,8 @@
   :global(html[data-arrival=intro]) .seedField { animation-delay: 800ms; }
   .mission:global([data-reveal=visible]) > div:last-child,
   .community:global([data-reveal=visible]) .communityActions { animation: sectionIn 420ms var(--ease-out) 80ms both; }
-  .recent:global([data-reveal=visible]) :global(.story-card):nth-child(2),
-  .news:global([data-reveal=visible]) .newsItem:nth-child(2) { animation: sectionIn 420ms var(--ease-out) 80ms both; }
-  .recent:global([data-reveal=visible]) :global(.story-card):nth-child(3),
-  .news:global([data-reveal=visible]) .newsItem:nth-child(3) { animation: sectionIn 420ms var(--ease-out) 160ms both; }
+  .recent:global([data-reveal=visible]) :global(.story-card):nth-child(2) { animation: sectionIn 420ms var(--ease-out) 80ms both; }
+  .recent:global([data-reveal=visible]) :global(.story-card):nth-child(3) { animation: sectionIn 420ms var(--ease-out) 160ms both; }
 }
 @keyframes fieldIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes sectionIn { from { transform: translateY(12px); } to { transform: none; } }
