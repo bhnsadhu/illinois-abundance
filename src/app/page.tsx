@@ -11,6 +11,7 @@ import { EventJoinLink } from '@/components/event-join-link';
 import { EventRecurrence } from '@/components/event-recurrence';
 import { HomeTitle } from '@/components/home-title';
 import { Garden } from '@/components/garden';
+import { BrandPeople } from '@/components/brand-people';
 import { getStories, getTopics, getNextEvent, coverFor, coverAlt } from '@/lib/data';
 import { eventLocation } from '@/lib/event-links';
 import { eventDate } from '@/lib/syndication';
@@ -138,9 +139,12 @@ export default async function Home() {
 
     <Reveal className={styles.community} aria-labelledby="community-title">
       <div><h2 id="community-title">{home.communityTitle}</h2><p>{home.communityBody}</p></div>
-      <div className={styles.communityActions}>
-        <a className="button button-light" href={content.about.socialHref} target="_blank" rel="noopener noreferrer">{content.about.socialLabel} <ArrowUpRight size={17}/><span className="sr-only"> (opens in a new tab)</span></a>
-        <a className="text-link" href={`mailto:${content.branding.contactEmail}`}>{content.navigation.contactLabel} <ArrowRight size={17}/></a>
+      <div className={styles.communityInvitation}>
+        <BrandPeople className={styles.communityPeople}/>
+        <div className={styles.communityActions}>
+          <a className="button button-light" href={content.about.socialHref} target="_blank" rel="noopener noreferrer">{content.about.socialLabel} <ArrowUpRight size={17}/><span className="sr-only"> (opens in a new tab)</span></a>
+          <a className="text-link" href={`mailto:${content.branding.contactEmail}`}>{content.navigation.contactLabel} <ArrowRight size={17}/></a>
+        </div>
       </div>
     </Reveal>
   </div>;

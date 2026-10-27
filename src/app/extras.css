@@ -20,6 +20,13 @@
   max-width: 18ch;
   margin-inline: 0;
 }
+.events-heading-title { display: flex; align-items: center; justify-content: space-between; gap: 32px; max-width: 800px; margin-bottom: 24px; }
+.events-heading-title h1 { margin-bottom: 0; min-width: 0; }
+.events-heading-title .events-people { width: 160px; height: 100px; }
+@media (max-width: 767px) {
+  .events-heading-title { gap: 20px; }
+  .events-heading-title .events-people { width: clamp(64px, 22vw, 96px); height: auto; aspect-ratio: 8 / 5; }
+}
 
 .extras-section {
   margin-top: 80px;

@@ -64,7 +64,7 @@ test('the compact opening pairs the introduction with an event and links to a se
     expect(eventBox.x).toBeGreaterThanOrEqual(titleBox.x + titleBox.width);
     expect(eventBox.y + eventBox.height).toBeLessThan(700);
   }
-  await expect(page.locator('.brand-people image')).toHaveAttribute('href', '/brand/logo-transparent.png');
+  await expect(page.locator('.site-header .brand-people image')).toHaveAttribute('href', '/brand/logo-transparent.png');
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', '/brand/favicon.svg');
   if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
   const navigation = page.getByRole('navigation', { name: isMobile ? 'Mobile navigation' : 'Main navigation' });
