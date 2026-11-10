@@ -63,7 +63,7 @@ One Next.js app on Vercel with a serverless Postgres database. Pages read only f
 - **Lint and typecheck are clean** (`npm run lint`, `npm run typecheck`).
 - **Public pages are tested to hide what they should.** Tests check that an anonymous visitor cannot fetch an unpublished cover and that hidden topics stay out of the directory.
 
-**Not measured yet.** The browser tests in [tests/browser](tests/browser) exist but were not run for this README. There are no performance, accessibility-audit, or load numbers, and no reader or writer analytics are reported here. `npm run build` currently stops at the framework's own security check on the installed Next.js version, so a dependency upgrade is needed before the next deploy.
+**Not measured yet.** The browser tests in [tests/browser](tests/browser) exist but were not run for this README. There are no performance, accessibility-audit, or load numbers, and no reader or writer analytics are reported here. The full check (`npm run check`: lint, typecheck, tests, production build) passes on Next.js 16.4.6.
 
 ## How it was built
 
@@ -114,6 +114,6 @@ docs/             The news source review
 
 ## What's next
 
-**Known limits.** The build needs a Next.js upgrade (see above). The browser tests have not been run for this README. News links are curated by hand, and the digest is sent by hand.
+**Known limits.** The browser tests have not been run for this README, and `npm audit` still reports high-severity advisories in transitive dependencies (the blob client, `undici`, `zod`) that need a breaking upgrade. News links are curated by hand, and the digest is sent by hand.
 
-**Next.** Upgrade Next.js and re-run the full check, run the browser tests and an accessibility audit, and measure how long a story takes from draft to publish.
+**Next.** Clear the remaining dependency advisories, run the browser tests and an accessibility audit, and measure how long a story takes from draft to publish.
